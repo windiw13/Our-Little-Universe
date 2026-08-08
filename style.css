@@ -22,7 +22,7 @@ body.pixel-theme {
     position: relative;
 }
 
-.auth-container, .home-container {
+.auth-container, .home-container, .sub-screen {
     width: 100%;
     max-width: 420px;
     z-index: 1;
@@ -195,7 +195,7 @@ body.pixel-theme {
 }
 
 /* Home Layout */
-.home-container { padding-bottom: 90px; }
+.home-container, .sub-screen { padding-bottom: 90px; }
 .home-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
 .greeting-text { font-size: 11px; color: #8d7b68; display: block; }
 .home-header h2 { font-size: 18px; color: #3d405b; }
@@ -213,6 +213,18 @@ body.pixel-theme {
     align-items: center;
     gap: 6px;
 }
+
+/* ON THIS DAY WIDGET STYLING */
+.on-this-day-card {
+    background: #fff3b0;
+    border: 2px solid #e07a5f;
+    margin-bottom: 14px;
+    text-align: center;
+}
+.otd-badge { font-size: 10px; font-weight: 800; color: #e07a5f; text-transform: uppercase; margin-bottom: 4px; }
+.on-this-day-card h4 { font-size: 14px; color: #3d405b; font-weight: 800; margin-bottom: 8px; }
+.otd-img { width: 100%; max-height: 200px; object-fit: cover; border-radius: 12px; border: 2px solid #f2cc8f; margin-bottom: 8px; }
+.otd-caption { font-size: 12px; font-weight: 600; color: #4a3e3d; }
 
 .counter-card {
     text-align: center;
@@ -300,6 +312,34 @@ body.pixel-theme {
 .nav-item span { font-size: 9px; font-weight: 700; margin-top: 2px; }
 .nav-item.active { color: #e07a5f; }
 
+/* SUB-SCREEN STYLING (JOURNEY, MEMORIES, HEARTNOTES) */
+.sub-screen-header { margin-bottom: 16px; text-align: center; }
+.sub-screen-header h3 { font-size: 18px; color: #3d405b; font-weight: 800; }
+.sub-screen-header p { font-size: 12px; color: #8d7b68; }
+
+/* Journey Timeline */
+.timeline-container { display: flex; flex-direction: column; gap: 12px; position: relative; }
+.timeline-item { background: #ffffff; border: 2px solid #f2cc8f; border-radius: 14px; padding: 12px; position: relative; }
+.timeline-date { font-size: 10px; font-weight: 800; color: #e07a5f; background: #fdf6ec; padding: 2px 8px; border-radius: 6px; display: inline-block; margin-bottom: 4px; }
+.timeline-title { font-size: 13px; font-weight: 800; color: #3d405b; }
+.timeline-desc { font-size: 11px; color: #8d7b68; margin-top: 2px; }
+
+/* Memories Grid */
+.memories-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+.mem-card { background: #ffffff; border: 2px solid #f2cc8f; border-radius: 12px; padding: 8px; text-align: center; }
+.mem-card img { width: 100%; height: 110px; object-fit: cover; border-radius: 8px; margin-bottom: 6px; }
+.mem-title { font-size: 11px; font-weight: 800; color: #3d405b; }
+.mem-desc { font-size: 9px; color: #8d7b68; font-style: italic; }
+
+/* Heartnotes List */
+.notes-list { display: flex; flex-direction: column; gap: 10px; }
+.note-card { background: #fff3b0; border: 2px solid #f2cc8f; border-radius: 14px; padding: 12px; }
+.note-card .note-header { display: flex; justify-content: space-between; margin-bottom: 6px; }
+.note-card .note-author { font-size: 10px; font-weight: 800; color: #e07a5f; }
+.note-card .note-date { font-size: 9px; color: #8d7b68; }
+.note-card .note-title { font-size: 12px; font-weight: 800; color: #3d405b; margin-bottom: 4px; }
+.note-card .note-content { font-size: 11px; color: #4a3e3d; line-height: 1.4; white-space: pre-line; }
+
 /* Modal Styling */
 .modal {
     position: fixed;
@@ -351,7 +391,6 @@ body.pixel-theme {
     width: 100%; height: 80px; background: #fdf6ec; border: 2px solid #f2cc8f; border-radius: 12px; padding: 10px; color: #3d405b; font-size: 12px; outline: none; margin-bottom: 10px; resize: none;
 }
 
-/* STYLING DESAIN WISHLIST KITA */
 .add-wish-form {
     background: #fdf6ec;
     border: 2px dashed #f2cc8f;
@@ -373,48 +412,16 @@ body.pixel-theme {
     outline: none;
 }
 
-.wishlist-list {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    max-height: 250px;
-    overflow-y: auto;
-    padding-right: 2px;
-}
-
-.wish-card {
-    background: #fdf6ec;
-    border: 2px solid #f2cc8f;
-    border-radius: 12px;
-    padding: 10px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.wish-card.done {
-    background: #e8f5e9;
-    border-color: #81b29a;
-    opacity: 0.85;
-}
-
-.wish-card.done .wish-title {
-    text-decoration: line-through;
-    color: #81b29a;
-}
+.wishlist-list { display: flex; flex-direction: column; gap: 8px; max-height: 250px; overflow-y: auto; padding-right: 2px; }
+.wish-card { background: #fdf6ec; border: 2px solid #f2cc8f; border-radius: 12px; padding: 10px; display: flex; justify-content: space-between; align-items: center; }
+.wish-card.done { background: #e8f5e9; border-color: #81b29a; opacity: 0.85; }
+.wish-card.done .wish-title { text-decoration: line-through; color: #81b29a; }
 
 .wish-info .wish-cat { font-size: 9px; background: #ffffff; padding: 2px 6px; border-radius: 6px; font-weight: 700; color: #8d7b68; border: 1px solid #f2cc8f; }
 .wish-info .wish-title { font-size: 12px; font-weight: 800; color: #3d405b; margin: 4px 0 2px 0; }
 .wish-info .wish-author { font-size: 9px; color: #8d7b68; }
 
-.btn-toggle-wish {
-    background: #ffffff;
-    border: 2px solid #f2cc8f;
-    border-radius: 8px;
-    padding: 6px 8px;
-    font-size: 12px;
-    cursor: pointer;
-}
+.btn-toggle-wish { background: #ffffff; border: 2px solid #f2cc8f; border-radius: 8px; padding: 6px 8px; font-size: 12px; cursor: pointer; }
 .wish-card.done .btn-toggle-wish { border-color: #81b29a; }
 
 /* TAMPILAN FULL-SCREEN RUANGAN MOCHI */
@@ -439,31 +446,10 @@ body.pixel-theme {
     border-bottom: 2px solid #f2cc8f;
 }
 
-.btn-back {
-    background: #ffffff;
-    border: 2px solid #e07a5f;
-    padding: 6px 12px;
-    border-radius: 12px;
-    font-weight: 800;
-    font-size: 11px;
-    color: #e07a5f;
-    cursor: pointer;
-}
-
+.btn-back { background: #ffffff; border: 2px solid #e07a5f; padding: 6px 12px; border-radius: 12px; font-weight: 800; font-size: 11px; color: #e07a5f; cursor: pointer; }
 .pet-status-bars { display: flex; gap: 6px; }
 
-.status-pill {
-    background: #ffffff;
-    padding: 4px 8px;
-    border-radius: 12px;
-    font-size: 10px;
-    font-weight: 700;
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    border: 1px solid #f2cc8f;
-}
-
+.status-pill { background: #ffffff; padding: 4px 8px; border-radius: 12px; font-size: 10px; font-weight: 700; display: flex; align-items: center; gap: 4px; border: 1px solid #f2cc8f; }
 .bar-bg { width: 35px; height: 8px; background: #fdf6ec; border-radius: 4px; overflow: hidden; border: 1px solid #f2cc8f; }
 .bar-fill { height: 100%; transition: width 0.3s; }
 .bar-fill.hunger { background: #f4a261; }
@@ -485,43 +471,15 @@ body.pixel-theme {
     touch-action: none;
 }
 
-.pet-speech-bubble {
-    background: #ffffff;
-    border: 2px solid #81b29a;
-    border-radius: 14px;
-    padding: 8px 14px;
-    font-size: 12px;
-    font-weight: 800;
-    color: #3d405b;
-    margin-bottom: 24px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-}
-
-.draggable-item {
-    position: absolute;
-    font-size: 42px;
-    cursor: grab;
-    z-index: 20;
-    top: 60px;
-    left: 40px;
-    animation: pulse 1s infinite alternate;
-}
+.pet-speech-bubble { background: #ffffff; border: 2px solid #81b29a; border-radius: 14px; padding: 8px 14px; font-size: 12px; font-weight: 800; color: #3d405b; margin-bottom: 24px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+.draggable-item { position: absolute; font-size: 42px; cursor: grab; z-index: 20; top: 60px; left: 40px; animation: pulse 1s infinite alternate; }
 .draggable-item:active { cursor: grabbing; }
 
 .mochi-character-box {
-    position: relative;
-    width: 120px; height: 110px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    cursor: pointer;
-    animation: mochiBounce 1.5s infinite ease-in-out;
+    position: relative; width: 120px; height: 110px; display: flex; flex-direction: column; align-items: center; cursor: pointer; animation: mochiBounce 1.5s infinite ease-in-out;
 }
 
-@keyframes mochiBounce {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-10px); }
-}
+@keyframes mochiBounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
 
 .mochi-ears { display: flex; justify-content: space-between; width: 80px; position: absolute; top: 2px; z-index: 1; }
 .mochi-ears .ear { width: 24px; height: 24px; background: #e07a5f; border-radius: 4px 12px 0 0; }
@@ -529,65 +487,27 @@ body.pixel-theme {
 .mochi-ears .ear.right { transform: rotate(15deg); }
 
 .mochi-body {
-    width: 100px; height: 85px;
-    background: #f4a261;
-    border: 3px solid #3d405b;
-    border-radius: 45% 45% 40% 40%;
-    position: absolute; bottom: 10px;
-    display: flex; justify-content: center; align-items: center;
-    box-shadow: inset -5px -5px 0 rgba(0,0,0,0.1);
+    width: 100px; height: 85px; background: #f4a261; border: 3px solid #3d405b; border-radius: 45% 45% 40% 40%; position: absolute; bottom: 10px; display: flex; justify-content: center; align-items: center; box-shadow: inset -5px -5px 0 rgba(0,0,0,0.1);
 }
 
 .mochi-face { text-align: center; }
 .mochi-eyes { display: flex; justify-content: space-between; width: 44px; margin: 0 auto 2px auto; }
 .mochi-eyes .eye { width: 10px; height: 10px; background: #3d405b; border-radius: 50%; animation: eyeBlink 3s infinite; }
 
-@keyframes eyeBlink {
-    0%, 96%, 100% { transform: scaleY(1); }
-    98% { transform: scaleY(0.1); }
-}
+@keyframes eyeBlink { 0%, 96%, 100% { transform: scaleY(1); } 98% { transform: scaleY(0.1); } }
 
 .mochi-cheeks { display: flex; justify-content: space-between; width: 60px; margin: -4px auto 0 auto; }
 .mochi-cheeks .cheek { width: 12px; height: 7px; background: #f28482; border-radius: 50%; opacity: 0.8; }
 .mochi-mouth { font-size: 16px; font-weight: 800; color: #3d405b; line-height: 1; }
 .mochi-shadow { width: 80px; height: 12px; background: rgba(0,0,0,0.1); border-radius: 50%; position: absolute; bottom: -2px; }
 
-.pet-room-nav {
-    background: #ffffff;
-    border-top: 3px solid #f2cc8f;
-    padding: 12px 20px;
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-}
-
-.room-nav-btn {
-    background: #fdf6ec;
-    border: 2px solid #f2cc8f;
-    border-radius: 16px;
-    padding: 10px 20px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    cursor: pointer;
-    font-size: 11px;
-    font-weight: 800;
-    color: #3d405b;
-    box-shadow: 0 3px 0 #f2cc8f;
-    transition: 0.1s;
-}
-
+.pet-room-nav { background: #ffffff; border-top: 3px solid #f2cc8f; padding: 12px 20px; display: flex; justify-content: space-around; align-items: center; }
+.room-nav-btn { background: #fdf6ec; border: 2px solid #f2cc8f; border-radius: 16px; padding: 10px 20px; display: flex; flex-direction: column; align-items: center; cursor: pointer; font-size: 11px; font-weight: 800; color: #3d405b; box-shadow: 0 3px 0 #f2cc8f; transition: 0.1s; }
 .room-nav-btn:active { transform: translateY(2px); box-shadow: none; }
 .room-nav-btn .nav-icon { font-size: 24px; margin-bottom: 2px; }
 
-/* ANIMASI MOCHI MAKAN & MANDI */
 .mochi-character-box.happy-eat { animation: eatJump 0.4s infinite alternate ease-in-out; }
 @keyframes eatJump { 0% { transform: translateY(0) scale(1); } 100% { transform: translateY(-15px) scale(1.1); } }
 
-.mochi-character-box.babbing-soap::after {
-    content: '🫧🫧🫧';
-    position: absolute;
-    top: -20px; font-size: 24px;
-    animation: soapFloat 1s infinite alternate;
-}
+.mochi-character-box.babbing-soap::after { content: '🫧🫧🫧'; position: absolute; top: -20px; font-size: 24px; animation: soapFloat 1s infinite alternate; }
 @keyframes soapFloat { 0% { transform: translateY(0); opacity: 0.5; } 100% { transform: translateY(-10px); opacity: 1; } }

@@ -205,6 +205,10 @@ document.getElementById('btnEnterApp')?.addEventListener('click', () => {
         listenStartDate(currentUserData.coupleSpaceId);
         listenMochiStats(currentUserData.coupleSpaceId);
         listenWishlist(currentUserData.coupleSpaceId);
+        checkOnThisDayMemories(currentUserData.coupleSpaceId);
+        listenJourney(currentUserData.coupleSpaceId);
+        listenMemories(currentUserData.coupleSpaceId);
+        listenHeartnotes(currentUserData.coupleSpaceId);
     }
 });
 
@@ -263,6 +267,48 @@ async function updateUserPresence(spaceId) {
     });
 }
 
+// REVISI 1: WIDGET ON THIS DAY (KENANGAN TANGGAL SAMA DI MASA LALU)
+function checkOnThisDayMemories(spaceId) {
+    if (!spaceId) return;
+
+    const today = new Date();
+    const currentMonthDay = `${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+
+    const memRef = collection(db, "couple_spaces", spaceId, "memories");
+    onSnapshot(memRef, (snapshot) => {
+        const widget = document.getElementById('onThisDayWidget');
+        let matchFound = false;
+
+        snapshot.docs.forEach((docSnap) => {
+            const data = docSnap.data();
+            if (data.date) {
+                const memDate = new Date(data.date);
+                const memMonthDay = `${String(memDate.getMonth() + 1).padStart(2, '0')}-${String(memDate.getDate()).padStart(2, '0')}`;
+
+                if (memMonthDay === currentMonthDay && memDate.getFullYear() < today.getFullYear()) {
+                    matchFound = true;
+                    const yearsAgo = today.getFullYear() - memDate.getFullYear();
+
+                    document.getElementById('otdTitle').innerText = `${yearsAgo} Tahun Lalu Hari Ini ✨`;
+                    document.getElementById('otdCaption').innerText = `"${data.title}" ${data.desc ? '- ' + data.desc : ''}`;
+
+                    const imgEl = document.getElementById('otdImage');
+                    if (data.url) {
+                        imgEl.src = data.url;
+                        imgEl.classList.remove('hidden');
+                    } else {
+                        imgEl.classList.add('hidden');
+                    }
+
+                    widget?.classList.remove('hidden');
+                }
+            }
+        });
+
+        if (!matchFound) widget?.classList.add('hidden');
+    });
+}
+
 // START DATE COUNTER
 const startDateInput = document.getElementById('startDateInput');
 
@@ -293,7 +339,191 @@ function calculateDaysTogether(startDateStr) {
     document.getElementById('daysTogetherCount').innerText = isNaN(diffDays) ? 0 : diffDays;
 }
 
-// REALTIME WISHLIST FEATURE
+// NAVIGATION BETWEEN SUB-SCREENS (HOME, JOURNEY, MEMORIES, HEARTNOTES)
+const homeScreen = document.getElementById('homeScreen');
+const journeyScreen = document.getElementById('journeyScreen');
+const memoriesScreen = document.getElementById('memoriesScreen');
+const heartnotesScreen = document.getElementById('heartnotesScreen');
+
+function showSubScreen(screenToShow) {
+    [homeScreen, journeyScreen, memoriesScreen, heartnotesScreen].forEach(s => s?.classList.add('hidden'));
+    screenToShow?.classList.remove('hidden');
+}
+
+// Event Listeners Navigasi Bawah
+document.querySelectorAll('[id^="navHome"]').forEach(btn => btn.addEventListener('click', () => showSubScreen(homeScreen)));
+document.querySelectorAll('[id^="navJourney"]').forEach(btn => btn.addEventListener('click', () => showSubScreen(journeyScreen)));
+document.querySelectorAll('[id^="navMemories"]').forEach(btn => btn.addEventListener('click', () => showSubScreen(memoriesScreen)));
+document.querySelectorAll('[id^="navHeartnotes"]').forEach(btn => btn.addEventListener('click', () => showSubScreen(heartnotesScreen)));
+
+// 1. FEATURE: JOURNEY (MILESTONES)
+document.getElementById('btnOpenAddJourney')?.addEventListener('click', () => {
+    document.getElementById('addJourneyForm')?.classList.toggle('hidden');
+});
+
+document.getElementById('addJourneyForm')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const title = document.getElementById('journeyTitleInput').value.trim();
+    const date = document.getElementById('journeyDateInput').value;
+    const desc = document.getElementById('journeyDescInput').value.trim();
+
+    if (!currentUserData || !currentUserData.coupleSpaceId) return;
+
+    await addDoc(collection(db, "couple_spaces", currentUserData.coupleSpaceId, "journey"), {
+        title, date, desc, author: currentUserData.nickname, createdAt: new Date()
+    });
+
+    document.getElementById('journeyTitleInput').value = '';
+    document.getElementById('journeyDescInput').value = '';
+    document.getElementById('addJourneyForm').classList.add('hidden');
+});
+
+function listenJourney(spaceId) {
+    if (!spaceId) return;
+    const ref = collection(db, "couple_spaces", spaceId, "journey");
+    const q = query(ref, orderBy("date", "asc"));
+
+    onSnapshot(q, (snapshot) => {
+        const container = document.getElementById('journeyTimelineContainer');
+        if (!container) return;
+        container.innerHTML = '';
+
+        if (snapshot.empty) {
+            container.innerHTML = '<p class="empty-act">Belum ada jejak perjalanan. Yuk catat momen pertama kalian!</p>';
+            return;
+        }
+
+        snapshot.docs.forEach(docSnap => {
+            const data = docSnap.data();
+            const item = document.createElement('div');
+            item.className = 'timeline-item';
+            item.innerHTML = `
+                <span class="timeline-date">📅 ${data.date}</span>
+                <div class="timeline-title">${data.title}</div>
+                ${data.desc ? `<div class="timeline-desc">${data.desc}</div>` : ''}
+            `;
+            container.appendChild(item);
+        });
+    });
+}
+
+// 2. FEATURE: MEMORIES (DAILY PHOTO & ALBUM)
+document.getElementById('btnOpenAddMemory')?.addEventListener('click', () => {
+    document.getElementById('addMemoryForm')?.classList.toggle('hidden');
+});
+
+document.getElementById('addMemoryForm')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const title = document.getElementById('memTitleInput').value.trim();
+    const url = document.getElementById('memUrlInput').value.trim();
+    const date = document.getElementById('memDateInput').value;
+    const desc = document.getElementById('memDescInput').value.trim();
+
+    if (!currentUserData || !currentUserData.coupleSpaceId) return;
+
+    await addDoc(collection(db, "couple_spaces", currentUserData.coupleSpaceId, "memories"), {
+        title, url, date, desc, author: currentUserData.nickname, createdAt: new Date()
+    });
+
+    document.getElementById('memTitleInput').value = '';
+    document.getElementById('memUrlInput').value = '';
+    document.getElementById('memDescInput').value = '';
+    document.getElementById('addMemoryForm').classList.add('hidden');
+});
+
+function listenMemories(spaceId) {
+    if (!spaceId) return;
+    const ref = collection(db, "couple_spaces", spaceId, "memories");
+    const q = query(ref, orderBy("date", "desc"));
+
+    onSnapshot(q, (snapshot) => {
+        const container = document.getElementById('memoriesGridContainer');
+        if (!container) return;
+        container.innerHTML = '';
+
+        if (snapshot.empty) {
+            container.innerHTML = '<p class="empty-act">Belum ada foto kenangan. Upload foto manis kalian yuk!</p>';
+            return;
+        }
+
+        snapshot.docs.forEach(docSnap => {
+            const data = docSnap.data();
+            const card = document.createElement('div');
+            card.className = 'mem-card';
+            card.innerHTML = `
+                <img src="${data.url}" alt="${data.title}">
+                <div class="mem-title">${data.title}</div>
+                ${data.desc ? `<div class="mem-desc">"${data.desc}"</div>` : ''}
+            `;
+            container.appendChild(card);
+        });
+    });
+}
+
+// 3. FEATURE: HEARTNOTES (UNSAID THOUGHTS)
+document.getElementById('btnOpenAddNote')?.addEventListener('click', () => {
+    document.getElementById('addNoteForm')?.classList.toggle('hidden');
+});
+
+document.getElementById('addNoteForm')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const title = document.getElementById('noteTitleInput').value.trim();
+    const content = document.getElementById('noteContentInput').value.trim();
+
+    if (!currentUserData || !currentUserData.coupleSpaceId) return;
+
+    await addDoc(collection(db, "couple_spaces", currentUserData.coupleSpaceId, "heartnotes"), {
+        title, content, author: currentUserData.nickname, createdAt: new Date()
+    });
+
+    await addDoc(collection(db, "couple_spaces", currentUserData.coupleSpaceId, "notifications"), {
+        type: "note",
+        senderUid: currentUserData.uid,
+        senderName: currentUserData.nickname,
+        message: `menulis Heartnote baru: "${title}"`,
+        timestamp: new Date()
+    });
+
+    document.getElementById('noteTitleInput').value = '';
+    document.getElementById('noteContentInput').value = '';
+    document.getElementById('addNoteForm').classList.add('hidden');
+});
+
+function listenHeartnotes(spaceId) {
+    if (!spaceId) return;
+    const ref = collection(db, "couple_spaces", spaceId, "heartnotes");
+    const q = query(ref, orderBy("createdAt", "desc"));
+
+    onSnapshot(q, (snapshot) => {
+        const container = document.getElementById('notesContainer');
+        if (!container) return;
+        container.innerHTML = '';
+
+        if (snapshot.empty) {
+            container.innerHTML = '<p class="empty-act">Belum ada Heartnotes. Tulis ucapan manis untuk pasanganmu!</p>';
+            return;
+        }
+
+        snapshot.docs.forEach(docSnap => {
+            const data = docSnap.data();
+            const timeStr = data.createdAt ? new Date(data.createdAt.toDate()).toLocaleDateString() : '';
+
+            const card = document.createElement('div');
+            card.className = 'note-card';
+            card.innerHTML = `
+                <div class="note-header">
+                    <span class="note-author">Dari: ${data.author}</span>
+                    <span class="note-date">${timeStr}</span>
+                </div>
+                <div class="note-title">${data.title}</div>
+                <div class="note-content">${data.content}</div>
+            `;
+            container.appendChild(card);
+        });
+    });
+}
+
+// REALTIME WISHLIST
 const wishlistModal = document.getElementById('wishlistModal');
 const btnOpenAddWish = document.getElementById('btnOpenAddWish');
 const addWishForm = document.getElementById('addWishForm');
@@ -301,9 +531,7 @@ const addWishForm = document.getElementById('addWishForm');
 document.getElementById('btnWishlistModal')?.addEventListener('click', () => wishlistModal?.classList.remove('hidden'));
 document.getElementById('closeWishlistModal')?.addEventListener('click', () => wishlistModal?.classList.add('hidden'));
 
-btnOpenAddWish?.addEventListener('click', () => {
-    addWishForm?.classList.toggle('hidden');
-});
+btnOpenAddWish?.addEventListener('click', () => addWishForm?.classList.toggle('hidden'));
 
 addWishForm?.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -313,20 +541,7 @@ addWishForm?.addEventListener('submit', async (e) => {
     if (!title || !currentUserData || !currentUserData.coupleSpaceId) return;
 
     await addDoc(collection(db, "couple_spaces", currentUserData.coupleSpaceId, "wishlists"), {
-        title,
-        category,
-        author: currentUserData.nickname,
-        authorUid: currentUserData.uid,
-        isDone: false,
-        createdAt: new Date()
-    });
-
-    await addDoc(collection(db, "couple_spaces", currentUserData.coupleSpaceId, "notifications"), {
-        type: "wish",
-        senderUid: currentUserData.uid,
-        senderName: currentUserData.nickname,
-        message: `menambahkan wishlist baru: "${title}"`,
-        timestamp: new Date()
+        title, category, author: currentUserData.nickname, authorUid: currentUserData.uid, isDone: false, createdAt: new Date()
     });
 
     document.getElementById('wishTitleInput').value = '';
@@ -335,7 +550,6 @@ addWishForm?.addEventListener('submit', async (e) => {
 
 function listenWishlist(spaceId) {
     if (!spaceId) return;
-
     const wishRef = collection(db, "couple_spaces", spaceId, "wishlists");
     const q = query(wishRef, orderBy("createdAt", "desc"));
 
@@ -365,28 +579,15 @@ function listenWishlist(spaceId) {
                     ${data.isDone ? '🎉 Terwujud' : '⏳ Tandai'}
                 </button>
             `;
-
             container.appendChild(card);
         });
 
-        // Event listener untuk tombol Tandai Terwujud
         document.querySelectorAll('.btn-toggle-wish').forEach(btn => {
             btn.addEventListener('click', async (e) => {
                 const wishId = e.target.getAttribute('data-id');
                 const currentDone = e.target.getAttribute('data-done') === 'true';
-
                 const docRef = doc(db, "couple_spaces", spaceId, "wishlists", wishId);
                 await updateDoc(docRef, { isDone: !currentDone });
-
-                if (!currentDone) {
-                    await addDoc(collection(db, "couple_spaces", spaceId, "notifications"), {
-                        type: "wish",
-                        senderUid: currentUserData.uid,
-                        senderName: currentUserData.nickname,
-                        message: `mewujudkan wishlist! 🎉`,
-                        timestamp: new Date()
-                    });
-                }
             });
         });
     });
@@ -602,8 +803,8 @@ function showNotifBanner(type, sender, message) {
     const msgEl = document.getElementById('notifMessage');
 
     if (iconEl && titleEl && msgEl && banner) {
-        iconEl.innerText = type === "express" ? "💖" : (type === "mochi" ? "🐱" : (type === "wish" ? "⭐" : "😊"));
-        titleEl.innerText = type === "express" ? "Express Love Masuk! 💖" : (type === "mochi" ? "Mochi Dirawat! 🐱" : (type === "wish" ? "Wishlist Update! ⭐" : "Mood Pasangan Update!"));
+        iconEl.innerText = type === "express" ? "💖" : (type === "mochi" ? "🐱" : (type === "wish" ? "⭐" : (type === "note" ? "💌" : "😊")));
+        titleEl.innerText = type === "express" ? "Express Love Masuk! 💖" : (type === "mochi" ? "Mochi Dirawat! 🐱" : (type === "wish" ? "Wishlist Update! ⭐" : (type === "note" ? "Heartnotes Baru! 💌" : "Mood Pasangan Update!")));
         msgEl.innerText = `${sender}: ${message}`;
 
         banner.classList.remove('hidden');
