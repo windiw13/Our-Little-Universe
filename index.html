@@ -259,9 +259,37 @@
         </div>
     </div>
 
-    <!-- SCREEN RUANGAN MOCHI FULL-SCREEN (ALA TALKING ANGELA & TALKING TOM) -->
+    <!-- MODAL WISHLIST KITA -->
+    <div id="wishlistModal" class="modal hidden">
+        <div class="modal-content wishlist-modal-content">
+            <div class="modal-header">
+                <h3>Wishlist Kita ⭐</h3>
+                <button class="close-modal" id="closeWishlistModal">✕</button>
+            </div>
+            <p class="modal-sub">Impian & rencana seru yang ingin kita wujudkan berdua!</p>
+            
+            <button id="btnOpenAddWish" class="btn-secondary" style="margin-bottom: 12px;">+ Tambah Impian Baru</button>
+
+            <!-- Form Input Wishlist Baru (Hidden Default) -->
+            <form id="addWishForm" class="add-wish-form hidden">
+                <input type="text" id="wishTitleInput" placeholder="Judul impian (contoh: 'Piknik ke Lembang')" required>
+                <select id="wishCategorySelect">
+                    <option value="✈️ Travel">✈️ Travel / Jalan-jalan</option>
+                    <option value="🎁 Barang">🎁 Barang / Koleksi</option>
+                    <option value="💍 Masa Depan">💍 Masa Depan</option>
+                    <option value="🍕 Kuliner">🍕 Kuliner / Date</option>
+                </select>
+                <button type="submit" class="btn-primary" style="padding: 8px; margin-top: 4px;">Simpan Wishlist ➔</button>
+            </form>
+
+            <div id="wishlistContainer" class="wishlist-list">
+                <p class="empty-act">Belum ada wishlist. Yuk buat impian pertama kalian!</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCREEN RUANGAN MOCHI FULL-SCREEN -->
     <div id="petScreen" class="pet-room-container hidden">
-        <!-- Top Status Header -->
         <header class="pet-room-header">
             <button id="btnBackFromPet" class="btn-back">⬅️ Home</button>
             <div class="pet-status-bars">
@@ -271,14 +299,10 @@
             </div>
         </header>
 
-        <!-- Area Ruangan Utama Tempat Mochi Berdiri -->
         <main class="pet-room-view" id="mochiPlayArea">
             <div class="pet-speech-bubble" id="mochiBubble">"Meow! Rawat Mochi berdua ya! 🤍"</div>
-            
-            <!-- Draggable Item (Ikan / Spons / Mainan) -->
             <div id="draggableItem" class="draggable-item hidden">🐟</div>
 
-            <!-- Karakter Kucing Mochi Pou-Style -->
             <div class="mochi-character-box" id="mochiCharacter">
                 <div class="mochi-ears">
                     <span class="ear left"></span>
@@ -301,7 +325,6 @@
             </div>
         </main>
 
-        <!-- Bottom Room Navigation Bar (Ala Talking Angela) -->
         <footer class="pet-room-nav">
             <button id="btnFeedTool" class="room-nav-btn">
                 <span class="nav-icon">🍽️</span>

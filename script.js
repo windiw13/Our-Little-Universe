@@ -204,6 +204,7 @@ document.getElementById('btnEnterApp')?.addEventListener('click', () => {
         listenRealtimeNotifications(currentUserData.coupleSpaceId);
         listenStartDate(currentUserData.coupleSpaceId);
         listenMochiStats(currentUserData.coupleSpaceId);
+        listenWishlist(currentUserData.coupleSpaceId);
     }
 });
 
@@ -292,6 +293,105 @@ function calculateDaysTogether(startDateStr) {
     document.getElementById('daysTogetherCount').innerText = isNaN(diffDays) ? 0 : diffDays;
 }
 
+// REALTIME WISHLIST FEATURE
+const wishlistModal = document.getElementById('wishlistModal');
+const btnOpenAddWish = document.getElementById('btnOpenAddWish');
+const addWishForm = document.getElementById('addWishForm');
+
+document.getElementById('btnWishlistModal')?.addEventListener('click', () => wishlistModal?.classList.remove('hidden'));
+document.getElementById('closeWishlistModal')?.addEventListener('click', () => wishlistModal?.classList.add('hidden'));
+
+btnOpenAddWish?.addEventListener('click', () => {
+    addWishForm?.classList.toggle('hidden');
+});
+
+addWishForm?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const title = document.getElementById('wishTitleInput').value.trim();
+    const category = document.getElementById('wishCategorySelect').value;
+
+    if (!title || !currentUserData || !currentUserData.coupleSpaceId) return;
+
+    await addDoc(collection(db, "couple_spaces", currentUserData.coupleSpaceId, "wishlists"), {
+        title,
+        category,
+        author: currentUserData.nickname,
+        authorUid: currentUserData.uid,
+        isDone: false,
+        createdAt: new Date()
+    });
+
+    await addDoc(collection(db, "couple_spaces", currentUserData.coupleSpaceId, "notifications"), {
+        type: "wish",
+        senderUid: currentUserData.uid,
+        senderName: currentUserData.nickname,
+        message: `menambahkan wishlist baru: "${title}"`,
+        timestamp: new Date()
+    });
+
+    document.getElementById('wishTitleInput').value = '';
+    addWishForm.classList.add('hidden');
+});
+
+function listenWishlist(spaceId) {
+    if (!spaceId) return;
+
+    const wishRef = collection(db, "couple_spaces", spaceId, "wishlists");
+    const q = query(wishRef, orderBy("createdAt", "desc"));
+
+    onSnapshot(q, (snapshot) => {
+        const container = document.getElementById('wishlistContainer');
+        if (!container) return;
+        container.innerHTML = '';
+
+        if (snapshot.empty) {
+            container.innerHTML = '<p class="empty-act">Belum ada wishlist. Yuk buat impian pertama kalian!</p>';
+            return;
+        }
+
+        snapshot.docs.forEach((docSnap) => {
+            const data = docSnap.data();
+            const id = docSnap.id;
+
+            const card = document.createElement('div');
+            card.className = `wish-card ${data.isDone ? 'done' : ''}`;
+            card.innerHTML = `
+                <div class="wish-info">
+                    <span class="wish-cat">${data.category}</span>
+                    <div class="wish-title">${data.title}</div>
+                    <div class="wish-author">Oleh: ${data.author}</div>
+                </div>
+                <button class="btn-toggle-wish" data-id="${id}" data-done="${data.isDone}">
+                    ${data.isDone ? '🎉 Terwujud' : '⏳ Tandai'}
+                </button>
+            `;
+
+            container.appendChild(card);
+        });
+
+        // Event listener untuk tombol Tandai Terwujud
+        document.querySelectorAll('.btn-toggle-wish').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                const wishId = e.target.getAttribute('data-id');
+                const currentDone = e.target.getAttribute('data-done') === 'true';
+
+                const docRef = doc(db, "couple_spaces", spaceId, "wishlists", wishId);
+                await updateDoc(docRef, { isDone: !currentDone });
+
+                if (!currentDone) {
+                    await addDoc(collection(db, "couple_spaces", spaceId, "notifications"), {
+                        type: "wish",
+                        senderUid: currentUserData.uid,
+                        senderName: currentUserData.nickname,
+                        message: `mewujudkan wishlist! 🎉`,
+                        timestamp: new Date()
+                    });
+                }
+            });
+        });
+    });
+}
+
 // MOCHI ROOM SWITCHING
 document.getElementById('btnPetModal')?.addEventListener('click', () => {
     document.getElementById('homeScreen')?.classList.add('hidden');
@@ -303,7 +403,7 @@ document.getElementById('btnBackFromPet')?.addEventListener('click', () => {
     document.getElementById('homeScreen')?.classList.remove('hidden');
 });
 
-// REALTIME MOCHI GAME & ANIMATED EXPRESSIONS
+// REALTIME MOCHI GAME
 let activeToolType = null;
 
 function listenMochiStats(spaceId) {
@@ -388,7 +488,6 @@ draggableItem?.addEventListener('pointermove', (e) => {
         isDragging = false;
         draggableItem.classList.add('hidden');
 
-        // ANIMASI EKSPRESI MOCHI SAAT MAKAN & MANDI
         if (activeToolType === 'feed') {
             document.getElementById('mochiMouth').innerText = 'O';
             document.getElementById('mochiBubble').innerText = '"Nom nom! Ikan lezat! 😋"';
@@ -503,8 +602,8 @@ function showNotifBanner(type, sender, message) {
     const msgEl = document.getElementById('notifMessage');
 
     if (iconEl && titleEl && msgEl && banner) {
-        iconEl.innerText = type === "express" ? "💖" : (type === "mochi" ? "🐱" : "😊");
-        titleEl.innerText = type === "express" ? "Express Love Masuk! 💖" : (type === "mochi" ? "Mochi Dirawat! 🐱" : "Mood Pasangan Update!");
+        iconEl.innerText = type === "express" ? "💖" : (type === "mochi" ? "🐱" : (type === "wish" ? "⭐" : "😊"));
+        titleEl.innerText = type === "express" ? "Express Love Masuk! 💖" : (type === "mochi" ? "Mochi Dirawat! 🐱" : (type === "wish" ? "Wishlist Update! ⭐" : "Mood Pasangan Update!"));
         msgEl.innerText = `${sender}: ${message}`;
 
         banner.classList.remove('hidden');
