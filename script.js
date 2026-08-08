@@ -2,14 +2,15 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebas
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 import { getFirestore, doc, setDoc, getDoc, updateDoc, onSnapshot, collection, addDoc, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
+// KONFIGURASI FIREBASE YANG BENAR (HURUF 'O' BESAR)
 const firebaseConfig = {
-    apiKey: "AIzaSyDLgyp6_0-T9oHNUZM-mOj-lpKpE6rJ04E",
-    authDomain: "our-little-universe-0209.firebaseapp.com",
-    projectId: "our-little-universe-0209",
-    storageBucket: "our-little-universe-0209.firebasestorage.app",
-    messagingSenderId: "924945430782",
-    appId: "1:924945430782:web:9dcab9bd35b5595c480daf",
-    measurementId: "G-Y7FSMN5NJP"
+  apiKey: "AIzaSyDLgyp6_O-T9oHNUZM-mOj-lpKpE6rJ04E",
+  authDomain: "our-little-universe-0209.firebaseapp.com",
+  projectId: "our-little-universe-0209",
+  storageBucket: "our-little-universe-0209.firebasestorage.app",
+  messagingSenderId: "924945430782",
+  appId: "1:924945430782:web:9dcab9bd35b5595c480daf",
+  measurementId: "G-Y7FSMN5NJP"
 };
 
 const app = initializeApp(firebaseConfig);
@@ -17,7 +18,6 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 
 let currentUserData = null;
-let notifUnsub = null;
 
 // DOM Elements
 const authCard = document.getElementById('authCard');
@@ -187,7 +187,7 @@ document.getElementById('btnCopyCode')?.addEventListener('click', () => {
     alert("Kode berhasil disalin! Kirimkan ke Rama ya 🤍");
 });
 
-// ENTER HOME DASHBOARD & START REALTIME LISTENER
+// ENTER HOME DASHBOARD
 document.getElementById('btnEnterApp')?.addEventListener('click', () => {
     const authContainer = document.querySelector('.auth-container');
     if (authContainer) authContainer.classList.add('hidden');
@@ -201,7 +201,7 @@ document.getElementById('btnEnterApp')?.addEventListener('click', () => {
     }
 });
 
-// REALTIME NOTIFICATIONS & ACTIVITY LISTENER
+// REALTIME NOTIFICATIONS
 function listenRealtimeNotifications(spaceId) {
     if (!spaceId) return;
 
@@ -210,22 +210,19 @@ function listenRealtimeNotifications(spaceId) {
 
     let isInitialLoad = true;
 
-    notifUnsub = onSnapshot(q, (snapshot) => {
+    onSnapshot(q, (snapshot) => {
         snapshot.docChanges().forEach((change) => {
             if (change.type === "added") {
                 const data = change.doc.data();
 
-                // Update text di aktivitas terakhir
                 const actText = document.getElementById('lastActivityText');
                 if (actText) {
                     actText.innerText = `${data.senderName}: ${data.message}`;
                 }
 
-                // Jangan munculkan popup kalau data baru dimuat pertama kali atau dari diri sendiri
                 if (isInitialLoad) return;
                 if (data.senderUid === currentUserData.uid) return;
 
-                // TAMPILKAN POPUP DENGAN GETARAN INSTAN!
                 showNotifBanner(data.type, data.senderName, data.message);
                 if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
             }
@@ -240,12 +237,14 @@ function showNotifBanner(type, sender, message) {
     const titleEl = document.getElementById('notifTitle');
     const msgEl = document.getElementById('notifMessage');
 
-    iconEl.innerText = type === "hug" ? "🤗" : "😊";
-    titleEl.innerText = type === "hug" ? "Pelukan Masuk! 🤍" : "Mood Pasangan Update!";
-    msgEl.innerText = `${sender}: ${message}`;
+    if (iconEl && titleEl && msgEl && banner) {
+        iconEl.innerText = type === "hug" ? "🤗" : "😊";
+        titleEl.innerText = type === "hug" ? "Pelukan Masuk! 🤍" : "Mood Pasangan Update!";
+        msgEl.innerText = `${sender}: ${message}`;
 
-    banner.classList.remove('hidden');
-    setTimeout(() => banner.classList.add('hidden'), 5000);
+        banner.classList.remove('hidden');
+        setTimeout(() => banner.classList.add('hidden'), 5000);
+    }
 }
 
 document.getElementById('closeNotifBtn')?.addEventListener('click', () => {
@@ -262,7 +261,7 @@ document.getElementById('closeHugModal')?.addEventListener('click', () => hugMod
 document.getElementById('btnMoodModal')?.addEventListener('click', () => moodModal?.classList.remove('hidden'));
 document.getElementById('closeMoodModal')?.addEventListener('click', () => moodModal?.classList.add('hidden'));
 
-// SEND HUG ACTION (REALTIME TO FIREBASE)
+// SEND HUG ACTION
 document.querySelectorAll('.hug-opt-btn').forEach(btn => {
     btn.addEventListener('click', async () => {
         const hugType = btn.getAttribute('data-type');
@@ -281,7 +280,7 @@ document.querySelectorAll('.hug-opt-btn').forEach(btn => {
     });
 });
 
-// SELECT MOOD ACTION (REALTIME TO FIREBASE)
+// SELECT MOOD ACTION
 let selectedMood = "😊 Bahagia";
 document.querySelectorAll('.mood-opt').forEach(btn => {
     btn.addEventListener('click', () => {
