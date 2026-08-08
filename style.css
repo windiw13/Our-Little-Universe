@@ -577,3 +577,21 @@ body.pixel-theme {
 
 .room-nav-btn:active { transform: translateY(2px); box-shadow: none; }
 .room-nav-btn .nav-icon { font-size: 24px; margin-bottom: 2px; }
+
+/* ANIMASI EFEK MOCHI MAKAN & MANDI */
+.mochi-character-box.happy-eat {
+    animation: eatJump 0.4s infinite alternate ease-in-out;
+}
+
+@keyframes eatJump {
+    0% { transform: translateY(0) scale(1); }
+    100% { transform: translateY(-15px) scale(1.1); }
+}
+
+.mochi-character-box.babbing-soap::after {
+    content: '🫧🫧🫧';
+    position: absolute;
+    top: -20px;
+    font-size: 24px;
+    animation: soapFloat 1s infinite alternate;
+}
