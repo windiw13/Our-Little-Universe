@@ -5,11 +5,19 @@
     font-family: 'Plus Jakarta Sans', sans-serif;
 }
 
+/* Sembunyikan elemen secara tegas */
+.hidden {
+    display: none !important;
+}
+
+.form-content.hidden {
+    display: none !important;
+}
+
 /* TEMA CERAH PASTEL & PIXEL ART */
 body.pixel-theme {
-    background-color: #fdf6ec; /* Warm Cream Light Background */
-    background-image: 
-        radial-gradient(#f1dfc4 1px, transparent 0);
+    background-color: #fdf6ec;
+    background-image: radial-gradient(#f1dfc4 1px, transparent 0);
     background-size: 20px 20px;
     color: #4a3e3d;
     min-height: 100vh;
@@ -27,19 +35,28 @@ body.pixel-theme {
     z-index: 1;
 }
 
-.auth-container.hidden, .home-container.hidden {
-    display: none !important;
-}
-
 /* Header Pixel Style */
 .app-header {
     text-align: center;
     margin-bottom: 20px;
 }
 
-.pixel-avatar {
-    font-size: 28px;
-    margin-bottom: 6px;
+.pixel-anim-box {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 8px;
+}
+
+.pixel-gif {
+    width: 70px;
+    height: 70px;
+    image-rendering: pixelated;
+}
+
+.pixel-gif-small {
+    width: 50px;
+    height: 50px;
+    image-rendering: pixelated;
 }
 
 .pixel-title {
@@ -66,7 +83,6 @@ body.pixel-theme {
     transition: all 0.2s ease;
 }
 
-.card.hidden { display: none !important; }
 .card.active { display: block; }
 
 /* Realtime Notification Toast Banner */
@@ -89,8 +105,6 @@ body.pixel-theme {
     animation: bounceDown 0.4s ease;
 }
 
-.notif-toast.hidden { display: none !important; }
-
 @keyframes bounceDown {
     0% { transform: translate(-50%, -50px); opacity: 0; }
     100% { transform: translate(-50%, 0); opacity: 1; }
@@ -98,7 +112,7 @@ body.pixel-theme {
 
 .notif-icon { font-size: 28px; }
 .notif-body { flex: 1; }
-.notif-body h4 { font-size: 13px; font-family: 'Press Start 2P', monospace; color: #e07a5f; margin-bottom: 4px; }
+.notif-body h4 { font-size: 12px; font-family: 'Press Start 2P', monospace; color: #e07a5f; margin-bottom: 4px; }
 .notif-body p { font-size: 12px; color: #3d405b; font-weight: 600; }
 .notif-close { background: none; border: none; font-size: 16px; color: #8d7b68; cursor: pointer; }
 
@@ -147,9 +161,6 @@ body.pixel-theme {
     color: #3d405b;
     font-size: 13px;
     outline: none;
-}
-.input-group input:focus {
-    border-color: #e07a5f;
 }
 
 /* Buttons */
@@ -218,8 +229,6 @@ body.pixel-theme {
 .btn-icon { background: none; border: none; cursor: pointer; font-size: 12px; color: #8d7b68; }
 
 .waiting-animation { text-align: center; margin-top: 12px; }
-.pulse-heart { font-size: 24px; animation: pulse 1.2s infinite; }
-@keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.2); } 100% { transform: scale(1); } }
 
 .success-icon { font-size: 40px; text-align: center; margin-bottom: 4px; }
 .couple-badge {
@@ -255,7 +264,7 @@ body.pixel-theme {
     gap: 6px;
 }
 
-/* Counter Card Light */
+/* Counter Card Light & Date Picker */
 .counter-card {
     text-align: center;
     background: #f4f1de;
@@ -265,14 +274,42 @@ body.pixel-theme {
     overflow: hidden;
 }
 
-.pixel-decor { position: absolute; font-size: 20px; top: 10px; }
-.pixel-decor.left { left: 12px; }
-.pixel-decor.right { right: 12px; }
+.pixel-corner-gif {
+    width: 35px;
+    height: 35px;
+    position: absolute;
+    top: 8px;
+    left: 10px;
+}
 
 .counter-badge { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: #81b29a; font-weight: 800; margin-bottom: 4px; }
 .counter-days { font-size: 42px; font-weight: 800; color: #3d405b; line-height: 1; }
 .counter-days small { font-size: 14px; color: #8d7b68; }
-.counter-sub { font-size: 11px; color: #8d7b68; margin-top: 6px; }
+
+.start-date-picker {
+    margin: 12px 0 6px 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+
+.start-date-picker label {
+    font-size: 11px;
+    font-weight: 700;
+    color: #8d7b68;
+}
+
+.start-date-picker input {
+    background: #ffffff;
+    border: 1px solid #81b29a;
+    border-radius: 8px;
+    padding: 4px 8px;
+    font-size: 11px;
+    color: #3d405b;
+}
+
+.counter-sub { font-size: 11px; color: #8d7b68; margin-top: 4px; }
 
 /* Distance Card Light */
 .distance-card { margin-bottom: 14px; padding: 16px; border-color: #f2cc8f; }
@@ -285,11 +322,32 @@ body.pixel-theme {
 .km-badge { background: #fdf6ec; border: 1px solid #f2cc8f; padding: 2px 6px; border-radius: 8px; font-size: 10px; color: #8d7b68; font-weight: 700; }
 .distance-quote { font-size: 11px; font-style: italic; color: #8d7b68; text-align: center; }
 
-/* Activity Card */
-.activity-card { margin-bottom: 14px; padding: 14px; background: #fff3b0; border-color: #f2cc8f; }
-.act-header { display: flex; align-items: center; gap: 6px; margin-bottom: 4px; }
+/* Activity Log Container */
+.activity-card { margin-bottom: 14px; padding: 16px; background: #fff3b0; border-color: #f2cc8f; }
+.act-header { display: flex; align-items: center; gap: 6px; margin-bottom: 10px; }
 .act-header h4 { font-size: 12px; color: #3d405b; font-weight: 800; }
-.act-text { font-size: 12px; color: #5a5043; font-weight: 600; }
+
+.activity-log-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 180px;
+    overflow-y: auto;
+    padding-right: 4px;
+}
+
+.act-item {
+    background: #ffffff;
+    border: 1px solid #f2cc8f;
+    border-radius: 10px;
+    padding: 8px 10px;
+    font-size: 11px;
+    color: #3d405b;
+}
+
+.act-item .act-user { font-weight: 800; color: #e07a5f; }
+.act-item .act-time { font-size: 9px; color: #8d7b68; display: block; margin-top: 2px; }
+.empty-act { font-size: 11px; color: #8d7b68; font-style: italic; text-align: center; }
 
 /* Quick Grid */
 .quick-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 16px; }
@@ -341,7 +399,6 @@ body.pixel-theme {
     padding: 20px;
     z-index: 100;
 }
-.modal.hidden { display: none !important; }
 
 .modal-content {
     background: #ffffff;
@@ -354,7 +411,7 @@ body.pixel-theme {
 }
 
 .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
-.modal-header h3 { font-size: 15px; color: #3d405b; font-weight: 800; }
+.modal-header h3 { font-size: 14px; color: #3d405b; font-weight: 800; }
 .close-modal { background: none; border: none; color: #8d7b68; font-size: 16px; cursor: pointer; }
 
 .modal-sub { font-size: 11px; color: #8d7b68; margin-bottom: 14px; }
@@ -396,12 +453,4 @@ body.pixel-theme {
     outline: none;
     margin-bottom: 10px;
     resize: none;
-}
-/* Aturan Sembunyikan Form & Elemen */
-.hidden {
-    display: none !important;
-}
-
-.form-content.hidden {
-    display: none !important;
 }

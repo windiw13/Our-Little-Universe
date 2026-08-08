@@ -10,12 +10,12 @@
 </head>
 <body class="pixel-theme">
 
-    <!-- FLOATING REALTIME NOTIFICATION POPUP -->
+    <!-- FLOATING REALTIME NOTIFICATION BANNER -->
     <div id="realtimeNotif" class="notif-toast hidden">
-        <div class="notif-icon" id="notifIcon">🤗</div>
+        <div class="notif-icon" id="notifIcon">💖</div>
         <div class="notif-body">
-            <h4 id="notifTitle">Pelukan Masuk!</h4>
-            <p id="notifMessage">Rama mengirimkan Pelukan Sayang ❤️</p>
+            <h4 id="notifTitle">Pesan Masuk!</h4>
+            <p id="notifMessage">Rama mengirimkan sesuatu...</p>
         </div>
         <button id="closeNotifBtn" class="notif-close">✕</button>
     </div>
@@ -23,7 +23,10 @@
     <!-- AUTHENTICATION CONTAINER -->
     <main class="auth-container">
         <div class="app-header">
-            <div class="pixel-avatar">👾🤍👾</div>
+            <!-- Animasi GIF Pixel Cute -->
+            <div class="pixel-anim-box">
+                <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExdW93OWptZW5zeXRhY3p3dnZwNWk0Zmd1bHFxYWZlMXpibmd0MnlsYyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/vbf8A28y3fLCE/giphy.gif" alt="Pixel Cat GIF" class="pixel-gif">
+            </div>
             <h1 class="pixel-title">Our Little Universe</h1>
             <p>A small cozy space for Diw & Rama</p>
         </div>
@@ -35,7 +38,7 @@
                 <button id="tabRegister" class="tab-btn">Daftar Akun</button>
             </div>
 
-            <!-- Login Form (Tampil pertama saat tab Masuk aktif) -->
+            <!-- Login Form -->
             <form id="loginForm" class="form-content">
                 <div class="input-group">
                     <label>Email</label>
@@ -48,7 +51,7 @@
                 <button type="submit" class="btn-primary">Masuk ➔</button>
             </form>
 
-            <!-- Register Form (Sembunyi secara default) -->
+            <!-- Register Form -->
             <form id="registerForm" class="form-content hidden">
                 <div class="input-group">
                     <label>Nama Lengkap</label>
@@ -111,7 +114,7 @@
             </div>
 
             <div class="waiting-animation">
-                <div class="pulse-heart">👾❤️👾</div>
+                <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExcGpmYWVsYndsdmI2ZHluandpZ2gxa21yc3I0YTZ0eDlndmtseGZwOCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/KztT2c4u8mYYUiMKdJ/giphy.gif" alt="Pixel Heart GIF" class="pixel-gif-small">
                 <p>Menunggu Rama bergabung...</p>
             </div>
         </div>
@@ -144,15 +147,23 @@
             </div>
         </header>
 
-        <!-- Card 1: Day Counter -->
+        <!-- Card 1: Day Counter dengan Pengaturan Tanggal Bersama -->
         <section class="card counter-card">
-            <div class="pixel-decor left">🌸</div>
-            <div class="pixel-decor right">🌿</div>
+            <div class="pixel-decor left">
+                <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExdW93OWptZW5zeXRhY3p3dnZwNWk0Zmd1bHFxYWZlMXpibmd0MnlsYyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/vbf8A28y3fLCE/giphy.gif" class="pixel-corner-gif">
+            </div>
             <div class="counter-badge">Together Since</div>
             <div class="counter-days">
-                <span id="daysTogetherCount">214</span>
+                <span id="daysTogetherCount">0</span>
                 <small>Hari</small>
             </div>
+            
+            <!-- Date Picker untuk Atur Tanggal Bersama -->
+            <div class="start-date-picker">
+                <label for="startDateInput">📅 Tanggal Jadian / Bersama:</label>
+                <input type="date" id="startDateInput">
+            </div>
+
             <p class="counter-sub">Diw & Rama's Pixel World 🎮</p>
         </section>
 
@@ -176,20 +187,11 @@
             <p class="distance-quote">"Distance means so little when someone means so much."</p>
         </section>
 
-        <!-- Card 3: Last Activity Display -->
-        <section class="card activity-card">
-            <div class="act-header">
-                <span class="pixel-icon">💌</span>
-                <h4>Aktivitas Terakhir</h4>
-            </div>
-            <p id="lastActivityText" class="act-text">Belum ada aktivitas hari ini. Kirim pelukan yuk!</p>
-        </section>
-
-        <!-- Card 4: Quick Action Buttons -->
+        <!-- Card 3: Quick Action Buttons (Express Love & Daily Check) -->
         <section class="quick-grid">
             <button id="btnHugModal" class="action-btn hug-btn">
-                <span class="btn-icon">🤗</span>
-                <span class="btn-label">Send Hug</span>
+                <span class="btn-icon">💖</span>
+                <span class="btn-label">Express Love</span>
             </button>
             <button id="btnMoodModal" class="action-btn mood-btn">
                 <span class="btn-icon">😊</span>
@@ -205,6 +207,17 @@
             </button>
         </section>
 
+        <!-- Card 4: Riwayat Seluruh Aktivitas Pasangan (Activity Log) -->
+        <section class="card activity-card">
+            <div class="act-header">
+                <span class="pixel-icon">💌</span>
+                <h4>Riwayat Aktivitas Kita</h4>
+            </div>
+            <div id="activityLogList" class="activity-log-container">
+                <p class="empty-act">Belum ada aktivitas hari ini. Kirim Express Love yuk!</p>
+            </div>
+        </section>
+
         <!-- Bottom Navigation Bar -->
         <nav class="bottom-nav">
             <button class="nav-item active">🏠 <span>Home</span></button>
@@ -214,19 +227,20 @@
         </nav>
     </div>
 
-    <!-- MODAL SEND HUG -->
+    <!-- MODAL EXPRESS LOVE (HUG, KISS, PAT, ETC) -->
     <div id="hugModal" class="modal hidden">
         <div class="modal-content">
             <div class="modal-header">
-                <h3>Kirim Pelukan 🤍</h3>
+                <h3>Express Love to Rama 💖</h3>
                 <button class="close-modal" id="closeHugModal">✕</button>
             </div>
-            <p class="modal-sub">Pilih jenis pelukan yang mau kamu kirim sekarang:</p>
+            <p class="modal-sub">Pilih jenis perasaan yang mau kamu kirim sekarang:</p>
             <div class="hug-options">
-                <button class="hug-opt-btn" data-type="Peluk Biasa 🤗">🤗 Peluk Biasa</button>
-                <button class="hug-opt-btn" data-type="Peluk Lama 🫂">🫂 Peluk Lama</button>
-                <button class="hug-opt-btn" data-type="Peluk Karena Kangen 🥺">🥺 Peluk Karena Kangen</button>
-                <button class="hug-opt-btn" data-type="Peluk Sayang ❤️">❤️ Peluk Sayang Banget</button>
+                <button class="hug-opt-btn" data-type="Peluk Hangat 🤗">🤗 Peluk Hangat</button>
+                <button class="hug-opt-btn" data-type="Cium Manis 💋">💋 Cium Manis (Kiss)</button>
+                <button class="hug-opt-btn" data-type="Usap Kepala 🫳">🫳 Usap-usap Kepala (Pat)</button>
+                <button class="hug-opt-btn" data-type="Kangen Banget 🥺">🥺 Kangen Banget</button>
+                <button class="hug-opt-btn" data-type="Peluk + Cium ❤️">❤️ Peluk & Cium</button>
             </div>
         </div>
     </div>

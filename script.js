@@ -2,7 +2,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebas
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 import { getFirestore, doc, setDoc, getDoc, updateDoc, onSnapshot, collection, addDoc, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-// KONFIGURASI FIREBASE YANG BENAR (HURUF 'O' BESAR)
+// FIREBASE CONFIG (Huruf O Besar)
 const firebaseConfig = {
   apiKey: "AIzaSyDLgyp6_O-T9oHNUZM-mOj-lpKpE6rJ04E",
   authDomain: "our-little-universe-0209.firebaseapp.com",
@@ -111,6 +111,7 @@ document.getElementById('btnCreateSpace')?.addEventListener('click', async () =>
         partner2_uid: null,
         partner2_name: null,
         status: "waiting",
+        startDate: null,
         createdAt: new Date()
     });
 
@@ -198,35 +199,77 @@ document.getElementById('btnEnterApp')?.addEventListener('click', () => {
     if (currentUserData) {
         document.getElementById('homeUserGreeting').innerText = currentUserData.nickname + " ❤️";
         listenRealtimeNotifications(currentUserData.coupleSpaceId);
+        listenStartDate(currentUserData.coupleSpaceId);
     }
 });
 
-// REALTIME NOTIFICATIONS
+// 1. DYNAMIC START DATE COUNTER (REVISI TANGGAL BERSAMA)
+const startDateInput = document.getElementById('startDateInput');
+
+function listenStartDate(spaceId) {
+    if (!spaceId) return;
+    onSnapshot(doc(db, "couple_spaces", spaceId), (docSnap) => {
+        if (docSnap.exists() && docSnap.data().startDate) {
+            const savedDate = docSnap.data().startDate;
+            startDateInput.value = savedDate;
+            calculateDaysTogether(savedDate);
+        }
+    });
+}
+
+startDateInput?.addEventListener('change', async (e) => {
+    const chosenDate = e.target.value;
+    if (currentUserData && currentUserData.coupleSpaceId) {
+        await updateDoc(doc(db, "couple_spaces", currentUserData.coupleSpaceId), {
+            startDate: chosenDate
+        });
+        calculateDaysTogether(chosenDate);
+    }
+});
+
+function calculateDaysTogether(startDateStr) {
+    const start = new Date(startDateStr);
+    const today = new Date();
+    const diffTime = Math.abs(today - start);
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    document.getElementById('daysTogetherCount').innerText = isNaN(diffDays) ? 0 : diffDays;
+}
+
+// 2. REALTIME NOTIFICATIONS & ENTIRE ACTIVITY LOG
 function listenRealtimeNotifications(spaceId) {
     if (!spaceId) return;
 
     const notifRef = collection(db, "couple_spaces", spaceId, "notifications");
-    const q = query(notifRef, orderBy("timestamp", "desc"), limit(1));
+    const q = query(notifRef, orderBy("timestamp", "desc"), limit(15));
 
     let isInitialLoad = true;
 
     onSnapshot(q, (snapshot) => {
-        snapshot.docChanges().forEach((change) => {
-            if (change.type === "added") {
-                const data = change.doc.data();
+        const logContainer = document.getElementById('activityLogList');
+        if (logContainer) logContainer.innerHTML = '';
 
-                const actText = document.getElementById('lastActivityText');
-                if (actText) {
-                    actText.innerText = `${data.senderName}: ${data.message}`;
-                }
+        if (snapshot.empty) {
+            logContainer.innerHTML = '<p class="empty-act">Belum ada aktivitas hari ini. Kirim Express Love yuk!</p>';
+            return;
+        }
 
-                if (isInitialLoad) return;
-                if (data.senderUid === currentUserData.uid) return;
+        snapshot.docs.forEach((docSnap, index) => {
+            const data = docSnap.data();
+            const timeStr = data.timestamp ? new Date(data.timestamp.toDate()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
 
+            // Render ke list riwayat aktivitas
+            const item = document.createElement('div');
+            item.className = 'act-item';
+            item.innerHTML = `<span class="act-user">${data.senderName}</span> ${data.message} <span class="act-time">${timeStr}</span>`;
+            logContainer.appendChild(item);
+
+            // Munculkan Popup Banner hanya untuk pesan yang paling baru
+            if (index === 0 && !isInitialLoad && data.senderUid !== currentUserData.uid) {
                 showNotifBanner(data.type, data.senderName, data.message);
                 if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
             }
         });
+
         isInitialLoad = false;
     });
 }
@@ -238,8 +281,8 @@ function showNotifBanner(type, sender, message) {
     const msgEl = document.getElementById('notifMessage');
 
     if (iconEl && titleEl && msgEl && banner) {
-        iconEl.innerText = type === "hug" ? "🤗" : "😊";
-        titleEl.innerText = type === "hug" ? "Pelukan Masuk! 🤍" : "Mood Pasangan Update!";
+        iconEl.innerText = type === "express" ? "💖" : "😊";
+        titleEl.innerText = type === "express" ? "Express Love Masuk! 💖" : "Mood Pasangan Update!";
         msgEl.innerText = `${sender}: ${message}`;
 
         banner.classList.remove('hidden');
@@ -261,21 +304,21 @@ document.getElementById('closeHugModal')?.addEventListener('click', () => hugMod
 document.getElementById('btnMoodModal')?.addEventListener('click', () => moodModal?.classList.remove('hidden'));
 document.getElementById('closeMoodModal')?.addEventListener('click', () => moodModal?.classList.add('hidden'));
 
-// SEND HUG ACTION
+// SEND EXPRESS LOVE ACTION
 document.querySelectorAll('.hug-opt-btn').forEach(btn => {
     btn.addEventListener('click', async () => {
-        const hugType = btn.getAttribute('data-type');
+        const loveType = btn.getAttribute('data-type');
         hugModal?.classList.add('hidden');
 
         if (currentUserData && currentUserData.coupleSpaceId) {
             await addDoc(collection(db, "couple_spaces", currentUserData.coupleSpaceId, "notifications"), {
-                type: "hug",
+                type: "express",
                 senderUid: currentUserData.uid,
                 senderName: currentUserData.nickname,
-                message: `mengirimkan ${hugType}`,
+                message: `mengirimkan ${loveType}`,
                 timestamp: new Date()
             });
-            alert(`Berhasil ngirim ${hugType} ke pasangan! 🤍`);
+            alert(`Berhasil ngirim ${loveType} ke pasangan! 💖`);
         }
     });
 });
@@ -306,18 +349,3 @@ document.getElementById('btnSaveMood')?.addEventListener('click', async () => {
         alert(`Mood hari ini (${selectedMood}) tersimpan! 🤍`);
     }
 });
-if (tabLogin && tabRegister) {
-    tabLogin.addEventListener('click', () => {
-        tabLogin.classList.add('active');
-        tabRegister.classList.remove('active');
-        loginForm.classList.remove('hidden');
-        registerForm.classList.add('hidden');
-    });
-
-    tabRegister.addEventListener('click', () => {
-        tabRegister.classList.add('active');
-        tabLogin.classList.remove('active');
-        registerForm.classList.remove('hidden');
-        loginForm.classList.add('hidden');
-    });
-}
