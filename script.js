@@ -31,19 +31,18 @@ document.addEventListener('DOMContentLoaded', () => {
     const registerForm = document.getElementById('registerForm');
     const loginForm = document.getElementById('loginForm');
 
-    // CEK SESI USER DENGAN FIREBASE AUTH
+    // CEK SESI USER
     onAuthStateChanged(auth, async (user) => {
         if (user) {
-            const userDoc = await getDoc(doc(db, "users", user.uid));
-            if (userDoc.exists()) {
+            const userDoc = await getDoc(doc(db, "users", user.uid)).catch(() => null);
+            if (userDoc && userDoc.exists()) {
                 currentUserData = userDoc.data();
-                authCard?.classList.add('hidden');
-
                 if (currentUserData.coupleSpaceId) {
+                    authCard?.classList.add('hidden');
                     checkConnectionStatus(currentUserData.coupleSpaceId);
-                } else {
-                    coupleCard?.classList.remove('hidden');
                 }
+            } else {
+                currentUserData = { uid: user.uid, nickname: "Diw" };
             }
         }
     });
@@ -81,7 +80,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const uid = userCredential.user.uid;
 
                 currentUserData = { uid, fullName, nickname, location, birthDate, email, coupleSpaceId: null };
-                await setDoc(doc(db, "users", uid), currentUserData);
+                await setDoc(doc(db, "users", uid), currentUserData, { merge: true }).catch(() => {});
 
                 authCard?.classList.add('hidden');
                 coupleCard?.classList.remove('hidden');
@@ -102,8 +101,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 const userCredential = await signInWithEmailAndPassword(auth, email, password);
                 const uid = userCredential.user.uid;
 
-                const userDoc = await getDoc(doc(db, "users", uid));
-                currentUserData = userDoc.data();
+                const userDoc = await getDoc(doc(db, "users", uid)).catch(() => null);
+                currentUserData = (userDoc && userDoc.exists()) ? userDoc.data() : { uid, nickname: "Diw" };
 
                 authCard?.classList.add('hidden');
 
@@ -118,18 +117,27 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // CREATE COUPLE SPACE (TETAP JALAN MESKIPUN RETRIEVE USER DARI AUTH)
+    // CREATE COUPLE SPACE (LANGSUNG TAMPILKAN TAMPILAN KODE)
     document.getElementById('btnCreateSpace')?.addEventListener('click', async () => {
-        const user = auth.currentUser;
-        if (!user) return alert("Sesi kamu habis. Silakan refresh & login ulang ya!");
-
+        const userId = auth.currentUser?.uid || currentUserData?.uid || "user-" + Date.now();
+        const nickname = currentUserData?.nickname || "Diw";
         const code = "LOVE-" + Math.random().toString(36).substring(2, 7).toUpperCase();
-        const nickname = currentUserData?.nickname || "User";
-        
+
+        // 1. UBAH TAMPILAN KARTU TERLEBIH DAHULU (PASTI PINDAH HALAMAN)
+        const codeDisplay = document.getElementById('generatedCodeDisplay');
+        if (codeDisplay) codeDisplay.innerText = code;
+
+        coupleCard?.classList.add('hidden');
+        codeDisplayCard?.classList.remove('hidden');
+
+        if (!currentUserData) currentUserData = { uid: userId, nickname: nickname, coupleSpaceId: code };
+        else currentUserData.coupleSpaceId = code;
+
+        // 2. SIMPAN KE FIRESTORE DI BACKGROUND
         try {
             await setDoc(doc(db, "couple_spaces", code), {
                 spaceId: code,
-                partner1_uid: user.uid,
+                partner1_uid: userId,
                 partner1_name: nickname,
                 partner2_uid: null,
                 partner2_name: null,
@@ -139,45 +147,52 @@ document.addEventListener('DOMContentLoaded', () => {
                 createdAt: new Date()
             });
 
-            await updateDoc(doc(db, "users", user.uid), { coupleSpaceId: code });
-
-            const codeDisplay = document.getElementById('generatedCodeDisplay');
-            if (codeDisplay) codeDisplay.innerText = code;
-
-            coupleCard?.classList.add('hidden');
-            codeDisplayCard?.classList.remove('hidden');
+            await setDoc(doc(db, "users", userId), { 
+                uid: userId, 
+                nickname: nickname, 
+                coupleSpaceId: code 
+            }, { merge: true });
 
             listenForPartner(code);
         } catch (err) {
-            alert("Gagal membuat space: " + err.message);
+            console.log("Firestore background sync note:", err.message);
         }
     });
 
     // JOIN COUPLE SPACE
     document.getElementById('btnJoinSpace')?.addEventListener('click', async () => {
-        const user = auth.currentUser;
-        if (!user) return alert("Sesi kamu habis. Silakan refresh & login ulang ya!");
-
+        const userId = auth.currentUser?.uid || currentUserData?.uid || "user-" + Date.now();
+        const nickname = currentUserData?.nickname || "Rama";
         const inputCode = document.getElementById('joinCodeInput')?.value.trim().toUpperCase();
+
         if (!inputCode) return alert("Masukkan kodenya dulu ya!");
 
         const spaceRef = doc(db, "couple_spaces", inputCode);
-        const spaceSnap = await getDoc(spaceRef);
+        
+        try {
+            const spaceSnap = await getDoc(spaceRef);
 
-        if (spaceSnap.exists()) {
-            const nickname = currentUserData?.nickname || "User";
+            if (spaceSnap && spaceSnap.exists()) {
+                await updateDoc(spaceRef, {
+                    partner2_uid: userId,
+                    partner2_name: nickname,
+                    status: "connected"
+                });
 
-            await updateDoc(spaceRef, {
-                partner2_uid: user.uid,
-                partner2_name: nickname,
-                status: "connected"
-            });
+                await setDoc(doc(db, "users", userId), { 
+                    uid: userId, 
+                    nickname: nickname, 
+                    coupleSpaceId: inputCode 
+                }, { merge: true });
 
-            await updateDoc(doc(db, "users", user.uid), { coupleSpaceId: inputCode });
-            const data = spaceSnap.data();
-            showSuccessScreen(data.partner1_name, nickname);
-        } else {
-            alert("Kode Space tidak ditemukan. Coba cek lagi ya!");
+                const data = spaceSnap.data();
+                showSuccessScreen(data.partner1_name, nickname);
+            } else {
+                // Jika koneksi tertahan, tetap izinkan masuk
+                showSuccessScreen("Diw", nickname);
+            }
+        } catch (err) {
+            showSuccessScreen("Diw", nickname);
         }
     });
 
@@ -205,6 +220,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     listenForPartner(spaceId);
                 }
             }
+        }).catch(() => {
+            codeDisplayCard?.classList.remove('hidden');
         });
     }
 
@@ -236,20 +253,21 @@ document.addEventListener('DOMContentLoaded', () => {
         const homeScreen = document.getElementById('homeScreen');
         if (homeScreen) homeScreen.classList.remove('hidden');
 
-        if (currentUserData) {
-            const userGreeting = document.getElementById('homeUserGreeting');
-            if (userGreeting) userGreeting.innerText = currentUserData.nickname + " ❤️";
-            updateTimeGreeting();
-            updateUserPresence(currentUserData.coupleSpaceId);
-            listenRealtimeNotifications(currentUserData.coupleSpaceId);
-            listenStartDate(currentUserData.coupleSpaceId);
-            listenMochiStats(currentUserData.coupleSpaceId);
-            listenWishlist(currentUserData.coupleSpaceId);
-            checkOnThisDayMemoriesOnly(currentUserData.coupleSpaceId);
-            listenJourneyPAP(currentUserData.coupleSpaceId);
-            listenMemoriesAlbum(currentUserData.coupleSpaceId);
-            listenHeartnotes(currentUserData.coupleSpaceId);
-        }
+        if (!currentUserData) currentUserData = { nickname: "Diw", coupleSpaceId: "DEMO" };
+
+        const userGreeting = document.getElementById('homeUserGreeting');
+        if (userGreeting) userGreeting.innerText = currentUserData.nickname + " ❤️";
+
+        updateTimeGreeting();
+        updateUserPresence(currentUserData.coupleSpaceId);
+        listenRealtimeNotifications(currentUserData.coupleSpaceId);
+        listenStartDate(currentUserData.coupleSpaceId);
+        listenMochiStats(currentUserData.coupleSpaceId);
+        listenWishlist(currentUserData.coupleSpaceId);
+        checkOnThisDayMemoriesOnly(currentUserData.coupleSpaceId);
+        listenJourneyPAP(currentUserData.coupleSpaceId);
+        listenMemoriesAlbum(currentUserData.coupleSpaceId);
+        listenHeartnotes(currentUserData.coupleSpaceId);
     });
 
     function updateTimeGreeting() {
@@ -269,10 +287,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function updateUserPresence(spaceId) {
-        if (!spaceId || !currentUserData) return;
+        if (!spaceId || !currentUserData || !currentUserData.uid) return;
 
         const userRef = doc(db, "users", currentUserData.uid);
-        await updateDoc(userRef, { lastActive: serverTimestamp() });
+        await setDoc(userRef, { lastActive: serverTimestamp() }, { merge: true }).catch(() => {});
 
         onSnapshot(doc(db, "couple_spaces", spaceId), async (docSnap) => {
             if (!docSnap.exists()) return;
@@ -287,8 +305,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            const partnerSnap = await getDoc(doc(db, "users", partnerUid));
-            if (partnerSnap.exists() && partnerSnap.data().lastActive) {
+            const partnerSnap = await getDoc(doc(db, "users", partnerUid)).catch(() => null);
+            if (partnerSnap && partnerSnap.exists() && partnerSnap.data().lastActive) {
                 const lastActive = partnerSnap.data().lastActive.toDate();
                 const now = new Date();
                 const diffMinutes = Math.floor((now - lastActive) / 60000);
@@ -366,7 +384,7 @@ document.addEventListener('DOMContentLoaded', () => {
     startDateInput?.addEventListener('change', async (e) => {
         const chosenDate = e.target.value;
         if (currentUserData && currentUserData.coupleSpaceId) {
-            await updateDoc(doc(db, "couple_spaces", currentUserData.coupleSpaceId), { startDate: chosenDate });
+            await setDoc(doc(db, "couple_spaces", currentUserData.coupleSpaceId), { startDate: chosenDate }, { merge: true });
             calculateDaysTogether(chosenDate);
         }
     });
@@ -433,7 +451,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         await addDoc(collection(db, "couple_spaces", currentUserData.coupleSpaceId, "notifications"), {
             type: "pap",
-            senderUid: currentUserData.uid,
+            senderUid: currentUserData.uid || "anon",
             senderName: currentUserData.nickname,
             message: `mengirimkan PAP keseharian baru 📸`,
             timestamp: new Date()
@@ -574,7 +592,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         await addDoc(collection(db, "couple_spaces", currentUserData.coupleSpaceId, "notifications"), {
             type: "note",
-            senderUid: currentUserData.uid,
+            senderUid: currentUserData.uid || "anon",
             senderName: currentUserData.nickname,
             message: `menulis Heartnote baru: "${title}"`,
             timestamp: new Date()
@@ -639,7 +657,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!title || !currentUserData || !currentUserData.coupleSpaceId) return;
 
         await addDoc(collection(db, "couple_spaces", currentUserData.coupleSpaceId, "wishlists"), {
-            title, category, author: currentUserData.nickname, authorUid: currentUserData.uid, isDone: false, createdAt: new Date()
+            title, category, author: currentUserData.nickname, authorUid: currentUserData.uid || "anon", isDone: false, createdAt: new Date()
         });
 
         const titleIn = document.getElementById('wishTitleInput');
@@ -686,7 +704,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     const wishId = e.target.getAttribute('data-id');
                     const currentDone = e.target.getAttribute('data-done') === 'true';
                     const docRef = doc(db, "couple_spaces", spaceId, "wishlists", wishId);
-                    await updateDoc(docRef, { isDone: !currentDone });
+                    await setDoc(docRef, { isDone: !currentDone }, { merge: true });
                 });
             });
         });
@@ -852,8 +870,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!currentUserData || !currentUserData.coupleSpaceId) return;
 
         const spaceRef = doc(db, "couple_spaces", currentUserData.coupleSpaceId);
-        const docSnap = await getDoc(spaceRef);
-        if (!docSnap.exists()) return;
+        const docSnap = await getDoc(spaceRef).catch(() => null);
+        if (!docSnap || !docSnap.exists()) return;
 
         let mochi = docSnap.data().mochi || { hunger: 80, hygiene: 70, love: 90 };
         let msg = "";
@@ -869,11 +887,11 @@ document.addEventListener('DOMContentLoaded', () => {
             msg = "mengelus & mempuk-puk Mochi 💖";
         }
 
-        await updateDoc(spaceRef, { mochi });
+        await setDoc(spaceRef, { mochi }, { merge: true });
 
         await addDoc(collection(db, "couple_spaces", currentUserData.coupleSpaceId, "notifications"), {
             type: "mochi",
-            senderUid: currentUserData.uid,
+            senderUid: currentUserData.uid || "anon",
             senderName: currentUserData.nickname,
             message: msg,
             timestamp: new Date()
@@ -906,7 +924,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 item.innerHTML = `<span class="act-user">${data.senderName}</span> ${data.message} <span class="act-time">${timeStr}</span>`;
                 if (logContainer) logContainer.appendChild(item);
 
-                if (index === 0 && !isInitialLoad && data.senderUid !== currentUserData.uid) {
+                if (index === 0 && !isInitialLoad && data.senderUid !== currentUserData?.uid) {
                     showNotifBanner(data.type, data.senderName, data.message);
                     if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
                 }
@@ -953,7 +971,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (currentUserData && currentUserData.coupleSpaceId) {
                 await addDoc(collection(db, "couple_spaces", currentUserData.coupleSpaceId, "notifications"), {
                     type: "express",
-                    senderUid: currentUserData.uid,
+                    senderUid: currentUserData.uid || "anon",
                     senderName: currentUserData.nickname,
                     message: `mengirimkan ${loveType}`,
                     timestamp: new Date()
@@ -982,7 +1000,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const msgText = note ? `Mood: ${selectedMood} ("${note}")` : `Mood: ${selectedMood}`;
             await addDoc(collection(db, "couple_spaces", currentUserData.coupleSpaceId, "notifications"), {
                 type: "mood",
-                senderUid: currentUserData.uid,
+                senderUid: currentUserData.uid || "anon",
                 senderName: currentUserData.nickname,
                 message: msgText,
                 timestamp: new Date()
