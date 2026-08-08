@@ -1,4 +1,3 @@
-// 1. KONFIGURASI FIREBASE KAMU
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 import { getFirestore, doc, setDoc, getDoc, updateDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
@@ -32,131 +31,141 @@ const registerForm = document.getElementById('registerForm');
 const loginForm = document.getElementById('loginForm');
 
 // Tab Toggle
-tabLogin.addEventListener('click', () => {
-    tabLogin.classList.add('active');
-    tabRegister.classList.remove('active');
-    loginForm.classList.remove('hidden');
-    registerForm.classList.add('hidden');
-});
+if (tabLogin && tabRegister) {
+    tabLogin.addEventListener('click', () => {
+        tabLogin.classList.add('active');
+        tabRegister.classList.remove('active');
+        loginForm.classList.remove('hidden');
+        registerForm.classList.add('hidden');
+    });
 
-tabRegister.addEventListener('click', () => {
-    tabRegister.classList.add('active');
-    tabLogin.classList.remove('active');
-    registerForm.classList.remove('hidden');
-    loginForm.classList.add('hidden');
-});
+    tabRegister.addEventListener('click', () => {
+        tabRegister.classList.add('active');
+        tabLogin.classList.remove('active');
+        registerForm.classList.remove('hidden');
+        loginForm.classList.add('hidden');
+    });
+}
 
 // REGISTER USER
-registerForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const fullName = document.getElementById('regFullName').value;
-    const nickname = document.getElementById('regNickname').value;
-    const location = document.getElementById('regLocation').value;
-    const birthDate = document.getElementById('regBirthDate').value;
-    const email = document.getElementById('regEmail').value;
-    const password = document.getElementById('regPassword').value;
+if (registerForm) {
+    registerForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const fullName = document.getElementById('regFullName').value;
+        const nickname = document.getElementById('regNickname').value;
+        const location = document.getElementById('regLocation').value;
+        const birthDate = document.getElementById('regBirthDate').value;
+        const email = document.getElementById('regEmail').value;
+        const password = document.getElementById('regPassword').value;
 
-    try {
-        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-        const uid = userCredential.user.uid;
+        try {
+            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+            const uid = userCredential.user.uid;
 
-        currentUserData = {
-            uid,
-            fullName,
-            nickname,
-            location,
-            birthDate,
-            email,
-            coupleSpaceId: null
-        };
+            currentUserData = {
+                uid,
+                fullName,
+                nickname,
+                location,
+                birthDate,
+                email,
+                coupleSpaceId: null
+            };
 
-        // Simpan ke Firestore
-        await setDoc(doc(db, "users", uid), currentUserData);
+            await setDoc(doc(db, "users", uid), currentUserData);
 
-        authCard.classList.add('hidden');
-        coupleCard.classList.remove('hidden');
-    } catch (error) {
-        alert("Gagal Daftar: " + error.message);
-    }
-});
+            authCard.classList.add('hidden');
+            coupleCard.classList.remove('hidden');
+        } catch (error) {
+            alert("Gagal Daftar: " + error.message);
+        }
+    });
+}
 
 // LOGIN USER
-loginForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const email = document.getElementById('loginEmail').value;
-    const password = document.getElementById('loginPassword').value;
+if (loginForm) {
+    loginForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = document.getElementById('loginEmail').value;
+        const password = document.getElementById('loginPassword').value;
 
-    try {
-        const userCredential = await signInWithEmailAndPassword(auth, email, password);
-        const uid = userCredential.user.uid;
+        try {
+            const userCredential = await signInWithEmailAndPassword(auth, email, password);
+            const uid = userCredential.user.uid;
 
-        const userDoc = await getDoc(doc(db, "users", uid));
-        currentUserData = userDoc.data();
+            const userDoc = await getDoc(doc(db, "users", uid));
+            currentUserData = userDoc.data();
 
-        authCard.classList.add('hidden');
+            authCard.classList.add('hidden');
 
-        if (currentUserData.coupleSpaceId) {
-            checkConnectionStatus(currentUserData.coupleSpaceId);
-        } else {
-            coupleCard.classList.remove('hidden');
+            if (currentUserData.coupleSpaceId) {
+                checkConnectionStatus(currentUserData.coupleSpaceId);
+            } else {
+                coupleCard.classList.remove('hidden');
+            }
+        } catch (error) {
+            alert("Gagal Login: " + error.message);
         }
-    } catch (error) {
-        alert("Gagal Login: " + error.message);
-    }
-});
+    });
+}
 
 // CREATE COUPLE SPACE
-document.getElementById('btnCreateSpace').addEventListener('click', async () => {
-    const code = "LOVE-" + Math.random().toString(36).substring(2, 7).toUpperCase();
-    
-    await setDoc(doc(db, "couple_spaces", code), {
-        spaceId: code,
-        partner1_uid: currentUserData.uid,
-        partner1_name: currentUserData.nickname,
-        partner2_uid: null,
-        partner2_name: null,
-        status: "waiting",
-        createdAt: new Date()
-    });
-
-    await updateDoc(doc(db, "users", currentUserData.uid), {
-        coupleSpaceId: code
-    });
-
-    document.getElementById('generatedCodeDisplay').innerText = code;
-    coupleCard.classList.add('hidden');
-    codeDisplayCard.classList.remove('hidden');
-
-    listenForPartner(code);
-});
-
-// JOIN COUPLE SPACE
-document.getElementById('btnJoinSpace').addEventListener('click', async () => {
-    const inputCode = document.getElementById('joinCodeInput').value.trim().toUpperCase();
-    if (!inputCode) return alert("Masukkan kodenya dulu ya!");
-
-    const spaceRef = doc(db, "couple_spaces", inputCode);
-    const spaceSnap = await getDoc(spaceRef);
-
-    if (spaceSnap.exists()) {
-        await updateDoc(spaceRef, {
-            partner2_uid: currentUserData.uid,
-            partner2_name: currentUserData.nickname,
-            status: "connected"
+const btnCreateSpace = document.getElementById('btnCreateSpace');
+if (btnCreateSpace) {
+    btnCreateSpace.addEventListener('click', async () => {
+        const code = "LOVE-" + Math.random().toString(36).substring(2, 7).toUpperCase();
+        
+        await setDoc(doc(db, "couple_spaces", code), {
+            spaceId: code,
+            partner1_uid: currentUserData.uid,
+            partner1_name: currentUserData.nickname,
+            partner2_uid: null,
+            partner2_name: null,
+            status: "waiting",
+            createdAt: new Date()
         });
 
         await updateDoc(doc(db, "users", currentUserData.uid), {
-            coupleSpaceId: inputCode
+            coupleSpaceId: code
         });
 
-        const data = spaceSnap.data();
-        showSuccessScreen(data.partner1_name, currentUserData.nickname);
-    } else {
-        alert("Kode Space tidak ditemukan. Coba cek lagi ya!");
-    }
-});
+        document.getElementById('generatedCodeDisplay').innerText = code;
+        coupleCard.classList.add('hidden');
+        codeDisplayCard.classList.remove('hidden');
 
-// LISTEN FOR PARTNER REALTIME
+        listenForPartner(code);
+    });
+}
+
+// JOIN COUPLE SPACE
+const btnJoinSpace = document.getElementById('btnJoinSpace');
+if (btnJoinSpace) {
+    btnJoinSpace.addEventListener('click', async () => {
+        const inputCode = document.getElementById('joinCodeInput').value.trim().toUpperCase();
+        if (!inputCode) return alert("Masukkan kodenya dulu ya!");
+
+        const spaceRef = doc(db, "couple_spaces", inputCode);
+        const spaceSnap = await getDoc(spaceRef);
+
+        if (spaceSnap.exists()) {
+            await updateDoc(spaceRef, {
+                partner2_uid: currentUserData.uid,
+                partner2_name: currentUserData.nickname,
+                status: "connected"
+            });
+
+            await updateDoc(doc(db, "users", currentUserData.uid), {
+                coupleSpaceId: inputCode
+            });
+
+            const data = spaceSnap.data();
+            showSuccessScreen(data.partner1_name, currentUserData.nickname);
+        } else {
+            alert("Kode Space tidak ditemukan. Coba cek lagi ya!");
+        }
+    });
+}
+
 function listenForPartner(spaceId) {
     onSnapshot(doc(db, "couple_spaces", spaceId), (docSnap) => {
         if (docSnap.exists()) {
@@ -193,22 +202,28 @@ function showSuccessScreen(p1, p2) {
 }
 
 // COPY CODE BUTTON
-document.getElementById('btnCopyCode').addEventListener('click', () => {
-    const code = document.getElementById('generatedCodeDisplay').innerText;
-    navigator.clipboard.writeText(code);
-    alert("Kode berhasil disalin! Kirimkan ke Rama ya 🤍");
-});
+const btnCopyCode = document.getElementById('btnCopyCode');
+if (btnCopyCode) {
+    btnCopyCode.addEventListener('click', () => {
+        const code = document.getElementById('generatedCodeDisplay').innerText;
+        navigator.clipboard.writeText(code);
+        alert("Kode berhasil disalin! Kirimkan ke Rama ya 🤍");
+    });
+}
 
-// ENTER APP BUTTON -> BUKA HOME DASHBOARD
-document.getElementById('btnEnterApp').addEventListener('click', () => {
-    const authContainer = document.querySelector('.auth-container');
-    if (authContainer) authContainer.classList.add('hidden');
-    
-    const homeScreen = document.getElementById('homeScreen');
-    if (homeScreen) homeScreen.classList.remove('hidden');
+// ENTER HOME DASHBOARD BUTTON
+const btnEnterApp = document.getElementById('btnEnterApp');
+if (btnEnterApp) {
+    btnEnterApp.addEventListener('click', () => {
+        const authContainer = document.querySelector('.auth-container');
+        if (authContainer) authContainer.classList.add('hidden');
+        
+        const homeScreen = document.getElementById('homeScreen');
+        if (homeScreen) homeScreen.classList.remove('hidden');
 
-    if (currentUserData) {
-        const greetingEl = document.getElementById('homeUserGreeting');
-        if (greetingEl) greetingEl.innerText = currentUserData.nickname + " ❤️";
-    }
-});
+        if (currentUserData) {
+            const greetingEl = document.getElementById('homeUserGreeting');
+            if (greetingEl) greetingEl.innerText = currentUserData.nickname + " ❤️";
+        }
+    });
+}
