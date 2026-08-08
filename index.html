@@ -145,9 +145,9 @@
             </div>
         </header>
 
-        <!-- WIDGET REVISI 1: ON THIS DAY / KENANGAN HARI INI -->
+        <!-- WIDGET DASHBOARD: MEMORIES ON THIS DAY -->
         <section id="onThisDayWidget" class="card on-this-day-card hidden">
-            <div class="otd-badge">📸 On This Day Memory</div>
+            <div class="otd-badge">📸 Kenangan Spesial Hari Ini</div>
             <h4 id="otdTitle">Kenangan di Tanggal Ini!</h4>
             <img id="otdImage" src="" alt="Memory Image" class="otd-img hidden">
             <p id="otdCaption" class="otd-caption"></p>
@@ -224,69 +224,82 @@
         <!-- Bottom Navigation Bar -->
         <nav class="bottom-nav">
             <button class="nav-item active" id="navHome">🏠 <span>Home</span></button>
-            <button class="nav-item" id="navJourney">❤️ <span>Journey</span></button>
-            <button class="nav-item" id="navMemories">📸 <span>Memories</span></button>
+            <button class="nav-item" id="navJourney">📸 <span>Our Journey</span></button>
+            <button class="nav-item" id="navMemories">🖼️ <span>Memories</span></button>
             <button class="nav-item" id="navHeartnotes">💌 <span>Heartnotes</span></button>
         </nav>
     </div>
 
-    <!-- SCREEN 1: JOURNEY (TIMELINE PERJALANAN CINTA) -->
+    <!-- SCREEN 1: OUR JOURNEY (PAP KESEHARIAN) -->
     <div id="journeyScreen" class="sub-screen hidden">
         <header class="sub-screen-header">
-            <h3>Our Journey ❤️</h3>
-            <p>Milestone & Jejak Langkah Kita</p>
+            <h3>Our Journey 📸</h3>
+            <p>PAP Keseharian & Activity Updates</p>
         </header>
         <div class="sub-screen-content">
-            <button id="btnOpenAddJourney" class="btn-secondary" style="margin-bottom: 12px;">+ Tambah Milestone Baru</button>
+            <button id="btnOpenAddJourney" class="btn-secondary" style="margin-bottom: 12px;">📷 Kirim PAP Keseharian</button>
+
             <form id="addJourneyForm" class="add-wish-form hidden">
-                <input type="text" id="journeyTitleInput" placeholder="Judul momen (contoh: 'Pertama kali ketemu')" required>
-                <input type="date" id="journeyDateInput" required>
-                <textarea id="journeyDescInput" placeholder="Catatan singkat kenangan ini..." style="width: 100%; height: 50px; padding: 6px; border-radius: 8px; border: 1px solid #f2cc8f; font-size: 11px; outline: none;"></textarea>
-                <button type="submit" class="btn-primary" style="padding: 8px;">Simpan Milestone ➔</button>
+                <label class="camera-btn-label">
+                    📷 Ambil Foto dari Kamera / Galeri
+                    <!-- INPUT FILE TERHUBUNG KE KAMERA HP -->
+                    <input type="file" id="journeyCameraInput" accept="image/*" capture="environment" class="hidden">
+                </label>
+                <div id="journeyPreviewContainer" class="img-preview-box hidden">
+                    <img id="journeyPreviewImg" src="" alt="Preview PAP">
+                </div>
+                <textarea id="journeyDescInput" placeholder="Keterangan aktivitas (ex: 'Lagi ngajar siswa SMK hari ini ✨')" required style="width: 100%; height: 50px; padding: 6px; border-radius: 8px; border: 1px solid #f2cc8f; font-size: 11px; outline: none;"></textarea>
+                <button type="submit" class="btn-primary" style="padding: 8px;">Kirim PAP ➔</button>
             </form>
 
             <div id="journeyTimelineContainer" class="timeline-container">
-                <p class="empty-act">Belum ada jejak perjalanan. Yuk catat momen pertama kalian!</p>
+                <p class="empty-act">Belum ada PAP keseharian. Kirim foto kegiatanmu yuk!</p>
             </div>
         </div>
-        <!-- Shared Bottom Nav -->
         <nav class="bottom-nav">
             <button class="nav-item" id="navHomeJ">🏠 <span>Home</span></button>
-            <button class="nav-item active" id="navJourneyJ">❤️ <span>Journey</span></button>
-            <button class="nav-item" id="navMemoriesJ">📸 <span>Memories</span></button>
+            <button class="nav-item active" id="navJourneyJ">📸 <span>Our Journey</span></button>
+            <button class="nav-item" id="navMemoriesJ">🖼️ <span>Memories</span></button>
             <button class="nav-item" id="navHeartnotesJ">💌 <span>Heartnotes</span></button>
         </nav>
     </div>
 
-    <!-- SCREEN 2: MEMORIES & DAILY PHOTO CHALLENGE -->
+    <!-- SCREEN 2: MEMORIES (ALBUM KENANGAN) -->
     <div id="memoriesScreen" class="sub-screen hidden">
         <header class="sub-screen-header">
-            <h3>Memories 📸</h3>
-            <p>Galeri Kenangan & Daily Photo</p>
+            <h3>Memories 🖼️</h3>
+            <p>Album Kenangan Spesial Kita</p>
         </header>
         <div class="sub-screen-content">
-            <button id="btnOpenAddMemory" class="btn-secondary" style="margin-bottom: 12px;">+ Upload Foto Kenangan</button>
+            <button id="btnOpenAddMemory" class="btn-secondary" style="margin-bottom: 12px;">+ Tambah Foto ke Album</button>
+
             <form id="addMemoryForm" class="add-wish-form hidden">
-                <input type="text" id="memTitleInput" placeholder="Judul / Keterangan foto..." required>
-                <input type="url" id="memUrlInput" placeholder="URL Link Foto (GDrive/Imgur/dsb)..." required>
+                <label class="camera-btn-label">
+                    📸 Pilih / Ambil Foto Spesial
+                    <input type="file" id="memCameraInput" accept="image/*" class="hidden">
+                </label>
+                <div id="memPreviewContainer" class="img-preview-box hidden">
+                    <img id="memPreviewImg" src="" alt="Preview Memory">
+                </div>
                 <input type="date" id="memDateInput" required>
-                <input type="text" id="memDescInput" placeholder="Keterangan aktivitas opsional (ex: 'Lagi ngajar siswa SMK ✨')">
-                <button type="submit" class="btn-primary" style="padding: 8px;">Simpan Foto ➔</button>
+                <input type="text" id="memTitleInput" placeholder="Judul momen (ex: 'Jalan-jalan ke Bandung', 'Date Cafe')" required>
+                <input type="text" id="memDescInput" placeholder="Keterangan kenangan..." style="width: 100%; padding: 6px; border-radius: 8px; border: 1px solid #f2cc8f; font-size: 11px; outline: none;">
+                <button type="submit" class="btn-primary" style="padding: 8px;">Simpan ke Album ➔</button>
             </form>
 
             <div id="memoriesGridContainer" class="memories-grid">
-                <p class="empty-act">Belum ada foto kenangan. Upload foto manis kalian yuk!</p>
+                <p class="empty-act">Belum ada album kenangan. Tambahkan momen spesial kalian!</p>
             </div>
         </div>
         <nav class="bottom-nav">
             <button class="nav-item" id="navHomeM">🏠 <span>Home</span></button>
-            <button class="nav-item" id="navJourneyM">❤️ <span>Journey</span></button>
-            <button class="nav-item active" id="navMemoriesM">📸 <span>Memories</span></button>
+            <button class="nav-item" id="navJourneyM">📸 <span>Our Journey</span></button>
+            <button class="nav-item active" id="navMemoriesM">🖼️ <span>Memories</span></button>
             <button class="nav-item" id="navHeartnotesM">💌 <span>Heartnotes</span></button>
         </nav>
     </div>
 
-    <!-- SCREEN 3: HEARTNOTES (UNSAID THOUGHTS) -->
+    <!-- SCREEN 3: HEARTNOTES -->
     <div id="heartnotesScreen" class="sub-screen hidden">
         <header class="sub-screen-header">
             <h3>Heartnotes 💌</h3>
@@ -306,8 +319,8 @@
         </div>
         <nav class="bottom-nav">
             <button class="nav-item" id="navHomeH">🏠 <span>Home</span></button>
-            <button class="nav-item" id="navJourneyH">❤️ <span>Journey</span></button>
-            <button class="nav-item" id="navMemoriesH">📸 <span>Memories</span></button>
+            <button class="nav-item" id="navJourneyH">📸 <span>Our Journey</span></button>
+            <button class="nav-item" id="navMemoriesH">🖼️ <span>Memories</span></button>
             <button class="nav-item active" id="navHeartnotesH">💌 <span>Heartnotes</span></button>
         </nav>
     </div>

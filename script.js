@@ -205,9 +205,9 @@ document.getElementById('btnEnterApp')?.addEventListener('click', () => {
         listenStartDate(currentUserData.coupleSpaceId);
         listenMochiStats(currentUserData.coupleSpaceId);
         listenWishlist(currentUserData.coupleSpaceId);
-        checkOnThisDayMemories(currentUserData.coupleSpaceId);
-        listenJourney(currentUserData.coupleSpaceId);
-        listenMemories(currentUserData.coupleSpaceId);
+        checkOnThisDayMemoriesOnly(currentUserData.coupleSpaceId);
+        listenJourneyPAP(currentUserData.coupleSpaceId);
+        listenMemoriesAlbum(currentUserData.coupleSpaceId);
         listenHeartnotes(currentUserData.coupleSpaceId);
     }
 });
@@ -267,8 +267,8 @@ async function updateUserPresence(spaceId) {
     });
 }
 
-// REVISI 1: WIDGET ON THIS DAY (KENANGAN TANGGAL SAMA DI MASA LALU)
-function checkOnThisDayMemories(spaceId) {
+// WIDGET DASHBOARD: HANYA DARI FOTO "MEMORIES" TANGGAL SAMA DI MASA LALU
+function checkOnThisDayMemoriesOnly(spaceId) {
     if (!spaceId) return;
 
     const today = new Date();
@@ -293,8 +293,8 @@ function checkOnThisDayMemories(spaceId) {
                     document.getElementById('otdCaption').innerText = `"${data.title}" ${data.desc ? '- ' + data.desc : ''}`;
 
                     const imgEl = document.getElementById('otdImage');
-                    if (data.url) {
-                        imgEl.src = data.url;
+                    if (data.imgData) {
+                        imgEl.src = data.imgData;
                         imgEl.classList.remove('hidden');
                     } else {
                         imgEl.classList.add('hidden');
@@ -339,7 +339,7 @@ function calculateDaysTogether(startDateStr) {
     document.getElementById('daysTogetherCount').innerText = isNaN(diffDays) ? 0 : diffDays;
 }
 
-// NAVIGATION BETWEEN SUB-SCREENS (HOME, JOURNEY, MEMORIES, HEARTNOTES)
+// SCREEN SWITCHING
 const homeScreen = document.getElementById('homeScreen');
 const journeyScreen = document.getElementById('journeyScreen');
 const memoriesScreen = document.getElementById('memoriesScreen');
@@ -350,38 +350,64 @@ function showSubScreen(screenToShow) {
     screenToShow?.classList.remove('hidden');
 }
 
-// Event Listeners Navigasi Bawah
 document.querySelectorAll('[id^="navHome"]').forEach(btn => btn.addEventListener('click', () => showSubScreen(homeScreen)));
 document.querySelectorAll('[id^="navJourney"]').forEach(btn => btn.addEventListener('click', () => showSubScreen(journeyScreen)));
 document.querySelectorAll('[id^="navMemories"]').forEach(btn => btn.addEventListener('click', () => showSubScreen(memoriesScreen)));
 document.querySelectorAll('[id^="navHeartnotes"]').forEach(btn => btn.addEventListener('click', () => showSubScreen(heartnotesScreen)));
 
-// 1. FEATURE: JOURNEY (MILESTONES)
+// 1. FEATURE: OUR JOURNEY (PAP KESEHARIAN WITH CAMERA INPUT)
+let journeyBase64Img = "";
+
 document.getElementById('btnOpenAddJourney')?.addEventListener('click', () => {
     document.getElementById('addJourneyForm')?.classList.toggle('hidden');
 });
 
+// Pemicu kamera HP & Convert gambar ke Base64
+document.getElementById('journeyCameraInput')?.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            journeyBase64Img = event.target.result;
+            document.getElementById('journeyPreviewImg').src = journeyBase64Img;
+            document.getElementById('journeyPreviewContainer').classList.remove('hidden');
+        };
+        reader.readAsDataURL(file);
+    }
+});
+
 document.getElementById('addJourneyForm')?.addEventListener('submit', async (e) => {
     e.preventDefault();
-    const title = document.getElementById('journeyTitleInput').value.trim();
-    const date = document.getElementById('journeyDateInput').value;
     const desc = document.getElementById('journeyDescInput').value.trim();
 
+    if (!journeyBase64Img) return alert("Ambil foto PAP terlebih dahulu ya!");
     if (!currentUserData || !currentUserData.coupleSpaceId) return;
 
-    await addDoc(collection(db, "couple_spaces", currentUserData.coupleSpaceId, "journey"), {
-        title, date, desc, author: currentUserData.nickname, createdAt: new Date()
+    await addDoc(collection(db, "couple_spaces", currentUserData.coupleSpaceId, "journey_pap"), {
+        imgData: journeyBase64Img,
+        desc,
+        author: currentUserData.nickname,
+        createdAt: new Date()
     });
 
-    document.getElementById('journeyTitleInput').value = '';
+    await addDoc(collection(db, "couple_spaces", currentUserData.coupleSpaceId, "notifications"), {
+        type: "pap",
+        senderUid: currentUserData.uid,
+        senderName: currentUserData.nickname,
+        message: `mengirimkan PAP keseharian baru 📸`,
+        timestamp: new Date()
+    });
+
+    journeyBase64Img = "";
     document.getElementById('journeyDescInput').value = '';
+    document.getElementById('journeyPreviewContainer').classList.add('hidden');
     document.getElementById('addJourneyForm').classList.add('hidden');
 });
 
-function listenJourney(spaceId) {
+function listenJourneyPAP(spaceId) {
     if (!spaceId) return;
-    const ref = collection(db, "couple_spaces", spaceId, "journey");
-    const q = query(ref, orderBy("date", "asc"));
+    const ref = collection(db, "couple_spaces", spaceId, "journey_pap");
+    const q = query(ref, orderBy("createdAt", "desc"));
 
     onSnapshot(q, (snapshot) => {
         const container = document.getElementById('journeyTimelineContainer');
@@ -389,49 +415,73 @@ function listenJourney(spaceId) {
         container.innerHTML = '';
 
         if (snapshot.empty) {
-            container.innerHTML = '<p class="empty-act">Belum ada jejak perjalanan. Yuk catat momen pertama kalian!</p>';
+            container.innerHTML = '<p class="empty-act">Belum ada PAP keseharian. Kirim foto kegiatanmu yuk!</p>';
             return;
         }
 
         snapshot.docs.forEach(docSnap => {
             const data = docSnap.data();
+            const timeStr = data.createdAt ? new Date(data.createdAt.toDate()).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' }) : '';
+
             const item = document.createElement('div');
-            item.className = 'timeline-item';
+            item.className = 'pap-card';
             item.innerHTML = `
-                <span class="timeline-date">📅 ${data.date}</span>
-                <div class="timeline-title">${data.title}</div>
-                ${data.desc ? `<div class="timeline-desc">${data.desc}</div>` : ''}
+                <div class="pap-header">
+                    <span class="pap-user">${data.author}</span>
+                    <span class="pap-time">${timeStr}</span>
+                </div>
+                <img src="${data.imgData}" alt="PAP Keseharian" class="pap-img">
+                <div class="pap-desc">${data.desc}</div>
             `;
             container.appendChild(item);
         });
     });
 }
 
-// 2. FEATURE: MEMORIES (DAILY PHOTO & ALBUM)
+// 2. FEATURE: MEMORIES (ALBUM FOTO DATE / SPESIAL)
+let memBase64Img = "";
+
 document.getElementById('btnOpenAddMemory')?.addEventListener('click', () => {
     document.getElementById('addMemoryForm')?.classList.toggle('hidden');
 });
 
+document.getElementById('memCameraInput')?.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            memBase64Img = event.target.result;
+            document.getElementById('memPreviewImg').src = memBase64Img;
+            document.getElementById('memPreviewContainer').classList.remove('hidden');
+        };
+        reader.readAsDataURL(file);
+    }
+});
+
 document.getElementById('addMemoryForm')?.addEventListener('submit', async (e) => {
     e.preventDefault();
-    const title = document.getElementById('memTitleInput').value.trim();
-    const url = document.getElementById('memUrlInput').value.trim();
     const date = document.getElementById('memDateInput').value;
+    const title = document.getElementById('memTitleInput').value.trim();
     const desc = document.getElementById('memDescInput').value.trim();
 
+    if (!memBase64Img) return alert("Pilih / ambil foto album terlebih dahulu!");
     if (!currentUserData || !currentUserData.coupleSpaceId) return;
 
     await addDoc(collection(db, "couple_spaces", currentUserData.coupleSpaceId, "memories"), {
-        title, url, date, desc, author: currentUserData.nickname, createdAt: new Date()
+        imgData: memBase64Img,
+        date, title, desc,
+        author: currentUserData.nickname,
+        createdAt: new Date()
     });
 
+    memBase64Img = "";
     document.getElementById('memTitleInput').value = '';
-    document.getElementById('memUrlInput').value = '';
     document.getElementById('memDescInput').value = '';
+    document.getElementById('memPreviewContainer').classList.add('hidden');
     document.getElementById('addMemoryForm').classList.add('hidden');
 });
 
-function listenMemories(spaceId) {
+function listenMemoriesAlbum(spaceId) {
     if (!spaceId) return;
     const ref = collection(db, "couple_spaces", spaceId, "memories");
     const q = query(ref, orderBy("date", "desc"));
@@ -442,7 +492,7 @@ function listenMemories(spaceId) {
         container.innerHTML = '';
 
         if (snapshot.empty) {
-            container.innerHTML = '<p class="empty-act">Belum ada foto kenangan. Upload foto manis kalian yuk!</p>';
+            container.innerHTML = '<p class="empty-act">Belum ada album kenangan. Tambahkan momen spesial kalian!</p>';
             return;
         }
 
@@ -451,7 +501,8 @@ function listenMemories(spaceId) {
             const card = document.createElement('div');
             card.className = 'mem-card';
             card.innerHTML = `
-                <img src="${data.url}" alt="${data.title}">
+                <img src="${data.imgData}" alt="${data.title}">
+                <span class="mem-date">📅 ${data.date}</span>
                 <div class="mem-title">${data.title}</div>
                 ${data.desc ? `<div class="mem-desc">"${data.desc}"</div>` : ''}
             `;
@@ -460,7 +511,7 @@ function listenMemories(spaceId) {
     });
 }
 
-// 3. FEATURE: HEARTNOTES (UNSAID THOUGHTS)
+// 3. FEATURE: HEARTNOTES
 document.getElementById('btnOpenAddNote')?.addEventListener('click', () => {
     document.getElementById('addNoteForm')?.classList.toggle('hidden');
 });
@@ -803,8 +854,8 @@ function showNotifBanner(type, sender, message) {
     const msgEl = document.getElementById('notifMessage');
 
     if (iconEl && titleEl && msgEl && banner) {
-        iconEl.innerText = type === "express" ? "💖" : (type === "mochi" ? "🐱" : (type === "wish" ? "⭐" : (type === "note" ? "💌" : "😊")));
-        titleEl.innerText = type === "express" ? "Express Love Masuk! 💖" : (type === "mochi" ? "Mochi Dirawat! 🐱" : (type === "wish" ? "Wishlist Update! ⭐" : (type === "note" ? "Heartnotes Baru! 💌" : "Mood Pasangan Update!")));
+        iconEl.innerText = type === "express" ? "💖" : (type === "mochi" ? "🐱" : (type === "pap" ? "📸" : (type === "note" ? "💌" : "😊")));
+        titleEl.innerText = type === "express" ? "Express Love Masuk! 💖" : (type === "mochi" ? "Mochi Dirawat! 🐱" : (type === "pap" ? "PAP Baru Masuk! 📸" : (type === "note" ? "Heartnotes Baru! 💌" : "Mood Pasangan Update!")));
         msgEl.innerText = `${sender}: ${message}`;
 
         banner.classList.remove('hidden');
