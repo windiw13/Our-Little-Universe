@@ -397,3 +397,11 @@ body.pixel-theme {
     margin-bottom: 10px;
     resize: none;
 }
+/* Aturan Sembunyikan Form & Elemen */
+.hidden {
+    display: none !important;
+}
+
+.form-content.hidden {
+    display: none !important;
+}

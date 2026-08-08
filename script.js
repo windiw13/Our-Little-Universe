@@ -306,3 +306,18 @@ document.getElementById('btnSaveMood')?.addEventListener('click', async () => {
         alert(`Mood hari ini (${selectedMood}) tersimpan! 🤍`);
     }
 });
+if (tabLogin && tabRegister) {
+    tabLogin.addEventListener('click', () => {
+        tabLogin.classList.add('active');
+        tabRegister.classList.remove('active');
+        loginForm.classList.remove('hidden');
+        registerForm.classList.add('hidden');
+    });
+
+    tabRegister.addEventListener('click', () => {
+        tabRegister.classList.add('active');
+        tabLogin.classList.remove('active');
+        registerForm.classList.remove('hidden');
+        loginForm.classList.add('hidden');
+    });
+}
