@@ -1,201 +1,35 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Our Little Universe 🤍</title>
-    <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-</head>
-<body>
-
-    <!-- Background Glows -->
-    <div class="bg-glow blue"></div>
-    <div class="bg-glow pink"></div>
-
-    <!-- AUTHENTICATION CONTAINER -->
-    <main class="auth-container">
-        <div class="app-header">
-            <div class="app-icon">🤍</div>
-            <h1>Our Little Universe</h1>
-            <p>A small place for two hearts, even when far apart.</p>
+<!-- MODAL SEND HUG -->
+<div id="hugModal" class="modal hidden">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Kirim Pelukan ke Rama 🤍</h3>
+            <button class="close-modal" id="closeHugModal">✕</button>
         </div>
-
-        <!-- CARD 1: LOGIN / REGISTER -->
-        <div id="authCard" class="card active">
-            <div class="tab-group">
-                <button id="tabLogin" class="tab-btn active">Masuk</button>
-                <button id="tabRegister" class="tab-btn">Daftar Akun</button>
-            </div>
-
-            <!-- Register Form -->
-            <form id="registerForm" class="form-content">
-                <div class="input-group">
-                    <label>Nama Lengkap</label>
-                    <input type="text" id="regFullName" placeholder="Windi Widiana" required>
-                </div>
-                <div class="input-group">
-                    <label>Nama Panggilan Sayang</label>
-                    <input type="text" id="regNickname" placeholder="Diw" required>
-                </div>
-                <div class="input-group">
-                    <label>Kota Tempat Tinggal</label>
-                    <input type="text" id="regLocation" placeholder="Sukabumi" required>
-                </div>
-                <div class="input-group">
-                    <label>Tanggal Lahir</label>
-                    <input type="date" id="regBirthDate" required>
-                </div>
-                <div class="input-group">
-                    <label>Email</label>
-                    <input type="email" id="regEmail" placeholder="email@gmail.com" required>
-                </div>
-                <div class="input-group">
-                    <label>Password</label>
-                    <input type="password" id="regPassword" placeholder="******" required>
-                </div>
-                <button type="submit" class="btn-primary">Daftar & Lanjut ➔</button>
-            </form>
-
-            <!-- Login Form -->
-            <form id="loginForm" class="form-content hidden">
-                <div class="input-group">
-                    <label>Email</label>
-                    <input type="email" id="loginEmail" placeholder="email@gmail.com" required>
-                </div>
-                <div class="input-group">
-                    <label>Password</label>
-                    <input type="password" id="loginPassword" placeholder="******" required>
-                </div>
-                <button type="submit" class="btn-primary">Masuk ➔</button>
-            </form>
+        <p class="modal-sub">Pilih jenis pelukan yang mau kamu kirim sekarang:</p>
+        <div class="hug-options">
+            <button class="hug-opt-btn" data-type="Peluk Biasa 🤗">🤗 Peluk Biasa</button>
+            <button class="hug-opt-btn" data-type="Peluk Lama 🫂">🫂 Peluk Lama</button>
+            <button class="hug-opt-btn" data-type="Peluk Kangen 🥺">🥺 Peluk Karena Kangen</button>
+            <button class="hug-opt-btn" data-type="Peluk Sayang ❤️">❤️ Peluk Sayang Banget</button>
         </div>
-
-        <!-- CARD 2: COUPLE SPACE SETUP -->
-        <div id="coupleCard" class="card hidden">
-            <h2>Hubungkan Pasangan 🤍</h2>
-            <p class="card-subtitle">Buat ruang baru atau masukkan kode dari Rama.</p>
-
-            <div class="couple-options">
-                <div class="option-box">
-                    <h3>Buat Space Baru</h3>
-                    <p>Dapatkan kode unik untuk dikirim ke Rama.</p>
-                    <button id="btnCreateSpace" class="btn-secondary">Buat Space & Dapatkan Kode</button>
-                </div>
-
-                <div class="divider"><span>atau</span></div>
-
-                <div class="option-box">
-                    <h3>Punya Kode Pasangan?</h3>
-                    <input type="text" id="joinCodeInput" placeholder="Contoh: LOVE-8F29Q">
-                    <button id="btnJoinSpace" class="btn-primary">Gabung ke Space Rama</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- CARD 3: SHOW CODE WAITING SCREEN -->
-        <div id="codeDisplayCard" class="card hidden">
-            <h2>Kode Space Kamu 🔒</h2>
-            <p class="card-subtitle">Kirimkan kode ini ke Rama untuk terhubung berdua:</p>
-            
-            <div class="code-box">
-                <span id="generatedCodeDisplay">LOVE-XXXXX</span>
-                <button id="btnCopyCode" class="btn-icon">📋 Salin</button>
-            </div>
-
-            <div class="waiting-animation">
-                <div class="pulse-heart">🤍</div>
-                <p>Menunggu Rama bergabung...</p>
-            </div>
-        </div>
-
-        <!-- CARD 4: CONNECTION SUCCESSFUL -->
-        <div id="successCard" class="card hidden">
-            <div class="success-icon">🎉</div>
-            <h2>Connection Successful!</h2>
-            <div class="couple-badge">
-                <span id="p1Name">Diw</span>
-                <span class="heart-anim">❤️</span>
-                <span id="p2Name">Rama</span>
-            </div>
-            <p class="card-subtitle">Your Little Universe is Ready 🤍</p>
-            <button id="btnEnterApp" class="btn-primary">Masuk ke Rumah Digital ➔</button>
-        </div>
-    </main>
-
-    <!-- HOME DASHBOARD CONTAINER -->
-    <div id="homeScreen" class="home-container hidden">
-        <header class="home-header">
-            <div class="user-greeting">
-                <span class="greeting-text">Good Morning,</span>
-                <h2 id="homeUserGreeting">Diw ❤️</h2>
-            </div>
-            <div class="couple-status-pill">
-                <span>Sukabumi</span>
-                <span class="heart-pulse">❤️</span>
-                <span>Bandung</span>
-            </div>
-        </header>
-
-        <!-- Card 1: Day Counter -->
-        <section class="card counter-card">
-            <div class="counter-badge">Together Since</div>
-            <div class="counter-days">
-                <span id="daysTogetherCount">214</span>
-                <small>Hari</small>
-            </div>
-            <p class="counter-sub">Windi & Rama's Little Universe 🤍</p>
-        </section>
-
-        <!-- Card 2: Distance Tracker -->
-        <section class="card distance-card">
-            <div class="distance-info">
-                <div class="city-box">
-                    <span class="city-name">Sukabumi</span>
-                    <span class="partner-name">Diw</span>
-                </div>
-                <div class="distance-line">
-                    <span class="line"></span>
-                    <span class="km-badge">~143 KM</span>
-                    <span class="line"></span>
-                </div>
-                <div class="city-box">
-                    <span class="city-name">Bandung</span>
-                    <span class="partner-name">Rama</span>
-                </div>
-            </div>
-            <p class="distance-quote">"Distance means so little when someone means so much."</p>
-        </section>
-
-        <!-- Card 3: Quick Action Buttons -->
-        <section class="quick-grid">
-            <button id="btnHugModal" class="action-btn hug-btn">
-                <span class="btn-icon">🤗</span>
-                <span class="btn-label">Send Hug</span>
-            </button>
-            <button id="btnMoodModal" class="action-btn mood-btn">
-                <span class="btn-icon">😊</span>
-                <span class="btn-label">Daily Check</span>
-            </button>
-            <button id="btnPetModal" class="action-btn pet-btn">
-                <span class="btn-icon">🐱</span>
-                <span class="btn-label">Mochi</span>
-            </button>
-            <button id="btnWishlistModal" class="action-btn wish-btn">
-                <span class="btn-icon">⭐</span>
-                <span class="btn-label">Wishlist</span>
-            </button>
-        </section>
-
-        <!-- Bottom Navigation Bar -->
-        <nav class="bottom-nav">
-            <button class="nav-item active">🏠 <span>Home</span></button>
-            <button class="nav-item">❤️ <span>Journey</span></button>
-            <button class="nav-item">📸 <span>Memories</span></button>
-            <button class="nav-item">💌 <span>Letters</span></button>
-        </nav>
     </div>
+</div>
 
-    <script type="module" src="script.js"></script>
-</body>
-</html>
+<!-- MODAL DAILY CHECK (MOOD) -->
+<div id="moodModal" class="modal hidden">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Perasaan Hari Ini 😊</h3>
+            <button class="close-modal" id="closeMoodModal">✕</button>
+        </div>
+        <div class="mood-selector">
+            <button class="mood-opt" data-mood="😊 Bahagia">😊</button>
+            <button class="mood-opt" data-mood="🥰 Semangat">🥰</button>
+            <button class="mood-opt" data-mood="😴 Lelah">😴</button>
+            <button class="mood-opt" data-mood="😔 Sedih">😔</button>
+            <button class="mood-opt" data-mood="🥺 Kangen">🥺</button>
+        </div>
+        <textarea id="moodNoteInput" placeholder="Ceritain sedikit hari ini... (misal: 'Capek kerjaan, tapi seneng inget kamu')"></textarea>
+        <button id="btnSaveMood" class="btn-primary">Simpan Mood Hari Ini ➔</button>
+    </div>
+</div>
