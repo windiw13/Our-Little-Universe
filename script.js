@@ -292,7 +292,7 @@ function calculateDaysTogether(startDateStr) {
     document.getElementById('daysTogetherCount').innerText = isNaN(diffDays) ? 0 : diffDays;
 }
 
-// MOCHI ROOM FULL-SCREEN SWITCHING
+// MOCHI ROOM SWITCHING
 document.getElementById('btnPetModal')?.addEventListener('click', () => {
     document.getElementById('homeScreen')?.classList.add('hidden');
     document.getElementById('petScreen')?.classList.remove('hidden');
@@ -303,7 +303,7 @@ document.getElementById('btnBackFromPet')?.addEventListener('click', () => {
     document.getElementById('homeScreen')?.classList.remove('hidden');
 });
 
-// REALTIME MOCHI GAME & DRAG DROP LOGIC
+// REALTIME MOCHI GAME & ANIMATED EXPRESSIONS
 let activeToolType = null;
 
 function listenMochiStats(spaceId) {
@@ -336,7 +336,7 @@ function updateMochiUI(mochi) {
     }
 }
 
-// PANGGIL ALAT DRAG & DROP
+// DRAG TOOLS
 const draggableItem = document.getElementById('draggableItem');
 const btnFeedTool = document.getElementById('btnFeedTool');
 const btnBathTool = document.getElementById('btnBathTool');
@@ -375,7 +375,8 @@ draggableItem?.addEventListener('pointermove', (e) => {
     draggableItem.style.left = `${x}px`;
     draggableItem.style.top = `${y}px`;
 
-    const mochiRect = document.getElementById('mochiCharacter').getBoundingClientRect();
+    const mochiChar = document.getElementById('mochiCharacter');
+    const mochiRect = mochiChar.getBoundingClientRect();
     const itemRect = draggableItem.getBoundingClientRect();
 
     if (
@@ -387,12 +388,26 @@ draggableItem?.addEventListener('pointermove', (e) => {
         isDragging = false;
         draggableItem.classList.add('hidden');
 
+        // ANIMASI EKSPRESI MOCHI SAAT MAKAN & MANDI
         if (activeToolType === 'feed') {
             document.getElementById('mochiMouth').innerText = 'O';
-            setTimeout(() => document.getElementById('mochiMouth').innerText = 'ω', 1000);
+            document.getElementById('mochiBubble').innerText = '"Nom nom! Ikan lezat! 😋"';
+            mochiChar.classList.add('happy-eat');
+
+            setTimeout(() => {
+                document.getElementById('mochiMouth').innerText = 'ω';
+                mochiChar.classList.remove('happy-eat');
+            }, 1500);
+
             updateMochiAction("feed", 25);
         } else if (activeToolType === 'bath') {
             document.getElementById('mochiBubble').innerText = '"Mochi wangi & segar! 🫧"';
+            mochiChar.classList.add('babbing-soap');
+
+            setTimeout(() => {
+                mochiChar.classList.remove('babbing-soap');
+            }, 1800);
+
             updateMochiAction("bath", 30);
         }
     }
@@ -400,7 +415,7 @@ draggableItem?.addEventListener('pointermove', (e) => {
 
 draggableItem?.addEventListener('pointerup', () => { isDragging = false; });
 
-// SENTUHAN KETUKAN LANGSUNG (PUK-PUK)
+// SENTUHAN PUK-PUK
 document.getElementById('mochiCharacter')?.addEventListener('click', () => {
     document.getElementById('mochiMouth').innerText = 'u';
     document.getElementById('mochiBubble').innerText = '"Purrr... Mochi sayang kalian! 💕"';

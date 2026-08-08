@@ -1,323 +1,575 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Our Little Universe 🤍</title>
-    <link rel="stylesheet" href="style.css">
-    <!-- Google Pixel & Modern Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
-</head>
-<body class="pixel-theme">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+import { getFirestore, doc, setDoc, getDoc, updateDoc, onSnapshot, collection, addDoc, query, orderBy, limit, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-    <!-- FLOATING REALTIME NOTIFICATION BANNER -->
-    <div id="realtimeNotif" class="notif-toast hidden">
-        <div class="notif-icon" id="notifIcon">💖</div>
-        <div class="notif-body">
-            <h4 id="notifTitle">Pesan Masuk!</h4>
-            <p id="notifMessage">Rama mengirimkan sesuatu...</p>
-        </div>
-        <button id="closeNotifBtn" class="notif-close">✕</button>
-    </div>
+// FIREBASE CONFIG
+const firebaseConfig = {
+  apiKey: "AIzaSyDLgyp6_O-T9oHNUZM-mOj-lpKpE6rJ04E",
+  authDomain: "our-little-universe-0209.firebaseapp.com",
+  projectId: "our-little-universe-0209",
+  storageBucket: "our-little-universe-0209.firebasestorage.app",
+  messagingSenderId: "924945430782",
+  appId: "1:924945430782:web:9dcab9bd35b5595c480daf",
+  measurementId: "G-Y7FSMN5NJP"
+};
 
-    <!-- AUTHENTICATION CONTAINER -->
-    <main class="auth-container">
-        <div class="app-header">
-            <div class="pixel-avatar">🐱🤍✨</div>
-            <h1 class="pixel-title">Our Little Universe</h1>
-            <p>A small cozy space for Diw & Rama</p>
-        </div>
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
 
-        <!-- CARD 1: LOGIN / REGISTER -->
-        <div id="authCard" class="card active">
-            <div class="tab-group">
-                <button id="tabLogin" class="tab-btn active">Masuk</button>
-                <button id="tabRegister" class="tab-btn">Daftar Akun</button>
-            </div>
+let currentUserData = null;
 
-            <!-- Login Form -->
-            <form id="loginForm" class="form-content">
-                <div class="input-group">
-                    <label>Email</label>
-                    <input type="email" id="loginEmail" placeholder="email@gmail.com" required>
-                </div>
-                <div class="input-group">
-                    <label>Password</label>
-                    <input type="password" id="loginPassword" placeholder="******" required>
-                </div>
-                <button type="submit" class="btn-primary">Masuk ➔</button>
-            </form>
+// DOM Elements
+const authCard = document.getElementById('authCard');
+const coupleCard = document.getElementById('coupleCard');
+const codeDisplayCard = document.getElementById('codeDisplayCard');
+const successCard = document.getElementById('successCard');
 
-            <!-- Register Form -->
-            <form id="registerForm" class="form-content hidden">
-                <div class="input-group">
-                    <label>Nama Lengkap</label>
-                    <input type="text" id="regFullName" placeholder="Windi Widiana" required>
-                </div>
-                <div class="input-group">
-                    <label>Nama Panggilan Sayang</label>
-                    <input type="text" id="regNickname" placeholder="Diw" required>
-                </div>
-                <div class="input-group">
-                    <label>Kota Tempat Tinggal</label>
-                    <input type="text" id="regLocation" placeholder="Sukabumi" required>
-                </div>
-                <div class="input-group">
-                    <label>Tanggal Lahir</label>
-                    <input type="date" id="regBirthDate" required>
-                </div>
-                <div class="input-group">
-                    <label>Email</label>
-                    <input type="email" id="regEmail" placeholder="email@gmail.com" required>
-                </div>
-                <div class="input-group">
-                    <label>Password</label>
-                    <input type="password" id="regPassword" placeholder="******" required>
-                </div>
-                <button type="submit" class="btn-primary">Daftar & Lanjut ➔</button>
-            </form>
-        </div>
+const tabLogin = document.getElementById('tabLogin');
+const tabRegister = document.getElementById('tabRegister');
+const registerForm = document.getElementById('registerForm');
+const loginForm = document.getElementById('loginForm');
 
-        <!-- CARD 2: COUPLE SPACE SETUP -->
-        <div id="coupleCard" class="card hidden">
-            <h2>Hubungkan Pasangan 🤍</h2>
-            <p class="card-subtitle">Buat ruang baru atau masukkan kode dari Rama.</p>
+// Tab Toggle
+if (tabLogin && tabRegister) {
+    tabLogin.addEventListener('click', () => {
+        tabLogin.classList.add('active');
+        tabRegister.classList.remove('active');
+        loginForm.classList.remove('hidden');
+        registerForm.classList.add('hidden');
+    });
 
-            <div class="couple-options">
-                <div class="option-box">
-                    <h3>Buat Space Baru</h3>
-                    <p>Dapatkan kode unik untuk dikirim ke Rama.</p>
-                    <button id="btnCreateSpace" class="btn-secondary">Buat Space & Dapatkan Kode</button>
-                </div>
+    tabRegister.addEventListener('click', () => {
+        tabRegister.classList.add('active');
+        tabLogin.classList.remove('active');
+        registerForm.classList.remove('hidden');
+        loginForm.classList.add('hidden');
+    });
+}
 
-                <div class="divider"><span>atau</span></div>
+// REGISTER USER
+if (registerForm) {
+    registerForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const fullName = document.getElementById('regFullName').value;
+        const nickname = document.getElementById('regNickname').value;
+        const location = document.getElementById('regLocation').value;
+        const birthDate = document.getElementById('regBirthDate').value;
+        const email = document.getElementById('regEmail').value;
+        const password = document.getElementById('regPassword').value;
 
-                <div class="option-box">
-                    <h3>Punya Kode Pasangan?</h3>
-                    <input type="text" id="joinCodeInput" placeholder="Contoh: LOVE-8F29Q">
-                    <button id="btnJoinSpace" class="btn-primary">Gabung ke Space Rama</button>
-                </div>
-            </div>
-        </div>
+        try {
+            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+            const uid = userCredential.user.uid;
 
-        <!-- CARD 3: SHOW CODE WAITING SCREEN -->
-        <div id="codeDisplayCard" class="card hidden">
-            <h2>Kode Space Kamu 🔒</h2>
-            <p class="card-subtitle">Kirimkan kode ini ke Rama untuk terhubung berdua:</p>
-            
-            <div class="code-box">
-                <span id="generatedCodeDisplay">LOVE-XXXXX</span>
-                <button id="btnCopyCode" class="btn-icon">📋 Salin</button>
-            </div>
+            currentUserData = { uid, fullName, nickname, location, birthDate, email, coupleSpaceId: null };
+            await setDoc(doc(db, "users", uid), currentUserData);
 
-            <div class="waiting-animation">
-                <div class="pixel-avatar pulse">🐱❤️🐱</div>
-                <p>Menunggu Rama bergabung...</p>
-            </div>
-        </div>
+            authCard.classList.add('hidden');
+            coupleCard.classList.remove('hidden');
+        } catch (error) {
+            alert("Gagal Daftar: " + error.message);
+        }
+    });
+}
 
-        <!-- CARD 4: CONNECTION SUCCESSFUL -->
-        <div id="successCard" class="card hidden">
-            <div class="success-icon">🎉</div>
-            <h2>Connection Successful!</h2>
-            <div class="couple-badge">
-                <span id="p1Name">Diw</span>
-                <span class="heart-anim">❤️</span>
-                <span id="p2Name">Rama</span>
-            </div>
-            <p class="card-subtitle">Your Little Universe is Ready 🤍</p>
-            <button id="btnEnterApp" class="btn-primary">Masuk ke Rumah Digital ➔</button>
-        </div>
-    </main>
+// LOGIN USER
+if (loginForm) {
+    loginForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = document.getElementById('loginEmail').value;
+        const password = document.getElementById('loginPassword').value;
 
-    <!-- HOME DASHBOARD CONTAINER -->
-    <div id="homeScreen" class="home-container hidden">
-        <header class="home-header">
-            <div class="user-greeting">
-                <span class="greeting-text" id="timeGreeting">Good Day! ✨</span>
-                <h2 id="homeUserGreeting">Diw ❤️</h2>
-                <span class="partner-active-status" id="partnerActiveStatus">🟢 Rama Aktif</span>
-            </div>
-            <div class="couple-status-pill">
-                <span>Sukabumi</span>
-                <span class="heart-pulse">💖</span>
-                <span>Bandung</span>
-            </div>
-        </header>
+        try {
+            const userCredential = await signInWithEmailAndPassword(auth, email, password);
+            const uid = userCredential.user.uid;
 
-        <!-- Card 1: Day Counter -->
-        <section class="card counter-card">
-            <div class="pixel-decor left">🌸</div>
-            <div class="pixel-decor right">🌿</div>
-            <div class="counter-badge">Together Since</div>
-            <div class="counter-days">
-                <span id="daysTogetherCount">0</span>
-                <small>Hari</small>
-            </div>
-            
-            <div class="start-date-picker">
-                <input type="date" id="startDateInput">
-            </div>
+            const userDoc = await getDoc(doc(db, "users", uid));
+            currentUserData = userDoc.data();
 
-            <p class="counter-sub">Diw & Rama's Pixel World 🎮</p>
-        </section>
+            authCard.classList.add('hidden');
 
-        <!-- Card 2: Distance Tracker -->
-        <section class="card distance-card">
-            <div class="distance-info">
-                <div class="city-box">
-                    <span class="city-name">Sukabumi</span>
-                    <span class="partner-name">Diw 🏡</span>
-                </div>
-                <div class="distance-line">
-                    <span class="line"></span>
-                    <span class="km-badge">~143 KM</span>
-                    <span class="line"></span>
-                </div>
-                <div class="city-box">
-                    <span class="city-name">Bandung</span>
-                    <span class="partner-name">Rama 🏢</span>
-                </div>
-            </div>
-            <p class="distance-quote">"Distance means so little when someone means so much."</p>
-        </section>
+            if (currentUserData.coupleSpaceId) {
+                checkConnectionStatus(currentUserData.coupleSpaceId);
+            } else {
+                coupleCard.classList.remove('hidden');
+            }
+        } catch (error) {
+            alert("Gagal Login: " + error.message);
+        }
+    });
+}
 
-        <!-- Card 3: Quick Action Buttons -->
-        <section class="quick-grid">
-            <button id="btnHugModal" class="action-btn hug-btn">
-                <span class="btn-icon">💖</span>
-                <span class="btn-label">Express Love</span>
-            </button>
-            <button id="btnMoodModal" class="action-btn mood-btn">
-                <span class="btn-icon">😊</span>
-                <span class="btn-label">Daily Check</span>
-            </button>
-            <button id="btnPetModal" class="action-btn pet-btn">
-                <span class="btn-icon">🐱</span>
-                <span class="btn-label">Mochi</span>
-            </button>
-            <button id="btnWishlistModal" class="action-btn wish-btn">
-                <span class="btn-icon">⭐</span>
-                <span class="btn-label">Wishlist</span>
-            </button>
-        </section>
+// CREATE COUPLE SPACE
+document.getElementById('btnCreateSpace')?.addEventListener('click', async () => {
+    const code = "LOVE-" + Math.random().toString(36).substring(2, 7).toUpperCase();
+    
+    await setDoc(doc(db, "couple_spaces", code), {
+        spaceId: code,
+        partner1_uid: currentUserData.uid,
+        partner1_name: currentUserData.nickname,
+        partner2_uid: null,
+        partner2_name: null,
+        status: "waiting",
+        startDate: null,
+        mochi: { hunger: 80, hygiene: 70, love: 90 },
+        createdAt: new Date()
+    });
 
-        <!-- Card 4: Riwayat Seluruh Aktivitas -->
-        <section class="card activity-card">
-            <div class="act-header">
-                <span class="pixel-icon">💌</span>
-                <h4>Riwayat Aktivitas Kita</h4>
-            </div>
-            <div id="activityLogList" class="activity-log-container">
-                <p class="empty-act">Belum ada aktivitas hari ini. Kirim Express Love yuk!</p>
-            </div>
-        </section>
+    await updateDoc(doc(db, "users", currentUserData.uid), { coupleSpaceId: code });
+    document.getElementById('generatedCodeDisplay').innerText = code;
+    coupleCard.classList.add('hidden');
+    codeDisplayCard.classList.remove('hidden');
 
-        <!-- Bottom Navigation Bar -->
-        <nav class="bottom-nav">
-            <button class="nav-item active">🏠 <span>Home</span></button>
-            <button class="nav-item">❤️ <span>Journey</span></button>
-            <button class="nav-item">📸 <span>Memories</span></button>
-            <button class="nav-item">💌 <span>Letters</span></button>
-        </nav>
-    </div>
+    listenForPartner(code);
+});
 
-    <!-- MODAL EXPRESS LOVE -->
-    <div id="hugModal" class="modal hidden">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>Express Love to Rama 💖</h3>
-                <button class="close-modal" id="closeHugModal">✕</button>
-            </div>
-            <p class="modal-sub">Pilih jenis perasaan yang mau kamu kirim sekarang:</p>
-            <div class="hug-options">
-                <button class="hug-opt-btn" data-type="Peluk Hangat 🤗">🤗 Peluk Hangat</button>
-                <button class="hug-opt-btn" data-type="Cium Manis 💋">💋 Cium Manis (Kiss)</button>
-                <button class="hug-opt-btn" data-type="Usap Kepala 🫳">🫳 Usap-usap Kepala (Pat)</button>
-                <button class="hug-opt-btn" data-type="Kangen Banget 🥺">🥺 Kangen Banget</button>
-                <button class="hug-opt-btn" data-type="Peluk + Cium ❤️">❤️ Peluk & Cium</button>
-            </div>
-        </div>
-    </div>
+// JOIN COUPLE SPACE
+document.getElementById('btnJoinSpace')?.addEventListener('click', async () => {
+    const inputCode = document.getElementById('joinCodeInput').value.trim().toUpperCase();
+    if (!inputCode) return alert("Masukkan kodenya dulu ya!");
 
-    <!-- MODAL DAILY CHECK (MOOD) -->
-    <div id="moodModal" class="modal hidden">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>Perasaan Hari Ini 😊</h3>
-                <button class="close-modal" id="closeMoodModal">✕</button>
-            </div>
-            <div class="mood-selector">
-                <button class="mood-opt" data-mood="😊 Bahagia">😊</button>
-                <button class="mood-opt" data-mood="🥰 Semangat">🥰</button>
-                <button class="mood-opt" data-mood="😴 Lelah">😴</button>
-                <button class="mood-opt" data-mood="😔 Sedih">😔</button>
-                <button class="mood-opt" data-mood="🥺 Kangen">🥺</button>
-            </div>
-            <textarea id="moodNoteInput" placeholder="Ceritain sedikit hari ini... (misal: 'Capek kerjaan, tapi seneng inget kamu')"></textarea>
-            <button id="btnSaveMood" class="btn-primary">Simpan Mood Hari Ini ➔</button>
-        </div>
-    </div>
+    const spaceRef = doc(db, "couple_spaces", inputCode);
+    const spaceSnap = await getDoc(spaceRef);
 
-    <!-- SCREEN RUANGAN MOCHI FULL-SCREEN (ALA TALKING ANGELA & TALKING TOM) -->
-    <div id="petScreen" class="pet-room-container hidden">
-        <!-- Top Status Header -->
-        <header class="pet-room-header">
-            <button id="btnBackFromPet" class="btn-back">⬅️ Home</button>
-            <div class="pet-status-bars">
-                <div class="status-pill">🍲 <div class="bar-bg"><div id="barHunger" class="bar-fill hunger" style="width: 80%;"></div></div> <span id="txtHunger">80%</span></div>
-                <div class="status-pill">🧼 <div class="bar-bg"><div id="barHygiene" class="bar-fill hygiene" style="width: 70%;"></div></div> <span id="txtHygiene">70%</span></div>
-                <div class="status-pill">💖 <div class="bar-bg"><div id="barLove" class="bar-fill love" style="width: 90%;"></div></div> <span id="txtLove">90%</span></div>
-            </div>
-        </header>
+    if (spaceSnap.exists()) {
+        await updateDoc(spaceRef, {
+            partner2_uid: currentUserData.uid,
+            partner2_name: currentUserData.nickname,
+            status: "connected"
+        });
 
-        <!-- Area Ruangan Utama Tempat Mochi Berdiri -->
-        <main class="pet-room-view" id="mochiPlayArea">
-            <div class="pet-speech-bubble" id="mochiBubble">"Meow! Rawat Mochi berdua ya! 🤍"</div>
-            
-            <!-- Draggable Item (Ikan / Spons / Mainan) -->
-            <div id="draggableItem" class="draggable-item hidden">🐟</div>
+        await updateDoc(doc(db, "users", currentUserData.uid), { coupleSpaceId: inputCode });
+        const data = spaceSnap.data();
+        showSuccessScreen(data.partner1_name, currentUserData.nickname);
+    } else {
+        alert("Kode Space tidak ditemukan. Coba cek lagi ya!");
+    }
+});
 
-            <!-- Karakter Kucing Mochi Pou-Style -->
-            <div class="mochi-character-box" id="mochiCharacter">
-                <div class="mochi-ears">
-                    <span class="ear left"></span>
-                    <span class="ear right"></span>
-                </div>
-                <div class="mochi-body">
-                    <div class="mochi-face">
-                        <div class="mochi-eyes">
-                            <span class="eye"></span>
-                            <span class="eye"></span>
-                        </div>
-                        <div class="mochi-cheeks">
-                            <span class="cheek"></span>
-                            <span class="cheek"></span>
-                        </div>
-                        <div class="mochi-mouth" id="mochiMouth">ω</div>
-                    </div>
-                </div>
-                <div class="mochi-shadow"></div>
-            </div>
-        </main>
+function listenForPartner(spaceId) {
+    onSnapshot(doc(db, "couple_spaces", spaceId), (docSnap) => {
+        if (docSnap.exists()) {
+            const data = docSnap.data();
+            if (data.status === "connected") {
+                showSuccessScreen(data.partner1_name, data.partner2_name);
+            }
+        }
+    });
+}
 
-        <!-- Bottom Room Navigation Bar (Ala Talking Angela) -->
-        <footer class="pet-room-nav">
-            <button id="btnFeedTool" class="room-nav-btn">
-                <span class="nav-icon">🍽️</span>
-                <span>Makan</span>
-            </button>
-            <button id="btnBathTool" class="room-nav-btn">
-                <span class="nav-icon">🚿</span>
-                <span>Mandi</span>
-            </button>
-            <button id="btnPlayPet" class="room-nav-btn active">
-                <span class="nav-icon">🫳</span>
-                <span>Puk-puk</span>
-            </button>
-        </footer>
-    </div>
+function checkConnectionStatus(spaceId) {
+    getDoc(doc(db, "couple_spaces", spaceId)).then((docSnap) => {
+        if (docSnap.exists()) {
+            const data = docSnap.data();
+            if (data.status === "connected") {
+                showSuccessScreen(data.partner1_name, data.partner2_name);
+            } else {
+                document.getElementById('generatedCodeDisplay').innerText = spaceId;
+                codeDisplayCard.classList.remove('hidden');
+                listenForPartner(spaceId);
+            }
+        }
+    });
+}
 
-    <script type="module" src="script.js"></script>
-</body>
-</html>
+function showSuccessScreen(p1, p2) {
+    document.getElementById('p1Name').innerText = p1;
+    document.getElementById('p2Name').innerText = p2;
+
+    coupleCard.classList.add('hidden');
+    codeDisplayCard.classList.add('hidden');
+    successCard.classList.remove('hidden');
+}
+
+// COPY CODE BUTTON
+document.getElementById('btnCopyCode')?.addEventListener('click', () => {
+    const code = document.getElementById('generatedCodeDisplay').innerText;
+    navigator.clipboard.writeText(code);
+    alert("Kode berhasil disalin! Kirimkan ke Rama ya 🤍");
+});
+
+// ENTER HOME DASHBOARD
+document.getElementById('btnEnterApp')?.addEventListener('click', () => {
+    const authContainer = document.querySelector('.auth-container');
+    if (authContainer) authContainer.classList.add('hidden');
+    
+    const homeScreen = document.getElementById('homeScreen');
+    if (homeScreen) homeScreen.classList.remove('hidden');
+
+    if (currentUserData) {
+        document.getElementById('homeUserGreeting').innerText = currentUserData.nickname + " ❤️";
+        updateTimeGreeting();
+        updateUserPresence(currentUserData.coupleSpaceId);
+        listenRealtimeNotifications(currentUserData.coupleSpaceId);
+        listenStartDate(currentUserData.coupleSpaceId);
+        listenMochiStats(currentUserData.coupleSpaceId);
+    }
+});
+
+function updateTimeGreeting() {
+    const hour = new Date().getHours();
+    const greetingEl = document.getElementById('timeGreeting');
+    if (!greetingEl) return;
+
+    if (hour >= 5 && hour < 12) {
+        greetingEl.innerText = "Good Morning! ☀️";
+    } else if (hour >= 12 && hour < 17) {
+        greetingEl.innerText = "Good Afternoon! 🌤️";
+    } else if (hour >= 17 && hour < 21) {
+        greetingEl.innerText = "Good Evening! 🌙";
+    } else {
+        greetingEl.innerText = "Good Night! ✨";
+    }
+}
+
+async function updateUserPresence(spaceId) {
+    if (!spaceId) return;
+
+    const userRef = doc(db, "users", currentUserData.uid);
+    await updateDoc(userRef, { lastActive: serverTimestamp() });
+
+    onSnapshot(doc(db, "couple_spaces", spaceId), async (docSnap) => {
+        if (!docSnap.exists()) return;
+        const data = docSnap.data();
+
+        const partnerUid = data.partner1_uid === currentUserData.uid ? data.partner2_uid : data.partner1_uid;
+        const partnerName = data.partner1_uid === currentUserData.uid ? data.partner2_name : data.partner1_name;
+
+        if (!partnerUid) {
+            document.getElementById('partnerActiveStatus').innerText = `⏳ Menunggu ${partnerName || 'Rama'}...`;
+            return;
+        }
+
+        const partnerSnap = await getDoc(doc(db, "users", partnerUid));
+        if (partnerSnap.exists() && partnerSnap.data().lastActive) {
+            const lastActive = partnerSnap.data().lastActive.toDate();
+            const now = new Date();
+            const diffMinutes = Math.floor((now - lastActive) / 60000);
+
+            const statusEl = document.getElementById('partnerActiveStatus');
+            if (statusEl) {
+                if (diffMinutes < 3) {
+                    statusEl.innerText = `🟢 ${partnerName} Aktif sekarang`;
+                } else if (diffMinutes < 60) {
+                    statusEl.innerText = `🟡 ${partnerName} Aktif ${diffMinutes} mnt lalu`;
+                } else {
+                    const diffHours = Math.floor(diffMinutes / 60);
+                    statusEl.innerText = `⚪ ${partnerName} Aktif ${diffHours} jam lalu`;
+                }
+            }
+        }
+    });
+}
+
+// START DATE COUNTER
+const startDateInput = document.getElementById('startDateInput');
+
+function listenStartDate(spaceId) {
+    if (!spaceId) return;
+    onSnapshot(doc(db, "couple_spaces", spaceId), (docSnap) => {
+        if (docSnap.exists() && docSnap.data().startDate) {
+            const savedDate = docSnap.data().startDate;
+            startDateInput.value = savedDate;
+            calculateDaysTogether(savedDate);
+        }
+    });
+}
+
+startDateInput?.addEventListener('change', async (e) => {
+    const chosenDate = e.target.value;
+    if (currentUserData && currentUserData.coupleSpaceId) {
+        await updateDoc(doc(db, "couple_spaces", currentUserData.coupleSpaceId), { startDate: chosenDate });
+        calculateDaysTogether(chosenDate);
+    }
+});
+
+function calculateDaysTogether(startDateStr) {
+    const start = new Date(startDateStr);
+    const today = new Date();
+    const diffTime = Math.abs(today - start);
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    document.getElementById('daysTogetherCount').innerText = isNaN(diffDays) ? 0 : diffDays;
+}
+
+// MOCHI ROOM SWITCHING
+document.getElementById('btnPetModal')?.addEventListener('click', () => {
+    document.getElementById('homeScreen')?.classList.add('hidden');
+    document.getElementById('petScreen')?.classList.remove('hidden');
+});
+
+document.getElementById('btnBackFromPet')?.addEventListener('click', () => {
+    document.getElementById('petScreen')?.classList.add('hidden');
+    document.getElementById('homeScreen')?.classList.remove('hidden');
+});
+
+// REALTIME MOCHI GAME & ANIMATED EXPRESSIONS
+let activeToolType = null;
+
+function listenMochiStats(spaceId) {
+    if (!spaceId) return;
+    onSnapshot(doc(db, "couple_spaces", spaceId), (docSnap) => {
+        if (docSnap.exists()) {
+            const mochi = docSnap.data().mochi || { hunger: 80, hygiene: 70, love: 90 };
+            updateMochiUI(mochi);
+        }
+    });
+}
+
+function updateMochiUI(mochi) {
+    document.getElementById('barHunger').style.width = mochi.hunger + '%';
+    document.getElementById('txtHunger').innerText = mochi.hunger + '%';
+
+    document.getElementById('barHygiene').style.width = mochi.hygiene + '%';
+    document.getElementById('txtHygiene').innerText = mochi.hygiene + '%';
+
+    document.getElementById('barLove').style.width = mochi.love + '%';
+    document.getElementById('txtLove').innerText = mochi.love + '%';
+
+    const bubble = document.getElementById('mochiBubble');
+    if (mochi.hunger < 40) {
+        bubble.innerText = '"Mochi lapar banget... minta makan dong! 🐟"';
+    } else if (mochi.love > 85) {
+        bubble.innerText = '"Mochi seneng banget disayang kalian! 💖"';
+    } else {
+        bubble.innerText = '"Meow! Rawat Mochi berdua ya! 🤍"';
+    }
+}
+
+// DRAG TOOLS
+const draggableItem = document.getElementById('draggableItem');
+const btnFeedTool = document.getElementById('btnFeedTool');
+const btnBathTool = document.getElementById('btnBathTool');
+
+btnFeedTool?.addEventListener('click', () => {
+    activeToolType = 'feed';
+    draggableItem.innerText = '🐟';
+    draggableItem.classList.remove('hidden');
+    draggableItem.style.top = '60px';
+    draggableItem.style.left = '40px';
+    document.getElementById('mochiBubble').innerText = '"Geser ikannya ke mulut Mochi yuk! 🐟"';
+});
+
+btnBathTool?.addEventListener('click', () => {
+    activeToolType = 'bath';
+    draggableItem.innerText = '🧽';
+    draggableItem.classList.remove('hidden');
+    draggableItem.style.top = '60px';
+    draggableItem.style.left = '40px';
+    document.getElementById('mochiBubble').innerText = '"Gosokkan sponsnya ke badan Mochi! 🧼"';
+});
+
+let isDragging = false;
+
+draggableItem?.addEventListener('pointerdown', (e) => {
+    isDragging = true;
+    draggableItem.setPointerCapture(e.pointerId);
+});
+
+draggableItem?.addEventListener('pointermove', (e) => {
+    if (!isDragging) return;
+    const playArea = document.getElementById('mochiPlayArea').getBoundingClientRect();
+    let x = e.clientX - playArea.left - 20;
+    let y = e.clientY - playArea.top - 20;
+
+    draggableItem.style.left = `${x}px`;
+    draggableItem.style.top = `${y}px`;
+
+    const mochiChar = document.getElementById('mochiCharacter');
+    const mochiRect = mochiChar.getBoundingClientRect();
+    const itemRect = draggableItem.getBoundingClientRect();
+
+    if (
+        itemRect.left < mochiRect.right &&
+        itemRect.right > mochiRect.left &&
+        itemRect.top < mochiRect.bottom &&
+        itemRect.bottom > mochiRect.top
+    ) {
+        isDragging = false;
+        draggableItem.classList.add('hidden');
+
+        // ANIMASI EKSPRESI MOCHI SAAT MAKAN & MANDI
+        if (activeToolType === 'feed') {
+            document.getElementById('mochiMouth').innerText = 'O';
+            document.getElementById('mochiBubble').innerText = '"Nom nom! Ikan lezat! 😋"';
+            mochiChar.classList.add('happy-eat');
+
+            setTimeout(() => {
+                document.getElementById('mochiMouth').innerText = 'ω';
+                mochiChar.classList.remove('happy-eat');
+            }, 1500);
+
+            updateMochiAction("feed", 25);
+        } else if (activeToolType === 'bath') {
+            document.getElementById('mochiBubble').innerText = '"Mochi wangi & segar! 🫧"';
+            mochiChar.classList.add('babbing-soap');
+
+            setTimeout(() => {
+                mochiChar.classList.remove('babbing-soap');
+            }, 1800);
+
+            updateMochiAction("bath", 30);
+        }
+    }
+});
+
+draggableItem?.addEventListener('pointerup', () => { isDragging = false; });
+
+// SENTUHAN PUK-PUK
+document.getElementById('mochiCharacter')?.addEventListener('click', () => {
+    document.getElementById('mochiMouth').innerText = 'u';
+    document.getElementById('mochiBubble').innerText = '"Purrr... Mochi sayang kalian! 💕"';
+    setTimeout(() => document.getElementById('mochiMouth').innerText = 'ω', 1200);
+    updateMochiAction("play", 15);
+});
+
+document.getElementById('btnPlayPet')?.addEventListener('click', () => {
+    document.getElementById('mochiBubble').innerText = '"Sentuh/ketuk Mochi langsung untuk puk-puk! 💕"';
+});
+
+async function updateMochiAction(actionType, increaseAmount) {
+    if (!currentUserData || !currentUserData.coupleSpaceId) return;
+
+    const spaceRef = doc(db, "couple_spaces", currentUserData.coupleSpaceId);
+    const docSnap = await getDoc(spaceRef);
+    if (!docSnap.exists()) return;
+
+    let mochi = docSnap.data().mochi || { hunger: 80, hygiene: 70, love: 90 };
+    let msg = "";
+
+    if (actionType === "feed") {
+        mochi.hunger = Math.min(100, mochi.hunger + increaseAmount);
+        msg = "menyuapkan ikan lezat ke mulut Mochi 🐟";
+    } else if (actionType === "bath") {
+        mochi.hygiene = Math.min(100, mochi.hygiene + increaseAmount);
+        msg = "menggosokkan spons mandikan Mochi 🧼";
+    } else if (actionType === "play") {
+        mochi.love = Math.min(100, mochi.love + increaseAmount);
+        msg = "mengelus & mempuk-puk Mochi 💖";
+    }
+
+    await updateDoc(spaceRef, { mochi });
+
+    await addDoc(collection(db, "couple_spaces", currentUserData.coupleSpaceId, "notifications"), {
+        type: "mochi",
+        senderUid: currentUserData.uid,
+        senderName: currentUserData.nickname,
+        message: msg,
+        timestamp: new Date()
+    });
+}
+
+// REALTIME NOTIFICATIONS & ACTIVITY LOG
+function listenRealtimeNotifications(spaceId) {
+    if (!spaceId) return;
+
+    const notifRef = collection(db, "couple_spaces", spaceId, "notifications");
+    const q = query(notifRef, orderBy("timestamp", "desc"), limit(15));
+
+    let isInitialLoad = true;
+
+    onSnapshot(q, (snapshot) => {
+        const logContainer = document.getElementById('activityLogList');
+        if (logContainer) logContainer.innerHTML = '';
+
+        if (snapshot.empty) {
+            logContainer.innerHTML = '<p class="empty-act">Belum ada aktivitas hari ini. Kirim Express Love yuk!</p>';
+            return;
+        }
+
+        snapshot.docs.forEach((docSnap, index) => {
+            const data = docSnap.data();
+            const timeStr = data.timestamp ? new Date(data.timestamp.toDate()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
+
+            const item = document.createElement('div');
+            item.className = 'act-item';
+            item.innerHTML = `<span class="act-user">${data.senderName}</span> ${data.message} <span class="act-time">${timeStr}</span>`;
+            logContainer.appendChild(item);
+
+            if (index === 0 && !isInitialLoad && data.senderUid !== currentUserData.uid) {
+                showNotifBanner(data.type, data.senderName, data.message);
+                if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+            }
+        });
+
+        isInitialLoad = false;
+    });
+}
+
+function showNotifBanner(type, sender, message) {
+    const banner = document.getElementById('realtimeNotif');
+    const iconEl = document.getElementById('notifIcon');
+    const titleEl = document.getElementById('notifTitle');
+    const msgEl = document.getElementById('notifMessage');
+
+    if (iconEl && titleEl && msgEl && banner) {
+        iconEl.innerText = type === "express" ? "💖" : (type === "mochi" ? "🐱" : "😊");
+        titleEl.innerText = type === "express" ? "Express Love Masuk! 💖" : (type === "mochi" ? "Mochi Dirawat! 🐱" : "Mood Pasangan Update!");
+        msgEl.innerText = `${sender}: ${message}`;
+
+        banner.classList.remove('hidden');
+        setTimeout(() => banner.classList.add('hidden'), 5000);
+    }
+}
+
+document.getElementById('closeNotifBtn')?.addEventListener('click', () => {
+    document.getElementById('realtimeNotif')?.classList.add('hidden');
+});
+
+// MODAL CONTROLS POPUP
+const hugModal = document.getElementById('hugModal');
+const moodModal = document.getElementById('moodModal');
+
+document.getElementById('btnHugModal')?.addEventListener('click', () => hugModal?.classList.remove('hidden'));
+document.getElementById('closeHugModal')?.addEventListener('click', () => hugModal?.classList.add('hidden'));
+
+document.getElementById('btnMoodModal')?.addEventListener('click', () => moodModal?.classList.remove('hidden'));
+document.getElementById('closeMoodModal')?.addEventListener('click', () => moodModal?.classList.add('hidden'));
+
+// SEND EXPRESS LOVE ACTION
+document.querySelectorAll('.hug-opt-btn').forEach(btn => {
+    btn.addEventListener('click', async () => {
+        const loveType = btn.getAttribute('data-type');
+        hugModal?.classList.add('hidden');
+
+        if (currentUserData && currentUserData.coupleSpaceId) {
+            await addDoc(collection(db, "couple_spaces", currentUserData.coupleSpaceId, "notifications"), {
+                type: "express",
+                senderUid: currentUserData.uid,
+                senderName: currentUserData.nickname,
+                message: `mengirimkan ${loveType}`,
+                timestamp: new Date()
+            });
+
+            updateMochiAction("play", 15);
+            alert(`Berhasil ngirim ${loveType} ke pasangan! 💖`);
+        }
+    });
+});
+
+// SELECT MOOD ACTION
+let selectedMood = "😊 Bahagia";
+document.querySelectorAll('.mood-opt').forEach(btn => {
+    btn.addEventListener('click', () => {
+        document.querySelectorAll('.mood-opt').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        selectedMood = btn.getAttribute('data-mood');
+    });
+});
+
+document.getElementById('btnSaveMood')?.addEventListener('click', async () => {
+    const note = document.getElementById('moodNoteInput').value;
+    moodModal?.classList.add('hidden');
+
+    if (currentUserData && currentUserData.coupleSpaceId) {
+        const msgText = note ? `Mood: ${selectedMood} ("${note}")` : `Mood: ${selectedMood}`;
+        await addDoc(collection(db, "couple_spaces", currentUserData.coupleSpaceId, "notifications"), {
+            type: "mood",
+            senderUid: currentUserData.uid,
+            senderName: currentUserData.nickname,
+            message: msgText,
+            timestamp: new Date()
+        });
+        alert(`Mood hari ini (${selectedMood}) tersimpan! 🤍`);
+    }
+});
