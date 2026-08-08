@@ -29,9 +29,7 @@ body.pixel-theme {
 }
 
 .app-header { text-align: center; margin-bottom: 20px; }
-.pixel-anim-box { display: flex; justify-content: center; margin-bottom: 8px; }
-.pixel-gif { width: 70px; height: 70px; image-rendering: pixelated; }
-.pixel-gif-small { width: 50px; height: 50px; image-rendering: pixelated; }
+.pixel-avatar { font-size: 28px; margin-bottom: 8px; }
 
 .pixel-title {
     font-family: 'Press Start 2P', monospace;
@@ -55,7 +53,7 @@ body.pixel-theme {
 
 .card.active { display: block; }
 
-/* Realtime Toast */
+/* Realtime Toast Banner */
 .notif-toast {
     position: fixed;
     top: 20px;
@@ -225,14 +223,25 @@ body.pixel-theme {
     overflow: hidden;
 }
 
-.pixel-corner-gif { width: 35px; height: 35px; position: absolute; top: 8px; left: 10px; }
+.pixel-decor { position: absolute; font-size: 18px; top: 10px; }
+.pixel-decor.left { left: 12px; }
+.pixel-decor.right { right: 12px; }
+
 .counter-badge { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: #81b29a; font-weight: 800; margin-bottom: 4px; }
 .counter-days { font-size: 42px; font-weight: 800; color: #3d405b; line-height: 1; }
 .counter-days small { font-size: 14px; color: #8d7b68; }
 
-.start-date-picker { margin: 12px 0 6px 0; display: flex; flex-direction: column; align-items: center; gap: 4px; }
-.start-date-picker label { font-size: 11px; font-weight: 700; color: #8d7b68; }
-.start-date-picker input { background: #ffffff; border: 1px solid #81b29a; border-radius: 8px; padding: 4px 8px; font-size: 11px; color: #3d405b; }
+.start-date-picker { margin: 8px 0 4px 0; text-align: center; }
+.start-date-picker input {
+    background: #ffffff;
+    border: 1px solid #81b29a;
+    border-radius: 8px;
+    padding: 4px 10px;
+    font-size: 11px;
+    color: #3d405b;
+    outline: none;
+}
+
 .counter-sub { font-size: 11px; color: #8d7b68; margin-top: 4px; }
 
 .distance-card { margin-bottom: 14px; padding: 16px; border-color: #f2cc8f; }
@@ -342,7 +351,7 @@ body.pixel-theme {
     width: 100%; height: 80px; background: #fdf6ec; border: 2px solid #f2cc8f; border-radius: 12px; padding: 10px; color: #3d405b; font-size: 12px; outline: none; margin-bottom: 10px; resize: none;
 }
 
-/* MOCHI GAME STYLING */
+/* DESAIN KUCING MOCHI POU-STYLE & DRAG ITEM STYLING */
 .pet-display-box {
     text-align: center;
     background: #fdf6ec;
@@ -351,6 +360,11 @@ body.pixel-theme {
     padding: 16px;
     margin-bottom: 14px;
     position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    user-select: none;
+    touch-action: none;
 }
 
 .pet-speech-bubble {
@@ -361,14 +375,122 @@ body.pixel-theme {
     font-size: 11px;
     font-weight: 700;
     color: #3d405b;
-    margin-bottom: 10px;
+    margin-bottom: 12px;
     display: inline-block;
 }
 
-.mochi-pet-gif {
-    width: 90px;
+/* Elemen Alat Drag yang Bisa Digeser */
+.draggable-item {
+    position: absolute;
+    font-size: 32px;
+    cursor: grab;
+    z-index: 20;
+    top: 50px;
+    left: 20px;
+    animation: pulse 1s infinite alternate;
+}
+.draggable-item:active { cursor: grabbing; }
+
+.mochi-character-box {
+    position: relative;
+    width: 100px;
     height: 90px;
-    image-rendering: pixelated;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+    animation: mochiBounce 1.5s infinite ease-in-out;
+}
+
+@keyframes mochiBounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+}
+
+.mochi-ears {
+    display: flex;
+    justify-content: space-between;
+    width: 70px;
+    position: absolute;
+    top: 2px;
+    z-index: 1;
+}
+
+.mochi-ears .ear {
+    width: 20px;
+    height: 20px;
+    background: #e07a5f;
+    border-radius: 4px 10px 0 0;
+}
+
+.mochi-ears .ear.left { transform: rotate(-15deg); }
+.mochi-ears .ear.right { transform: rotate(15deg); }
+
+.mochi-body {
+    width: 85px;
+    height: 70px;
+    background: #f4a261;
+    border: 3px solid #3d405b;
+    border-radius: 45% 45% 40% 40%;
+    position: absolute;
+    bottom: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: inset -4px -4px 0 rgba(0,0,0,0.1);
+}
+
+.mochi-face { text-align: center; }
+
+.mochi-eyes {
+    display: flex;
+    justify-content: space-between;
+    width: 36px;
+    margin: 0 auto 2px auto;
+}
+
+.mochi-eyes .eye {
+    width: 8px;
+    height: 8px;
+    background: #3d405b;
+    border-radius: 50%;
+    animation: eyeBlink 3s infinite;
+}
+
+@keyframes eyeBlink {
+    0%, 96%, 100% { transform: scaleY(1); }
+    98% { transform: scaleY(0.1); }
+}
+
+.mochi-cheeks {
+    display: flex;
+    justify-content: space-between;
+    width: 50px;
+    margin: -4px auto 0 auto;
+}
+
+.mochi-cheeks .cheek {
+    width: 10px;
+    height: 6px;
+    background: #f28482;
+    border-radius: 50%;
+    opacity: 0.8;
+}
+
+.mochi-mouth {
+    font-size: 14px;
+    font-weight: 800;
+    color: #3d405b;
+    line-height: 1;
+}
+
+.mochi-shadow {
+    width: 60px;
+    height: 10px;
+    background: rgba(0,0,0,0.08);
+    border-radius: 50%;
+    position: absolute;
+    bottom: 0;
 }
 
 .pet-stats-container { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }

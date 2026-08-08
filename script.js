@@ -199,21 +199,14 @@ document.getElementById('btnEnterApp')?.addEventListener('click', () => {
 
     if (currentUserData) {
         document.getElementById('homeUserGreeting').innerText = currentUserData.nickname + " ❤️";
-        
-        // 1. Jalankan Greeting waktu otomatis
         updateTimeGreeting();
-        
-        // 2. Update Heartbeat / Active status
         updateUserPresence(currentUserData.coupleSpaceId);
-        
-        // 3. Listen Notifikasi & Mochi
         listenRealtimeNotifications(currentUserData.coupleSpaceId);
         listenStartDate(currentUserData.coupleSpaceId);
         listenMochiStats(currentUserData.coupleSpaceId);
     }
 });
 
-// FITUR 1: GREETING SESUAI JAM LOKAL
 function updateTimeGreeting() {
     const hour = new Date().getHours();
     const greetingEl = document.getElementById('timeGreeting');
@@ -230,15 +223,12 @@ function updateTimeGreeting() {
     }
 }
 
-// FITUR 2: LAST SEEN / STATUS AKTIF REALTIME
 async function updateUserPresence(spaceId) {
     if (!spaceId) return;
 
-    // Update last active user
     const userRef = doc(db, "users", currentUserData.uid);
     await updateDoc(userRef, { lastActive: serverTimestamp() });
 
-    // Dengarkan status keaktifan pasangan
     onSnapshot(doc(db, "couple_spaces", spaceId), async (docSnap) => {
         if (!docSnap.exists()) return;
         const data = docSnap.data();
@@ -272,7 +262,7 @@ async function updateUserPresence(spaceId) {
     });
 }
 
-// FITUR DYNAMIC START DATE COUNTER
+// START DATE COUNTER
 const startDateInput = document.getElementById('startDateInput');
 
 function listenStartDate(spaceId) {
@@ -302,7 +292,9 @@ function calculateDaysTogether(startDateStr) {
     document.getElementById('daysTogetherCount').innerText = isNaN(diffDays) ? 0 : diffDays;
 }
 
-// FITUR 3: REALTIME MOCHI VIRTUAL PET GAME
+// REALTIME MOCHI GAME & DRAG DROP LOGIC
+let activeToolType = null; // 'feed' atau 'bath'
+
 function listenMochiStats(spaceId) {
     if (!spaceId) return;
     onSnapshot(doc(db, "couple_spaces", spaceId), (docSnap) => {
@@ -333,6 +325,85 @@ function updateMochiUI(mochi) {
     }
 }
 
+// PANGGIL ALAT MUKUL/MAKAN/MANDI (DRAG TOOL)
+const draggableItem = document.getElementById('draggableItem');
+const btnFeedTool = document.getElementById('btnFeedTool');
+const btnBathTool = document.getElementById('btnBathTool');
+
+btnFeedTool?.addEventListener('click', () => {
+    activeToolType = 'feed';
+    draggableItem.innerText = '🐟';
+    draggableItem.classList.remove('hidden');
+    draggableItem.style.top = '50px';
+    draggableItem.style.left = '20px';
+    document.getElementById('mochiBubble').innerText = '"Geser ikannya ke mulut Mochi yuk! 🐟"';
+});
+
+btnBathTool?.addEventListener('click', () => {
+    activeToolType = 'bath';
+    draggableItem.innerText = '🧽';
+    draggableItem.classList.remove('hidden');
+    draggableItem.style.top = '50px';
+    draggableItem.style.left = '20px';
+    document.getElementById('mochiBubble').innerText = '"Gosokkan sponsnya ke badan Mochi! 🧼"';
+});
+
+// LOGIKA DRAG & DROP UNTUK TOUCH / MOUSE
+let isDragging = false;
+
+draggableItem?.addEventListener('pointerdown', (e) => {
+    isDragging = true;
+    draggableItem.setPointerCapture(e.pointerId);
+});
+
+draggableItem?.addEventListener('pointermove', (e) => {
+    if (!isDragging) return;
+    const playArea = document.getElementById('mochiPlayArea').getBoundingClientRect();
+    let x = e.clientX - playArea.left - 15;
+    let y = e.clientY - playArea.top - 15;
+
+    draggableItem.style.left = `${x}px`;
+    draggableItem.style.top = `${y}px`;
+
+    // Cek Tabrakan Alat dengan Karakter Mochi
+    const mochiRect = document.getElementById('mochiCharacter').getBoundingClientRect();
+    const itemRect = draggableItem.getBoundingClientRect();
+
+    if (
+        itemRect.left < mochiRect.right &&
+        itemRect.right > mochiRect.left &&
+        itemRect.top < mochiRect.bottom &&
+        itemRect.bottom > mochiRect.top
+    ) {
+        // Terjadi Sentuhan ke Mochi!
+        isDragging = false;
+        draggableItem.classList.add('hidden');
+
+        if (activeToolType === 'feed') {
+            document.getElementById('mochiMouth').innerText = 'O';
+            setTimeout(() => document.getElementById('mochiMouth').innerText = 'ω', 1000);
+            updateMochiAction("feed", 25);
+        } else if (activeToolType === 'bath') {
+            document.getElementById('mochiBubble').innerText = '"Mochi wangi & segar! 🫧"';
+            updateMochiAction("bath", 30);
+        }
+    }
+});
+
+draggableItem?.addEventListener('pointerup', () => { isDragging = false; });
+
+// SENTUHAN KETUKAN LANGSUNG (PUK-PUK / PETTING)
+document.getElementById('mochiCharacter')?.addEventListener('click', () => {
+    document.getElementById('mochiMouth').innerText = 'u';
+    document.getElementById('mochiBubble').innerText = '"Purrr... Mochi sayang kalian! 💕"';
+    setTimeout(() => document.getElementById('mochiMouth').innerText = 'ω', 1200);
+    updateMochiAction("play", 15);
+});
+
+document.getElementById('btnPlayPet')?.addEventListener('click', () => {
+    document.getElementById('mochiBubble').innerText = '"Sentuh/ketuk Mochi langsung untuk puk-puk! 💕"';
+});
+
 async function updateMochiAction(actionType, increaseAmount) {
     if (!currentUserData || !currentUserData.coupleSpaceId) return;
 
@@ -345,13 +416,13 @@ async function updateMochiAction(actionType, increaseAmount) {
 
     if (actionType === "feed") {
         mochi.hunger = Math.min(100, mochi.hunger + increaseAmount);
-        msg = "memberi makan Mochi ikan lezat 🐟";
+        msg = "menyuapkan ikan lezat ke mulut Mochi 🐟";
     } else if (actionType === "bath") {
         mochi.hygiene = Math.min(100, mochi.hygiene + increaseAmount);
-        msg = "memandikan Mochi sampai wangi 🧼";
+        msg = "menggosokkan spons mandikan Mochi 🧼";
     } else if (actionType === "play") {
         mochi.love = Math.min(100, mochi.love + increaseAmount);
-        msg = "mengelus & mengajak main Mochi 🧶";
+        msg = "mengelus & mempuk-puk Mochi 💖";
     }
 
     await updateDoc(spaceRef, { mochi });
@@ -364,10 +435,6 @@ async function updateMochiAction(actionType, increaseAmount) {
         timestamp: new Date()
     });
 }
-
-document.getElementById('btnFeedPet')?.addEventListener('click', () => updateMochiAction("feed", 25));
-document.getElementById('btnBathPet')?.addEventListener('click', () => updateMochiAction("bath", 30));
-document.getElementById('btnPlayPet')?.addEventListener('click', () => updateMochiAction("play", 20));
 
 // REALTIME NOTIFICATIONS & ACTIVITY LOG
 function listenRealtimeNotifications(spaceId) {
@@ -414,7 +481,7 @@ function showNotifBanner(type, sender, message) {
 
     if (iconEl && titleEl && msgEl && banner) {
         iconEl.innerText = type === "express" ? "💖" : (type === "mochi" ? "🐱" : "😊");
-        titleEl.innerText = type === "express" ? "Express Love Masuk! 💖" : (type === "mochi" ? "Mochi Ditingkatkan! 🐱" : "Mood Pasangan Update!");
+        titleEl.innerText = type === "express" ? "Express Love Masuk! 💖" : (type === "mochi" ? "Mochi Dirawat! 🐱" : "Mood Pasangan Update!");
         msgEl.innerText = `${sender}: ${message}`;
 
         banner.classList.remove('hidden');
@@ -440,7 +507,7 @@ document.getElementById('closeMoodModal')?.addEventListener('click', () => moodM
 document.getElementById('btnPetModal')?.addEventListener('click', () => petModal?.classList.remove('hidden'));
 document.getElementById('closePetModal')?.addEventListener('click', () => petModal?.classList.add('hidden'));
 
-// SEND EXPRESS LOVE ACTION (Otomatis Tambah Love Mochi +15%)
+// SEND EXPRESS LOVE ACTION
 document.querySelectorAll('.hug-opt-btn').forEach(btn => {
     btn.addEventListener('click', async () => {
         const loveType = btn.getAttribute('data-type');
@@ -455,7 +522,6 @@ document.querySelectorAll('.hug-opt-btn').forEach(btn => {
                 timestamp: new Date()
             });
 
-            // Tambah Love Mochi +15%
             updateMochiAction("play", 15);
             alert(`Berhasil ngirim ${loveType} ke pasangan! 💖`);
         }

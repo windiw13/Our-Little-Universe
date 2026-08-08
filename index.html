@@ -23,9 +23,7 @@
     <!-- AUTHENTICATION CONTAINER -->
     <main class="auth-container">
         <div class="app-header">
-            <div class="pixel-anim-box">
-                <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExdW93OWptZW5zeXRhY3p3dnZwNWk0Zmd1bHFxYWZlMXpibmd0MnlsYyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/vbf8A28y3fLCE/giphy.gif" alt="Pixel Cat GIF" class="pixel-gif">
-            </div>
+            <div class="pixel-avatar">🐱🤍✨</div>
             <h1 class="pixel-title">Our Little Universe</h1>
             <p>A small cozy space for Diw & Rama</p>
         </div>
@@ -113,7 +111,7 @@
             </div>
 
             <div class="waiting-animation">
-                <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExcGpmYWVsYndsdmI2ZHluandpZ2gxa21yc3I0YTZ0eDlndmtseGZwOCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/KztT2c4u8mYYUiMKdJ/giphy.gif" alt="Pixel Heart GIF" class="pixel-gif-small">
+                <div class="pixel-avatar pulse">🐱❤️🐱</div>
                 <p>Menunggu Rama bergabung...</p>
             </div>
         </div>
@@ -136,10 +134,8 @@
     <div id="homeScreen" class="home-container hidden">
         <header class="home-header">
             <div class="user-greeting">
-                <!-- Greeting Menyesuaikan Waktu -->
                 <span class="greeting-text" id="timeGreeting">Good Day! ✨</span>
                 <h2 id="homeUserGreeting">Diw ❤️</h2>
-                <!-- Status Keaktifan Pasangan -->
                 <span class="partner-active-status" id="partnerActiveStatus">🟢 Rama Aktif</span>
             </div>
             <div class="couple-status-pill">
@@ -151,9 +147,8 @@
 
         <!-- Card 1: Day Counter -->
         <section class="card counter-card">
-            <div class="pixel-decor left">
-                <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExdW93OWptZW5zeXRhY3p3dnZwNWk0Zmd1bHFxYWZlMXpibmd0MnlsYyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/vbf8A28y3fLCE/giphy.gif" class="pixel-corner-gif">
-            </div>
+            <div class="pixel-decor left">🌸</div>
+            <div class="pixel-decor right">🌿</div>
             <div class="counter-badge">Together Since</div>
             <div class="counter-days">
                 <span id="daysTogetherCount">0</span>
@@ -161,7 +156,6 @@
             </div>
             
             <div class="start-date-picker">
-                <label for="startDateInput">📅 Tanggal Jadian / Bersama:</label>
                 <input type="date" id="startDateInput">
             </div>
 
@@ -265,7 +259,7 @@
         </div>
     </div>
 
-    <!-- MODAL GAME MOCHI (VIRTUAL PET) -->
+    <!-- MODAL GAME MOCHI (INTERAKTIF DRAG & DROP TOOL) -->
     <div id="petModal" class="modal hidden">
         <div class="modal-content pet-modal-content">
             <div class="modal-header">
@@ -273,10 +267,33 @@
                 <button class="close-modal" id="closePetModal">✕</button>
             </div>
 
-            <!-- Tampilan Visual Mochi & Bubble Pikirannya -->
-            <div class="pet-display-box">
+            <!-- Area Bermain Mochi & Alat Interactive Drag -->
+            <div class="pet-display-box" id="mochiPlayArea">
                 <div class="pet-speech-bubble" id="mochiBubble">"Meow! Rawat Mochi berdua ya! 🤍"</div>
-                <img id="mochiImg" src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExdW93OWptZW5zeXRhY3p3dnZwNWk0Zmd1bHFxYWZlMXpibmd0MnlsYyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/vbf8A28y3fLCE/giphy.gif" alt="Mochi Pet" class="mochi-pet-gif">
+                
+                <!-- Elemen Alat yang Bisa Digeser/Drag (Ikan / Spons / Mainan) -->
+                <div id="draggableItem" class="draggable-item hidden">🐟</div>
+
+                <div class="mochi-character-box" id="mochiCharacter">
+                    <div class="mochi-ears">
+                        <span class="ear left"></span>
+                        <span class="ear right"></span>
+                    </div>
+                    <div class="mochi-body">
+                        <div class="mochi-face">
+                            <div class="mochi-eyes">
+                                <span class="eye"></span>
+                                <span class="eye"></span>
+                            </div>
+                            <div class="mochi-cheeks">
+                                <span class="cheek"></span>
+                                <span class="cheek"></span>
+                            </div>
+                            <div class="mochi-mouth" id="mochiMouth">ω</div>
+                        </div>
+                    </div>
+                    <div class="mochi-shadow"></div>
+                </div>
             </div>
 
             <!-- Indikator Parameter Mochi -->
@@ -298,11 +315,11 @@
                 </div>
             </div>
 
-            <!-- Tombol Interaksi Game -->
+            <!-- Tombol Pilih Alat Interaktif -->
             <div class="pet-actions-grid">
-                <button id="btnFeedPet" class="pet-act-btn">🐟 Kasih Makan</button>
-                <button id="btnBathPet" class="pet-act-btn">🧼 Mandikan</button>
-                <button id="btnPlayPet" class="pet-act-btn">🧶 Puk-puk / Main</button>
+                <button id="btnFeedTool" class="pet-act-btn">🐟 Ambil Ikan</button>
+                <button id="btnBathTool" class="pet-act-btn">🧼 Ambil Spons</button>
+                <button id="btnPlayPet" class="pet-act-btn">🫳 Puk-puk Mochi</button>
             </div>
         </div>
     </div>
