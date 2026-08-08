@@ -1,0 +1,73 @@
+<!-- Tambahkan di luar auth-container, tepat di bawahnya -->
+<div id="homeScreen" class="home-container hidden">
+    <!-- Header App -->
+    <header class="home-header">
+        <div class="user-greeting">
+            <span class="greeting-text">Good Morning,</span>
+            <h2 id="homeUserGreeting">Diw ❤️</h2>
+        </div>
+        <div class="couple-status-pill">
+            <span>Sukabumi</span>
+            <span class="heart-pulse">❤️</span>
+            <span>Bandung</span>
+        </div>
+    </header>
+
+    <!-- Card 1: Day Counter -->
+    <section class="card counter-card">
+        <div class="counter-badge">Together Since</div>
+        <div class="counter-days">
+            <span id="daysTogetherCount">214</span>
+            <small>Hari</small>
+        </div>
+        <p class="counter-sub">Windi & Rama's Little Universe 🤍</p>
+    </section>
+
+    <!-- Card 2: Distance Tracker -->
+    <section class="card distance-card">
+        <div class="distance-info">
+            <div class="city-box">
+                <span class="city-name">Sukabumi</span>
+                <span class="partner-name">Diw</span>
+            </div>
+            <div class="distance-line">
+                <span class="line"></span>
+                <span class="km-badge">~143 KM</span>
+                <span class="line"></span>
+            </div>
+            <div class="city-box">
+                <span class="city-name">Bandung</span>
+                <span class="partner-name">Rama</span>
+            </div>
+        </div>
+        <p class="distance-quote">"Distance means so little when someone means so much."</p>
+    </section>
+
+    <!-- Card 3: Quick Action Buttons -->
+    <section class="quick-grid">
+        <button id="btnHugModal" class="action-btn hug-btn">
+            <span class="btn-icon">🤗</span>
+            <span class="btn-label">Send Hug</span>
+        </button>
+        <button id="btnMoodModal" class="action-btn mood-btn">
+            <span class="btn-icon">😊</span>
+            <span class="btn-label">Daily Check</span>
+        </button>
+        <button id="btnPetModal" class="action-btn pet-btn">
+            <span class="btn-icon">🐱</span>
+            <span class="btn-label">Mochi</span>
+        </button>
+        <button id="btnWishlistModal" class="action-btn wish-btn">
+            <span class="btn-icon">⭐</span>
+            <span class="btn-label">Wishlist</span>
+        </button>
+    </section>
+
+    <!-- Bottom Navigation Bar -->
+    <nav class="bottom-nav">
+        <button class="nav-item active">🏠 <span>Home</span></button>
+        <button class="nav-item">❤️ <span>Journey</span></button>
+        <button class="nav-item">📸 <span>Memories</span></button>
+        <button class="nav-item">💌 <span>Letters</span></button>
+    </nav>
+</div>
