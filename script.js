@@ -292,8 +292,19 @@ function calculateDaysTogether(startDateStr) {
     document.getElementById('daysTogetherCount').innerText = isNaN(diffDays) ? 0 : diffDays;
 }
 
+// MOCHI ROOM FULL-SCREEN SWITCHING
+document.getElementById('btnPetModal')?.addEventListener('click', () => {
+    document.getElementById('homeScreen')?.classList.add('hidden');
+    document.getElementById('petScreen')?.classList.remove('hidden');
+});
+
+document.getElementById('btnBackFromPet')?.addEventListener('click', () => {
+    document.getElementById('petScreen')?.classList.add('hidden');
+    document.getElementById('homeScreen')?.classList.remove('hidden');
+});
+
 // REALTIME MOCHI GAME & DRAG DROP LOGIC
-let activeToolType = null; // 'feed' atau 'bath'
+let activeToolType = null;
 
 function listenMochiStats(spaceId) {
     if (!spaceId) return;
@@ -325,7 +336,7 @@ function updateMochiUI(mochi) {
     }
 }
 
-// PANGGIL ALAT MUKUL/MAKAN/MANDI (DRAG TOOL)
+// PANGGIL ALAT DRAG & DROP
 const draggableItem = document.getElementById('draggableItem');
 const btnFeedTool = document.getElementById('btnFeedTool');
 const btnBathTool = document.getElementById('btnBathTool');
@@ -334,8 +345,8 @@ btnFeedTool?.addEventListener('click', () => {
     activeToolType = 'feed';
     draggableItem.innerText = '🐟';
     draggableItem.classList.remove('hidden');
-    draggableItem.style.top = '50px';
-    draggableItem.style.left = '20px';
+    draggableItem.style.top = '60px';
+    draggableItem.style.left = '40px';
     document.getElementById('mochiBubble').innerText = '"Geser ikannya ke mulut Mochi yuk! 🐟"';
 });
 
@@ -343,12 +354,11 @@ btnBathTool?.addEventListener('click', () => {
     activeToolType = 'bath';
     draggableItem.innerText = '🧽';
     draggableItem.classList.remove('hidden');
-    draggableItem.style.top = '50px';
-    draggableItem.style.left = '20px';
+    draggableItem.style.top = '60px';
+    draggableItem.style.left = '40px';
     document.getElementById('mochiBubble').innerText = '"Gosokkan sponsnya ke badan Mochi! 🧼"';
 });
 
-// LOGIKA DRAG & DROP UNTUK TOUCH / MOUSE
 let isDragging = false;
 
 draggableItem?.addEventListener('pointerdown', (e) => {
@@ -359,13 +369,12 @@ draggableItem?.addEventListener('pointerdown', (e) => {
 draggableItem?.addEventListener('pointermove', (e) => {
     if (!isDragging) return;
     const playArea = document.getElementById('mochiPlayArea').getBoundingClientRect();
-    let x = e.clientX - playArea.left - 15;
-    let y = e.clientY - playArea.top - 15;
+    let x = e.clientX - playArea.left - 20;
+    let y = e.clientY - playArea.top - 20;
 
     draggableItem.style.left = `${x}px`;
     draggableItem.style.top = `${y}px`;
 
-    // Cek Tabrakan Alat dengan Karakter Mochi
     const mochiRect = document.getElementById('mochiCharacter').getBoundingClientRect();
     const itemRect = draggableItem.getBoundingClientRect();
 
@@ -375,7 +384,6 @@ draggableItem?.addEventListener('pointermove', (e) => {
         itemRect.top < mochiRect.bottom &&
         itemRect.bottom > mochiRect.top
     ) {
-        // Terjadi Sentuhan ke Mochi!
         isDragging = false;
         draggableItem.classList.add('hidden');
 
@@ -392,7 +400,7 @@ draggableItem?.addEventListener('pointermove', (e) => {
 
 draggableItem?.addEventListener('pointerup', () => { isDragging = false; });
 
-// SENTUHAN KETUKAN LANGSUNG (PUK-PUK / PETTING)
+// SENTUHAN KETUKAN LANGSUNG (PUK-PUK)
 document.getElementById('mochiCharacter')?.addEventListener('click', () => {
     document.getElementById('mochiMouth').innerText = 'u';
     document.getElementById('mochiBubble').innerText = '"Purrr... Mochi sayang kalian! 💕"';
@@ -493,19 +501,15 @@ document.getElementById('closeNotifBtn')?.addEventListener('click', () => {
     document.getElementById('realtimeNotif')?.classList.add('hidden');
 });
 
-// MODAL CONTROLS
+// MODAL CONTROLS POPUP
 const hugModal = document.getElementById('hugModal');
 const moodModal = document.getElementById('moodModal');
-const petModal = document.getElementById('petModal');
 
 document.getElementById('btnHugModal')?.addEventListener('click', () => hugModal?.classList.remove('hidden'));
 document.getElementById('closeHugModal')?.addEventListener('click', () => hugModal?.classList.add('hidden'));
 
 document.getElementById('btnMoodModal')?.addEventListener('click', () => moodModal?.classList.remove('hidden'));
 document.getElementById('closeMoodModal')?.addEventListener('click', () => moodModal?.classList.add('hidden'));
-
-document.getElementById('btnPetModal')?.addEventListener('click', () => petModal?.classList.remove('hidden'));
-document.getElementById('closePetModal')?.addEventListener('click', () => petModal?.classList.add('hidden'));
 
 // SEND EXPRESS LOVE ACTION
 document.querySelectorAll('.hug-opt-btn').forEach(btn => {

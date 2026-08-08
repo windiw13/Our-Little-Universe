@@ -259,69 +259,63 @@
         </div>
     </div>
 
-    <!-- MODAL GAME MOCHI (INTERAKTIF DRAG & DROP TOOL) -->
-    <div id="petModal" class="modal hidden">
-        <div class="modal-content pet-modal-content">
-            <div class="modal-header">
-                <h3>Mochi the Virtual Pet 🐱</h3>
-                <button class="close-modal" id="closePetModal">✕</button>
+    <!-- SCREEN RUANGAN MOCHI FULL-SCREEN (ALA TALKING ANGELA & TALKING TOM) -->
+    <div id="petScreen" class="pet-room-container hidden">
+        <!-- Top Status Header -->
+        <header class="pet-room-header">
+            <button id="btnBackFromPet" class="btn-back">⬅️ Home</button>
+            <div class="pet-status-bars">
+                <div class="status-pill">🍲 <div class="bar-bg"><div id="barHunger" class="bar-fill hunger" style="width: 80%;"></div></div> <span id="txtHunger">80%</span></div>
+                <div class="status-pill">🧼 <div class="bar-bg"><div id="barHygiene" class="bar-fill hygiene" style="width: 70%;"></div></div> <span id="txtHygiene">70%</span></div>
+                <div class="status-pill">💖 <div class="bar-bg"><div id="barLove" class="bar-fill love" style="width: 90%;"></div></div> <span id="txtLove">90%</span></div>
             </div>
+        </header>
 
-            <!-- Area Bermain Mochi & Alat Interactive Drag -->
-            <div class="pet-display-box" id="mochiPlayArea">
-                <div class="pet-speech-bubble" id="mochiBubble">"Meow! Rawat Mochi berdua ya! 🤍"</div>
-                
-                <!-- Elemen Alat yang Bisa Digeser/Drag (Ikan / Spons / Mainan) -->
-                <div id="draggableItem" class="draggable-item hidden">🐟</div>
+        <!-- Area Ruangan Utama Tempat Mochi Berdiri -->
+        <main class="pet-room-view" id="mochiPlayArea">
+            <div class="pet-speech-bubble" id="mochiBubble">"Meow! Rawat Mochi berdua ya! 🤍"</div>
+            
+            <!-- Draggable Item (Ikan / Spons / Mainan) -->
+            <div id="draggableItem" class="draggable-item hidden">🐟</div>
 
-                <div class="mochi-character-box" id="mochiCharacter">
-                    <div class="mochi-ears">
-                        <span class="ear left"></span>
-                        <span class="ear right"></span>
-                    </div>
-                    <div class="mochi-body">
-                        <div class="mochi-face">
-                            <div class="mochi-eyes">
-                                <span class="eye"></span>
-                                <span class="eye"></span>
-                            </div>
-                            <div class="mochi-cheeks">
-                                <span class="cheek"></span>
-                                <span class="cheek"></span>
-                            </div>
-                            <div class="mochi-mouth" id="mochiMouth">ω</div>
+            <!-- Karakter Kucing Mochi Pou-Style -->
+            <div class="mochi-character-box" id="mochiCharacter">
+                <div class="mochi-ears">
+                    <span class="ear left"></span>
+                    <span class="ear right"></span>
+                </div>
+                <div class="mochi-body">
+                    <div class="mochi-face">
+                        <div class="mochi-eyes">
+                            <span class="eye"></span>
+                            <span class="eye"></span>
                         </div>
+                        <div class="mochi-cheeks">
+                            <span class="cheek"></span>
+                            <span class="cheek"></span>
+                        </div>
+                        <div class="mochi-mouth" id="mochiMouth">ω</div>
                     </div>
-                    <div class="mochi-shadow"></div>
                 </div>
+                <div class="mochi-shadow"></div>
             </div>
+        </main>
 
-            <!-- Indikator Parameter Mochi -->
-            <div class="pet-stats-container">
-                <div class="stat-row">
-                    <span>🍲 Kenyang</span>
-                    <div class="stat-bar-bg"><div id="barHunger" class="stat-bar-fill hunger" style="width: 80%;"></div></div>
-                    <span id="txtHunger">80%</span>
-                </div>
-                <div class="stat-row">
-                    <span>🧼 Bersih</span>
-                    <div class="stat-bar-bg"><div id="barHygiene" class="stat-bar-fill hygiene" style="width: 70%;"></div></div>
-                    <span id="txtHygiene">70%</span>
-                </div>
-                <div class="stat-row">
-                    <span>💖 Love Power</span>
-                    <div class="stat-bar-bg"><div id="barLove" class="stat-bar-fill love" style="width: 90%;"></div></div>
-                    <span id="txtLove">90%</span>
-                </div>
-            </div>
-
-            <!-- Tombol Pilih Alat Interaktif -->
-            <div class="pet-actions-grid">
-                <button id="btnFeedTool" class="pet-act-btn">🐟 Ambil Ikan</button>
-                <button id="btnBathTool" class="pet-act-btn">🧼 Ambil Spons</button>
-                <button id="btnPlayPet" class="pet-act-btn">🫳 Puk-puk Mochi</button>
-            </div>
-        </div>
+        <!-- Bottom Room Navigation Bar (Ala Talking Angela) -->
+        <footer class="pet-room-nav">
+            <button id="btnFeedTool" class="room-nav-btn">
+                <span class="nav-icon">🍽️</span>
+                <span>Makan</span>
+            </button>
+            <button id="btnBathTool" class="room-nav-btn">
+                <span class="nav-icon">🚿</span>
+                <span>Mandi</span>
+            </button>
+            <button id="btnPlayPet" class="room-nav-btn active">
+                <span class="nav-icon">🫳</span>
+                <span>Puk-puk</span>
+            </button>
+        </footer>
     </div>
 
     <script type="module" src="script.js"></script>

@@ -300,7 +300,7 @@ body.pixel-theme {
 .nav-item span { font-size: 9px; font-weight: 700; margin-top: 2px; }
 .nav-item.active { color: #e07a5f; }
 
-/* Modal Styling */
+/* Modal Styling Popup biasa */
 .modal {
     position: fixed;
     top: 0; left: 0; right: 0; bottom: 0;
@@ -351,18 +351,75 @@ body.pixel-theme {
     width: 100%; height: 80px; background: #fdf6ec; border: 2px solid #f2cc8f; border-radius: 12px; padding: 10px; color: #3d405b; font-size: 12px; outline: none; margin-bottom: 10px; resize: none;
 }
 
-/* DESAIN KUCING MOCHI POU-STYLE & DRAG ITEM STYLING */
-.pet-display-box {
-    text-align: center;
-    background: #fdf6ec;
-    border: 2px dashed #f2cc8f;
-    border-radius: 16px;
-    padding: 16px;
-    margin-bottom: 14px;
-    position: relative;
+/* TAMPILAN FULL-SCREEN RUANGAN MOCHI (TALKING ANGELA STYLE) */
+.pet-room-container {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    width: 100%;
+    height: 100vh;
+    background: linear-gradient(180deg, #fceade 0%, #f4a261 100%);
+    z-index: 200;
     display: flex;
     flex-direction: column;
+    justify-content: space-between;
+}
+
+.pet-room-header {
+    padding: 14px 16px;
+    display: flex;
+    justify-content: space-between;
     align-items: center;
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(10px);
+    border-bottom: 2px solid #f2cc8f;
+}
+
+.btn-back {
+    background: #ffffff;
+    border: 2px solid #e07a5f;
+    padding: 6px 12px;
+    border-radius: 12px;
+    font-weight: 800;
+    font-size: 11px;
+    color: #e07a5f;
+    cursor: pointer;
+}
+
+.pet-status-bars {
+    display: flex;
+    gap: 6px;
+}
+
+.status-pill {
+    background: #ffffff;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 10px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    border: 1px solid #f2cc8f;
+}
+
+.bar-bg { width: 35px; height: 8px; background: #fdf6ec; border-radius: 4px; overflow: hidden; border: 1px solid #f2cc8f; }
+.bar-fill { height: 100%; transition: width 0.3s; }
+.bar-fill.hunger { background: #f4a261; }
+.bar-fill.hygiene { background: #2a9d8f; }
+.bar-fill.love { background: #e07a5f; }
+
+/* Tampilan Tengah (Kucing & Lantai Ruangan) */
+.pet-room-view {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    background-image: 
+        linear-gradient(rgba(255,255,255,0.15) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.15) 1px, transparent 1px);
+    background-size: 30px 30px;
     user-select: none;
     touch-action: none;
 }
@@ -370,31 +427,30 @@ body.pixel-theme {
 .pet-speech-bubble {
     background: #ffffff;
     border: 2px solid #81b29a;
-    border-radius: 12px;
-    padding: 6px 10px;
-    font-size: 11px;
-    font-weight: 700;
+    border-radius: 14px;
+    padding: 8px 14px;
+    font-size: 12px;
+    font-weight: 800;
     color: #3d405b;
-    margin-bottom: 12px;
-    display: inline-block;
+    margin-bottom: 24px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
 }
 
-/* Elemen Alat Drag yang Bisa Digeser */
 .draggable-item {
     position: absolute;
-    font-size: 32px;
+    font-size: 42px;
     cursor: grab;
     z-index: 20;
-    top: 50px;
-    left: 20px;
+    top: 60px;
+    left: 40px;
     animation: pulse 1s infinite alternate;
 }
 .draggable-item:active { cursor: grabbing; }
 
 .mochi-character-box {
     position: relative;
-    width: 100px;
-    height: 90px;
+    width: 120px;
+    height: 110px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -404,31 +460,31 @@ body.pixel-theme {
 
 @keyframes mochiBounce {
     0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-8px); }
+    50% { transform: translateY(-10px); }
 }
 
 .mochi-ears {
     display: flex;
     justify-content: space-between;
-    width: 70px;
+    width: 80px;
     position: absolute;
     top: 2px;
     z-index: 1;
 }
 
 .mochi-ears .ear {
-    width: 20px;
-    height: 20px;
+    width: 24px;
+    height: 24px;
     background: #e07a5f;
-    border-radius: 4px 10px 0 0;
+    border-radius: 4px 12px 0 0;
 }
 
 .mochi-ears .ear.left { transform: rotate(-15deg); }
 .mochi-ears .ear.right { transform: rotate(15deg); }
 
 .mochi-body {
-    width: 85px;
-    height: 70px;
+    width: 100px;
+    height: 85px;
     background: #f4a261;
     border: 3px solid #3d405b;
     border-radius: 45% 45% 40% 40%;
@@ -437,7 +493,7 @@ body.pixel-theme {
     display: flex;
     justify-content: center;
     align-items: center;
-    box-shadow: inset -4px -4px 0 rgba(0,0,0,0.1);
+    box-shadow: inset -5px -5px 0 rgba(0,0,0,0.1);
 }
 
 .mochi-face { text-align: center; }
@@ -445,13 +501,13 @@ body.pixel-theme {
 .mochi-eyes {
     display: flex;
     justify-content: space-between;
-    width: 36px;
+    width: 44px;
     margin: 0 auto 2px auto;
 }
 
 .mochi-eyes .eye {
-    width: 8px;
-    height: 8px;
+    width: 10px;
+    height: 10px;
     background: #3d405b;
     border-radius: 50%;
     animation: eyeBlink 3s infinite;
@@ -465,52 +521,59 @@ body.pixel-theme {
 .mochi-cheeks {
     display: flex;
     justify-content: space-between;
-    width: 50px;
+    width: 60px;
     margin: -4px auto 0 auto;
 }
 
 .mochi-cheeks .cheek {
-    width: 10px;
-    height: 6px;
+    width: 12px;
+    height: 7px;
     background: #f28482;
     border-radius: 50%;
     opacity: 0.8;
 }
 
 .mochi-mouth {
-    font-size: 14px;
+    font-size: 16px;
     font-weight: 800;
     color: #3d405b;
     line-height: 1;
 }
 
 .mochi-shadow {
-    width: 60px;
-    height: 10px;
-    background: rgba(0,0,0,0.08);
+    width: 80px;
+    height: 12px;
+    background: rgba(0,0,0,0.1);
     border-radius: 50%;
     position: absolute;
-    bottom: 0;
+    bottom: -2px;
 }
 
-.pet-stats-container { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
-.stat-row { display: flex; align-items: center; justify-content: space-between; font-size: 11px; font-weight: 700; color: #3d405b; }
-.stat-bar-bg { flex: 1; height: 10px; background: #f4f1de; border-radius: 6px; margin: 0 8px; overflow: hidden; border: 1px solid #f2cc8f; }
-.stat-bar-fill { height: 100%; transition: width 0.3s ease; }
-.stat-bar-fill.hunger { background: #f4a261; }
-.stat-bar-fill.hygiene { background: #2a9d8f; }
-.stat-bar-fill.love { background: #e07a5f; }
-
-.pet-actions-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
-.pet-act-btn {
+/* Navigasi Bawah Full Width (Talking Angela Style) */
+.pet-room-nav {
     background: #ffffff;
+    border-top: 3px solid #f2cc8f;
+    padding: 12px 20px;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.room-nav-btn {
+    background: #fdf6ec;
     border: 2px solid #f2cc8f;
-    border-radius: 10px;
-    padding: 8px 4px;
-    font-size: 10px;
+    border-radius: 16px;
+    padding: 10px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+    font-size: 11px;
     font-weight: 800;
     color: #3d405b;
-    cursor: pointer;
-    box-shadow: 0 2px 0 #f2cc8f;
+    box-shadow: 0 3px 0 #f2cc8f;
+    transition: 0.1s;
 }
-.pet-act-btn:active { transform: translateY(2px); box-shadow: none; }
+
+.room-nav-btn:active { transform: translateY(2px); box-shadow: none; }
+.room-nav-btn .nav-icon { font-size: 24px; margin-bottom: 2px; }
