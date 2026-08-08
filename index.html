@@ -35,8 +35,21 @@
                 <button id="tabRegister" class="tab-btn">Daftar Akun</button>
             </div>
 
-            <!-- Register Form -->
-            <form id="registerForm" class="form-content">
+            <!-- Login Form (Tampil pertama saat tab Masuk aktif) -->
+            <form id="loginForm" class="form-content">
+                <div class="input-group">
+                    <label>Email</label>
+                    <input type="email" id="loginEmail" placeholder="email@gmail.com" required>
+                </div>
+                <div class="input-group">
+                    <label>Password</label>
+                    <input type="password" id="loginPassword" placeholder="******" required>
+                </div>
+                <button type="submit" class="btn-primary">Masuk ➔</button>
+            </form>
+
+            <!-- Register Form (Sembunyi secara default) -->
+            <form id="registerForm" class="form-content hidden">
                 <div class="input-group">
                     <label>Nama Lengkap</label>
                     <input type="text" id="regFullName" placeholder="Windi Widiana" required>
@@ -62,19 +75,6 @@
                     <input type="password" id="regPassword" placeholder="******" required>
                 </div>
                 <button type="submit" class="btn-primary">Daftar & Lanjut ➔</button>
-            </form>
-
-            <!-- Login Form -->
-            <form id="loginForm" class="form-content hidden">
-                <div class="input-group">
-                    <label>Email</label>
-                    <input type="email" id="loginEmail" placeholder="email@gmail.com" required>
-                </div>
-                <div class="input-group">
-                    <label>Password</label>
-                    <input type="password" id="loginPassword" placeholder="******" required>
-                </div>
-                <button type="submit" class="btn-primary">Masuk ➔</button>
             </form>
         </div>
 
@@ -225,7 +225,7 @@
             <div class="hug-options">
                 <button class="hug-opt-btn" data-type="Peluk Biasa 🤗">🤗 Peluk Biasa</button>
                 <button class="hug-opt-btn" data-type="Peluk Lama 🫂">🫂 Peluk Lama</button>
-                <button class="hug-opt-btn" data-type="Peluk Kangen 🥺">🥺 Peluk Karena Kangen</button>
+                <button class="hug-opt-btn" data-type="Peluk Karena Kangen 🥺">🥺 Peluk Karena Kangen</button>
                 <button class="hug-opt-btn" data-type="Peluk Sayang ❤️">❤️ Peluk Sayang Banget</button>
             </div>
         </div>
