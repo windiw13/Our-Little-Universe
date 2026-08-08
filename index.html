@@ -5,20 +5,27 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Our Little Universe 🤍</title>
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Google Pixel & Modern Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
 </head>
-<body>
+<body class="pixel-theme">
 
-    <!-- Background Glows -->
-    <div class="bg-glow blue"></div>
-    <div class="bg-glow pink"></div>
+    <!-- FLOATING REALTIME NOTIFICATION POPUP -->
+    <div id="realtimeNotif" class="notif-toast hidden">
+        <div class="notif-icon" id="notifIcon">🤗</div>
+        <div class="notif-body">
+            <h4 id="notifTitle">Pelukan Masuk!</h4>
+            <p id="notifMessage">Rama mengirimkan Pelukan Sayang ❤️</p>
+        </div>
+        <button id="closeNotifBtn" class="notif-close">✕</button>
+    </div>
 
     <!-- AUTHENTICATION CONTAINER -->
     <main class="auth-container">
         <div class="app-header">
-            <div class="app-icon">🤍</div>
-            <h1>Our Little Universe</h1>
-            <p>A small place for two hearts, even when far apart.</p>
+            <div class="pixel-avatar">👾🤍👾</div>
+            <h1 class="pixel-title">Our Little Universe</h1>
+            <p>A small cozy space for Diw & Rama</p>
         </div>
 
         <!-- CARD 1: LOGIN / REGISTER -->
@@ -104,7 +111,7 @@
             </div>
 
             <div class="waiting-animation">
-                <div class="pulse-heart">🤍</div>
+                <div class="pulse-heart">👾❤️👾</div>
                 <p>Menunggu Rama bergabung...</p>
             </div>
         </div>
@@ -127,24 +134,26 @@
     <div id="homeScreen" class="home-container hidden">
         <header class="home-header">
             <div class="user-greeting">
-                <span class="greeting-text">Good Morning,</span>
+                <span class="greeting-text">Good Day! ✨</span>
                 <h2 id="homeUserGreeting">Diw ❤️</h2>
             </div>
             <div class="couple-status-pill">
                 <span>Sukabumi</span>
-                <span class="heart-pulse">❤️</span>
+                <span class="heart-pulse">💖</span>
                 <span>Bandung</span>
             </div>
         </header>
 
         <!-- Card 1: Day Counter -->
         <section class="card counter-card">
+            <div class="pixel-decor left">🌸</div>
+            <div class="pixel-decor right">🌿</div>
             <div class="counter-badge">Together Since</div>
             <div class="counter-days">
                 <span id="daysTogetherCount">214</span>
                 <small>Hari</small>
             </div>
-            <p class="counter-sub">Windi & Rama's Little Universe 🤍</p>
+            <p class="counter-sub">Diw & Rama's Pixel World 🎮</p>
         </section>
 
         <!-- Card 2: Distance Tracker -->
@@ -152,7 +161,7 @@
             <div class="distance-info">
                 <div class="city-box">
                     <span class="city-name">Sukabumi</span>
-                    <span class="partner-name">Diw</span>
+                    <span class="partner-name">Diw 🏡</span>
                 </div>
                 <div class="distance-line">
                     <span class="line"></span>
@@ -161,13 +170,22 @@
                 </div>
                 <div class="city-box">
                     <span class="city-name">Bandung</span>
-                    <span class="partner-name">Rama</span>
+                    <span class="partner-name">Rama 🏢</span>
                 </div>
             </div>
             <p class="distance-quote">"Distance means so little when someone means so much."</p>
         </section>
 
-        <!-- Card 3: Quick Action Buttons -->
+        <!-- Card 3: Last Activity Display -->
+        <section class="card activity-card">
+            <div class="act-header">
+                <span class="pixel-icon">💌</span>
+                <h4>Aktivitas Terakhir</h4>
+            </div>
+            <p id="lastActivityText" class="act-text">Belum ada aktivitas hari ini. Kirim pelukan yuk!</p>
+        </section>
+
+        <!-- Card 4: Quick Action Buttons -->
         <section class="quick-grid">
             <button id="btnHugModal" class="action-btn hug-btn">
                 <span class="btn-icon">🤗</span>
@@ -200,7 +218,7 @@
     <div id="hugModal" class="modal hidden">
         <div class="modal-content">
             <div class="modal-header">
-                <h3>Kirim Pelukan ke Rama 🤍</h3>
+                <h3>Kirim Pelukan 🤍</h3>
                 <button class="close-modal" id="closeHugModal">✕</button>
             </div>
             <p class="modal-sub">Pilih jenis pelukan yang mau kamu kirim sekarang:</p>

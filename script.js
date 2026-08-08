@@ -1,15 +1,15 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-import { getFirestore, doc, setDoc, getDoc, updateDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { getFirestore, doc, setDoc, getDoc, updateDoc, onSnapshot, collection, addDoc, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyDLgyp6_O-T9oHNUZM-mOj-lpKpE6rJ04E",
-  authDomain: "our-little-universe-0209.firebaseapp.com",
-  projectId: "our-little-universe-0209",
-  storageBucket: "our-little-universe-0209.firebasestorage.app",
-  messagingSenderId: "924945430782",
-  appId: "1:924945430782:web:9dcab9bd35b5595c480daf",
-  measurementId: "G-Y7FSMN5NJP"
+    apiKey: "AIzaSyDLgyp6_0-T9oHNUZM-mOj-lpKpE6rJ04E",
+    authDomain: "our-little-universe-0209.firebaseapp.com",
+    projectId: "our-little-universe-0209",
+    storageBucket: "our-little-universe-0209.firebasestorage.app",
+    messagingSenderId: "924945430782",
+    appId: "1:924945430782:web:9dcab9bd35b5595c480daf",
+    measurementId: "G-Y7FSMN5NJP"
 };
 
 const app = initializeApp(firebaseConfig);
@@ -17,6 +17,7 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 
 let currentUserData = null;
+let notifUnsub = null;
 
 // DOM Elements
 const authCard = document.getElementById('authCard');
@@ -61,16 +62,7 @@ if (registerForm) {
             const userCredential = await createUserWithEmailAndPassword(auth, email, password);
             const uid = userCredential.user.uid;
 
-            currentUserData = {
-                uid,
-                fullName,
-                nickname,
-                location,
-                birthDate,
-                email,
-                coupleSpaceId: null
-            };
-
+            currentUserData = { uid, fullName, nickname, location, birthDate, email, coupleSpaceId: null };
             await setDoc(doc(db, "users", uid), currentUserData);
 
             authCard.classList.add('hidden');
@@ -109,61 +101,49 @@ if (loginForm) {
 }
 
 // CREATE COUPLE SPACE
-const btnCreateSpace = document.getElementById('btnCreateSpace');
-if (btnCreateSpace) {
-    btnCreateSpace.addEventListener('click', async () => {
-        const code = "LOVE-" + Math.random().toString(36).substring(2, 7).toUpperCase();
-        
-        await setDoc(doc(db, "couple_spaces", code), {
-            spaceId: code,
-            partner1_uid: currentUserData.uid,
-            partner1_name: currentUserData.nickname,
-            partner2_uid: null,
-            partner2_name: null,
-            status: "waiting",
-            createdAt: new Date()
-        });
-
-        await updateDoc(doc(db, "users", currentUserData.uid), {
-            coupleSpaceId: code
-        });
-
-        document.getElementById('generatedCodeDisplay').innerText = code;
-        coupleCard.classList.add('hidden');
-        codeDisplayCard.classList.remove('hidden');
-
-        listenForPartner(code);
+document.getElementById('btnCreateSpace')?.addEventListener('click', async () => {
+    const code = "LOVE-" + Math.random().toString(36).substring(2, 7).toUpperCase();
+    
+    await setDoc(doc(db, "couple_spaces", code), {
+        spaceId: code,
+        partner1_uid: currentUserData.uid,
+        partner1_name: currentUserData.nickname,
+        partner2_uid: null,
+        partner2_name: null,
+        status: "waiting",
+        createdAt: new Date()
     });
-}
+
+    await updateDoc(doc(db, "users", currentUserData.uid), { coupleSpaceId: code });
+    document.getElementById('generatedCodeDisplay').innerText = code;
+    coupleCard.classList.add('hidden');
+    codeDisplayCard.classList.remove('hidden');
+
+    listenForPartner(code);
+});
 
 // JOIN COUPLE SPACE
-const btnJoinSpace = document.getElementById('btnJoinSpace');
-if (btnJoinSpace) {
-    btnJoinSpace.addEventListener('click', async () => {
-        const inputCode = document.getElementById('joinCodeInput').value.trim().toUpperCase();
-        if (!inputCode) return alert("Masukkan kodenya dulu ya!");
+document.getElementById('btnJoinSpace')?.addEventListener('click', async () => {
+    const inputCode = document.getElementById('joinCodeInput').value.trim().toUpperCase();
+    if (!inputCode) return alert("Masukkan kodenya dulu ya!");
 
-        const spaceRef = doc(db, "couple_spaces", inputCode);
-        const spaceSnap = await getDoc(spaceRef);
+    const spaceRef = doc(db, "couple_spaces", inputCode);
+    const spaceSnap = await getDoc(spaceRef);
 
-        if (spaceSnap.exists()) {
-            await updateDoc(spaceRef, {
-                partner2_uid: currentUserData.uid,
-                partner2_name: currentUserData.nickname,
-                status: "connected"
-            });
+    if (spaceSnap.exists()) {
+        await updateDoc(spaceRef, {
+            partner2_uid: currentUserData.uid,
+            partner2_name: currentUserData.nickname,
+            status: "connected"
+        });
 
-            await updateDoc(doc(db, "users", currentUserData.uid), {
-                coupleSpaceId: inputCode
-            });
-
-            const data = spaceSnap.data();
-            showSuccessScreen(data.partner1_name, currentUserData.nickname);
-        } else {
-            alert("Kode Space tidak ditemukan. Coba cek lagi ya!");
-        }
-    });
-}
+        await updateDoc(doc(db, "users", currentUserData.uid), { coupleSpaceId: inputCode });
+        const data = spaceSnap.data();
+        showSuccessScreen(data.partner1_name, currentUserData.nickname);
+    } else {
+        alert("Kode Space tidak ditemukan. Coba cek lagi ya!");
+    }
+});
 
 function listenForPartner(spaceId) {
     onSnapshot(doc(db, "couple_spaces", spaceId), (docSnap) => {
@@ -201,31 +181,76 @@ function showSuccessScreen(p1, p2) {
 }
 
 // COPY CODE BUTTON
-const btnCopyCode = document.getElementById('btnCopyCode');
-if (btnCopyCode) {
-    btnCopyCode.addEventListener('click', () => {
-        const code = document.getElementById('generatedCodeDisplay').innerText;
-        navigator.clipboard.writeText(code);
-        alert("Kode berhasil disalin! Kirimkan ke Rama ya 🤍");
+document.getElementById('btnCopyCode')?.addEventListener('click', () => {
+    const code = document.getElementById('generatedCodeDisplay').innerText;
+    navigator.clipboard.writeText(code);
+    alert("Kode berhasil disalin! Kirimkan ke Rama ya 🤍");
+});
+
+// ENTER HOME DASHBOARD & START REALTIME LISTENER
+document.getElementById('btnEnterApp')?.addEventListener('click', () => {
+    const authContainer = document.querySelector('.auth-container');
+    if (authContainer) authContainer.classList.add('hidden');
+    
+    const homeScreen = document.getElementById('homeScreen');
+    if (homeScreen) homeScreen.classList.remove('hidden');
+
+    if (currentUserData) {
+        document.getElementById('homeUserGreeting').innerText = currentUserData.nickname + " ❤️";
+        listenRealtimeNotifications(currentUserData.coupleSpaceId);
+    }
+});
+
+// REALTIME NOTIFICATIONS & ACTIVITY LISTENER
+function listenRealtimeNotifications(spaceId) {
+    if (!spaceId) return;
+
+    const notifRef = collection(db, "couple_spaces", spaceId, "notifications");
+    const q = query(notifRef, orderBy("timestamp", "desc"), limit(1));
+
+    let isInitialLoad = true;
+
+    notifUnsub = onSnapshot(q, (snapshot) => {
+        snapshot.docChanges().forEach((change) => {
+            if (change.type === "added") {
+                const data = change.doc.data();
+
+                // Update text di aktivitas terakhir
+                const actText = document.getElementById('lastActivityText');
+                if (actText) {
+                    actText.innerText = `${data.senderName}: ${data.message}`;
+                }
+
+                // Jangan munculkan popup kalau data baru dimuat pertama kali atau dari diri sendiri
+                if (isInitialLoad) return;
+                if (data.senderUid === currentUserData.uid) return;
+
+                // TAMPILKAN POPUP DENGAN GETARAN INSTAN!
+                showNotifBanner(data.type, data.senderName, data.message);
+                if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+            }
+        });
+        isInitialLoad = false;
     });
 }
 
-// ENTER HOME DASHBOARD
-const btnEnterApp = document.getElementById('btnEnterApp');
-if (btnEnterApp) {
-    btnEnterApp.addEventListener('click', () => {
-        const authContainer = document.querySelector('.auth-container');
-        if (authContainer) authContainer.classList.add('hidden');
-        
-        const homeScreen = document.getElementById('homeScreen');
-        if (homeScreen) homeScreen.classList.remove('hidden');
+function showNotifBanner(type, sender, message) {
+    const banner = document.getElementById('realtimeNotif');
+    const iconEl = document.getElementById('notifIcon');
+    const titleEl = document.getElementById('notifTitle');
+    const msgEl = document.getElementById('notifMessage');
 
-        if (currentUserData) {
-            const greetingEl = document.getElementById('homeUserGreeting');
-            if (greetingEl) greetingEl.innerText = currentUserData.nickname + " ❤️";
-        }
-    });
+    iconEl.innerText = type === "hug" ? "🤗" : "😊";
+    titleEl.innerText = type === "hug" ? "Pelukan Masuk! 🤍" : "Mood Pasangan Update!";
+    msgEl.innerText = `${sender}: ${message}`;
+
+    banner.classList.remove('hidden');
+    setTimeout(() => banner.classList.add('hidden'), 5000);
 }
+
+document.getElementById('closeNotifBtn')?.addEventListener('click', () => {
+    document.getElementById('realtimeNotif')?.classList.add('hidden');
+});
 
 // MODAL CONTROLS
 const hugModal = document.getElementById('hugModal');
@@ -237,16 +262,26 @@ document.getElementById('closeHugModal')?.addEventListener('click', () => hugMod
 document.getElementById('btnMoodModal')?.addEventListener('click', () => moodModal?.classList.remove('hidden'));
 document.getElementById('closeMoodModal')?.addEventListener('click', () => moodModal?.classList.add('hidden'));
 
-// SEND HUG ACTION
+// SEND HUG ACTION (REALTIME TO FIREBASE)
 document.querySelectorAll('.hug-opt-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
+    btn.addEventListener('click', async () => {
         const hugType = btn.getAttribute('data-type');
-        alert(`Berhasil ngirim ${hugType} ke Rama! 🤍`);
         hugModal?.classList.add('hidden');
+
+        if (currentUserData && currentUserData.coupleSpaceId) {
+            await addDoc(collection(db, "couple_spaces", currentUserData.coupleSpaceId, "notifications"), {
+                type: "hug",
+                senderUid: currentUserData.uid,
+                senderName: currentUserData.nickname,
+                message: `mengirimkan ${hugType}`,
+                timestamp: new Date()
+            });
+            alert(`Berhasil ngirim ${hugType} ke pasangan! 🤍`);
+        }
     });
 });
 
-// SELECT MOOD ACTION
+// SELECT MOOD ACTION (REALTIME TO FIREBASE)
 let selectedMood = "😊 Bahagia";
 document.querySelectorAll('.mood-opt').forEach(btn => {
     btn.addEventListener('click', () => {
@@ -256,7 +291,19 @@ document.querySelectorAll('.mood-opt').forEach(btn => {
     });
 });
 
-document.getElementById('btnSaveMood')?.addEventListener('click', () => {
-    alert(`Mood hari ini (${selectedMood}) tersimpan! 🤍`);
+document.getElementById('btnSaveMood')?.addEventListener('click', async () => {
+    const note = document.getElementById('moodNoteInput').value;
     moodModal?.classList.add('hidden');
+
+    if (currentUserData && currentUserData.coupleSpaceId) {
+        const msgText = note ? `Mood: ${selectedMood} ("${note}")` : `Mood: ${selectedMood}`;
+        await addDoc(collection(db, "couple_spaces", currentUserData.coupleSpaceId, "notifications"), {
+            type: "mood",
+            senderUid: currentUserData.uid,
+            senderName: currentUserData.nickname,
+            message: msgText,
+            timestamp: new Date()
+        });
+        alert(`Mood hari ini (${selectedMood}) tersimpan! 🤍`);
+    }
 });
