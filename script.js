@@ -1,8 +1,8 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-import { getFirestore, doc, setDoc, getDoc, updateDoc, onSnapshot, collection, addDoc, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { getFirestore, doc, setDoc, getDoc, updateDoc, onSnapshot, collection, addDoc, query, orderBy, limit, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-// FIREBASE CONFIG (Huruf O Besar)
+// FIREBASE CONFIG
 const firebaseConfig = {
   apiKey: "AIzaSyDLgyp6_O-T9oHNUZM-mOj-lpKpE6rJ04E",
   authDomain: "our-little-universe-0209.firebaseapp.com",
@@ -112,6 +112,7 @@ document.getElementById('btnCreateSpace')?.addEventListener('click', async () =>
         partner2_name: null,
         status: "waiting",
         startDate: null,
+        mochi: { hunger: 80, hygiene: 70, love: 90 },
         createdAt: new Date()
     });
 
@@ -198,12 +199,80 @@ document.getElementById('btnEnterApp')?.addEventListener('click', () => {
 
     if (currentUserData) {
         document.getElementById('homeUserGreeting').innerText = currentUserData.nickname + " ❤️";
+        
+        // 1. Jalankan Greeting waktu otomatis
+        updateTimeGreeting();
+        
+        // 2. Update Heartbeat / Active status
+        updateUserPresence(currentUserData.coupleSpaceId);
+        
+        // 3. Listen Notifikasi & Mochi
         listenRealtimeNotifications(currentUserData.coupleSpaceId);
         listenStartDate(currentUserData.coupleSpaceId);
+        listenMochiStats(currentUserData.coupleSpaceId);
     }
 });
 
-// 1. DYNAMIC START DATE COUNTER (REVISI TANGGAL BERSAMA)
+// FITUR 1: GREETING SESUAI JAM LOKAL
+function updateTimeGreeting() {
+    const hour = new Date().getHours();
+    const greetingEl = document.getElementById('timeGreeting');
+    if (!greetingEl) return;
+
+    if (hour >= 5 && hour < 12) {
+        greetingEl.innerText = "Good Morning! ☀️";
+    } else if (hour >= 12 && hour < 17) {
+        greetingEl.innerText = "Good Afternoon! 🌤️";
+    } else if (hour >= 17 && hour < 21) {
+        greetingEl.innerText = "Good Evening! 🌙";
+    } else {
+        greetingEl.innerText = "Good Night! ✨";
+    }
+}
+
+// FITUR 2: LAST SEEN / STATUS AKTIF REALTIME
+async function updateUserPresence(spaceId) {
+    if (!spaceId) return;
+
+    // Update last active user
+    const userRef = doc(db, "users", currentUserData.uid);
+    await updateDoc(userRef, { lastActive: serverTimestamp() });
+
+    // Dengarkan status keaktifan pasangan
+    onSnapshot(doc(db, "couple_spaces", spaceId), async (docSnap) => {
+        if (!docSnap.exists()) return;
+        const data = docSnap.data();
+
+        const partnerUid = data.partner1_uid === currentUserData.uid ? data.partner2_uid : data.partner1_uid;
+        const partnerName = data.partner1_uid === currentUserData.uid ? data.partner2_name : data.partner1_name;
+
+        if (!partnerUid) {
+            document.getElementById('partnerActiveStatus').innerText = `⏳ Menunggu ${partnerName || 'Rama'}...`;
+            return;
+        }
+
+        const partnerSnap = await getDoc(doc(db, "users", partnerUid));
+        if (partnerSnap.exists() && partnerSnap.data().lastActive) {
+            const lastActive = partnerSnap.data().lastActive.toDate();
+            const now = new Date();
+            const diffMinutes = Math.floor((now - lastActive) / 60000);
+
+            const statusEl = document.getElementById('partnerActiveStatus');
+            if (statusEl) {
+                if (diffMinutes < 3) {
+                    statusEl.innerText = `🟢 ${partnerName} Aktif sekarang`;
+                } else if (diffMinutes < 60) {
+                    statusEl.innerText = `🟡 ${partnerName} Aktif ${diffMinutes} mnt lalu`;
+                } else {
+                    const diffHours = Math.floor(diffMinutes / 60);
+                    statusEl.innerText = `⚪ ${partnerName} Aktif ${diffHours} jam lalu`;
+                }
+            }
+        }
+    });
+}
+
+// FITUR DYNAMIC START DATE COUNTER
 const startDateInput = document.getElementById('startDateInput');
 
 function listenStartDate(spaceId) {
@@ -220,9 +289,7 @@ function listenStartDate(spaceId) {
 startDateInput?.addEventListener('change', async (e) => {
     const chosenDate = e.target.value;
     if (currentUserData && currentUserData.coupleSpaceId) {
-        await updateDoc(doc(db, "couple_spaces", currentUserData.coupleSpaceId), {
-            startDate: chosenDate
-        });
+        await updateDoc(doc(db, "couple_spaces", currentUserData.coupleSpaceId), { startDate: chosenDate });
         calculateDaysTogether(chosenDate);
     }
 });
@@ -235,7 +302,74 @@ function calculateDaysTogether(startDateStr) {
     document.getElementById('daysTogetherCount').innerText = isNaN(diffDays) ? 0 : diffDays;
 }
 
-// 2. REALTIME NOTIFICATIONS & ENTIRE ACTIVITY LOG
+// FITUR 3: REALTIME MOCHI VIRTUAL PET GAME
+function listenMochiStats(spaceId) {
+    if (!spaceId) return;
+    onSnapshot(doc(db, "couple_spaces", spaceId), (docSnap) => {
+        if (docSnap.exists()) {
+            const mochi = docSnap.data().mochi || { hunger: 80, hygiene: 70, love: 90 };
+            updateMochiUI(mochi);
+        }
+    });
+}
+
+function updateMochiUI(mochi) {
+    document.getElementById('barHunger').style.width = mochi.hunger + '%';
+    document.getElementById('txtHunger').innerText = mochi.hunger + '%';
+
+    document.getElementById('barHygiene').style.width = mochi.hygiene + '%';
+    document.getElementById('txtHygiene').innerText = mochi.hygiene + '%';
+
+    document.getElementById('barLove').style.width = mochi.love + '%';
+    document.getElementById('txtLove').innerText = mochi.love + '%';
+
+    const bubble = document.getElementById('mochiBubble');
+    if (mochi.hunger < 40) {
+        bubble.innerText = '"Mochi lapar banget... minta makan dong! 🐟"';
+    } else if (mochi.love > 85) {
+        bubble.innerText = '"Mochi seneng banget disayang kalian! 💖"';
+    } else {
+        bubble.innerText = '"Meow! Rawat Mochi berdua ya! 🤍"';
+    }
+}
+
+async function updateMochiAction(actionType, increaseAmount) {
+    if (!currentUserData || !currentUserData.coupleSpaceId) return;
+
+    const spaceRef = doc(db, "couple_spaces", currentUserData.coupleSpaceId);
+    const docSnap = await getDoc(spaceRef);
+    if (!docSnap.exists()) return;
+
+    let mochi = docSnap.data().mochi || { hunger: 80, hygiene: 70, love: 90 };
+    let msg = "";
+
+    if (actionType === "feed") {
+        mochi.hunger = Math.min(100, mochi.hunger + increaseAmount);
+        msg = "memberi makan Mochi ikan lezat 🐟";
+    } else if (actionType === "bath") {
+        mochi.hygiene = Math.min(100, mochi.hygiene + increaseAmount);
+        msg = "memandikan Mochi sampai wangi 🧼";
+    } else if (actionType === "play") {
+        mochi.love = Math.min(100, mochi.love + increaseAmount);
+        msg = "mengelus & mengajak main Mochi 🧶";
+    }
+
+    await updateDoc(spaceRef, { mochi });
+
+    await addDoc(collection(db, "couple_spaces", currentUserData.coupleSpaceId, "notifications"), {
+        type: "mochi",
+        senderUid: currentUserData.uid,
+        senderName: currentUserData.nickname,
+        message: msg,
+        timestamp: new Date()
+    });
+}
+
+document.getElementById('btnFeedPet')?.addEventListener('click', () => updateMochiAction("feed", 25));
+document.getElementById('btnBathPet')?.addEventListener('click', () => updateMochiAction("bath", 30));
+document.getElementById('btnPlayPet')?.addEventListener('click', () => updateMochiAction("play", 20));
+
+// REALTIME NOTIFICATIONS & ACTIVITY LOG
 function listenRealtimeNotifications(spaceId) {
     if (!spaceId) return;
 
@@ -257,13 +391,11 @@ function listenRealtimeNotifications(spaceId) {
             const data = docSnap.data();
             const timeStr = data.timestamp ? new Date(data.timestamp.toDate()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
 
-            // Render ke list riwayat aktivitas
             const item = document.createElement('div');
             item.className = 'act-item';
             item.innerHTML = `<span class="act-user">${data.senderName}</span> ${data.message} <span class="act-time">${timeStr}</span>`;
             logContainer.appendChild(item);
 
-            // Munculkan Popup Banner hanya untuk pesan yang paling baru
             if (index === 0 && !isInitialLoad && data.senderUid !== currentUserData.uid) {
                 showNotifBanner(data.type, data.senderName, data.message);
                 if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
@@ -281,8 +413,8 @@ function showNotifBanner(type, sender, message) {
     const msgEl = document.getElementById('notifMessage');
 
     if (iconEl && titleEl && msgEl && banner) {
-        iconEl.innerText = type === "express" ? "💖" : "😊";
-        titleEl.innerText = type === "express" ? "Express Love Masuk! 💖" : "Mood Pasangan Update!";
+        iconEl.innerText = type === "express" ? "💖" : (type === "mochi" ? "🐱" : "😊");
+        titleEl.innerText = type === "express" ? "Express Love Masuk! 💖" : (type === "mochi" ? "Mochi Ditingkatkan! 🐱" : "Mood Pasangan Update!");
         msgEl.innerText = `${sender}: ${message}`;
 
         banner.classList.remove('hidden');
@@ -297,6 +429,7 @@ document.getElementById('closeNotifBtn')?.addEventListener('click', () => {
 // MODAL CONTROLS
 const hugModal = document.getElementById('hugModal');
 const moodModal = document.getElementById('moodModal');
+const petModal = document.getElementById('petModal');
 
 document.getElementById('btnHugModal')?.addEventListener('click', () => hugModal?.classList.remove('hidden'));
 document.getElementById('closeHugModal')?.addEventListener('click', () => hugModal?.classList.add('hidden'));
@@ -304,7 +437,10 @@ document.getElementById('closeHugModal')?.addEventListener('click', () => hugMod
 document.getElementById('btnMoodModal')?.addEventListener('click', () => moodModal?.classList.remove('hidden'));
 document.getElementById('closeMoodModal')?.addEventListener('click', () => moodModal?.classList.add('hidden'));
 
-// SEND EXPRESS LOVE ACTION
+document.getElementById('btnPetModal')?.addEventListener('click', () => petModal?.classList.remove('hidden'));
+document.getElementById('closePetModal')?.addEventListener('click', () => petModal?.classList.add('hidden'));
+
+// SEND EXPRESS LOVE ACTION (Otomatis Tambah Love Mochi +15%)
 document.querySelectorAll('.hug-opt-btn').forEach(btn => {
     btn.addEventListener('click', async () => {
         const loveType = btn.getAttribute('data-type');
@@ -318,6 +454,9 @@ document.querySelectorAll('.hug-opt-btn').forEach(btn => {
                 message: `mengirimkan ${loveType}`,
                 timestamp: new Date()
             });
+
+            // Tambah Love Mochi +15%
+            updateMochiAction("play", 15);
             alert(`Berhasil ngirim ${loveType} ke pasangan! 💖`);
         }
     });

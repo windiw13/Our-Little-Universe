@@ -23,7 +23,6 @@
     <!-- AUTHENTICATION CONTAINER -->
     <main class="auth-container">
         <div class="app-header">
-            <!-- Animasi GIF Pixel Cute -->
             <div class="pixel-anim-box">
                 <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExdW93OWptZW5zeXRhY3p3dnZwNWk0Zmd1bHFxYWZlMXpibmd0MnlsYyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/vbf8A28y3fLCE/giphy.gif" alt="Pixel Cat GIF" class="pixel-gif">
             </div>
@@ -137,8 +136,11 @@
     <div id="homeScreen" class="home-container hidden">
         <header class="home-header">
             <div class="user-greeting">
-                <span class="greeting-text">Good Day! ✨</span>
+                <!-- Greeting Menyesuaikan Waktu -->
+                <span class="greeting-text" id="timeGreeting">Good Day! ✨</span>
                 <h2 id="homeUserGreeting">Diw ❤️</h2>
+                <!-- Status Keaktifan Pasangan -->
+                <span class="partner-active-status" id="partnerActiveStatus">🟢 Rama Aktif</span>
             </div>
             <div class="couple-status-pill">
                 <span>Sukabumi</span>
@@ -147,7 +149,7 @@
             </div>
         </header>
 
-        <!-- Card 1: Day Counter dengan Pengaturan Tanggal Bersama -->
+        <!-- Card 1: Day Counter -->
         <section class="card counter-card">
             <div class="pixel-decor left">
                 <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExdW93OWptZW5zeXRhY3p3dnZwNWk0Zmd1bHFxYWZlMXpibmd0MnlsYyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/vbf8A28y3fLCE/giphy.gif" class="pixel-corner-gif">
@@ -158,7 +160,6 @@
                 <small>Hari</small>
             </div>
             
-            <!-- Date Picker untuk Atur Tanggal Bersama -->
             <div class="start-date-picker">
                 <label for="startDateInput">📅 Tanggal Jadian / Bersama:</label>
                 <input type="date" id="startDateInput">
@@ -187,7 +188,7 @@
             <p class="distance-quote">"Distance means so little when someone means so much."</p>
         </section>
 
-        <!-- Card 3: Quick Action Buttons (Express Love & Daily Check) -->
+        <!-- Card 3: Quick Action Buttons -->
         <section class="quick-grid">
             <button id="btnHugModal" class="action-btn hug-btn">
                 <span class="btn-icon">💖</span>
@@ -207,7 +208,7 @@
             </button>
         </section>
 
-        <!-- Card 4: Riwayat Seluruh Aktivitas Pasangan (Activity Log) -->
+        <!-- Card 4: Riwayat Seluruh Aktivitas -->
         <section class="card activity-card">
             <div class="act-header">
                 <span class="pixel-icon">💌</span>
@@ -227,7 +228,7 @@
         </nav>
     </div>
 
-    <!-- MODAL EXPRESS LOVE (HUG, KISS, PAT, ETC) -->
+    <!-- MODAL EXPRESS LOVE -->
     <div id="hugModal" class="modal hidden">
         <div class="modal-content">
             <div class="modal-header">
@@ -261,6 +262,48 @@
             </div>
             <textarea id="moodNoteInput" placeholder="Ceritain sedikit hari ini... (misal: 'Capek kerjaan, tapi seneng inget kamu')"></textarea>
             <button id="btnSaveMood" class="btn-primary">Simpan Mood Hari Ini ➔</button>
+        </div>
+    </div>
+
+    <!-- MODAL GAME MOCHI (VIRTUAL PET) -->
+    <div id="petModal" class="modal hidden">
+        <div class="modal-content pet-modal-content">
+            <div class="modal-header">
+                <h3>Mochi the Virtual Pet 🐱</h3>
+                <button class="close-modal" id="closePetModal">✕</button>
+            </div>
+
+            <!-- Tampilan Visual Mochi & Bubble Pikirannya -->
+            <div class="pet-display-box">
+                <div class="pet-speech-bubble" id="mochiBubble">"Meow! Rawat Mochi berdua ya! 🤍"</div>
+                <img id="mochiImg" src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExdW93OWptZW5zeXRhY3p3dnZwNWk0Zmd1bHFxYWZlMXpibmd0MnlsYyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/vbf8A28y3fLCE/giphy.gif" alt="Mochi Pet" class="mochi-pet-gif">
+            </div>
+
+            <!-- Indikator Parameter Mochi -->
+            <div class="pet-stats-container">
+                <div class="stat-row">
+                    <span>🍲 Kenyang</span>
+                    <div class="stat-bar-bg"><div id="barHunger" class="stat-bar-fill hunger" style="width: 80%;"></div></div>
+                    <span id="txtHunger">80%</span>
+                </div>
+                <div class="stat-row">
+                    <span>🧼 Bersih</span>
+                    <div class="stat-bar-bg"><div id="barHygiene" class="stat-bar-fill hygiene" style="width: 70%;"></div></div>
+                    <span id="txtHygiene">70%</span>
+                </div>
+                <div class="stat-row">
+                    <span>💖 Love Power</span>
+                    <div class="stat-bar-bg"><div id="barLove" class="stat-bar-fill love" style="width: 90%;"></div></div>
+                    <span id="txtLove">90%</span>
+                </div>
+            </div>
+
+            <!-- Tombol Interaksi Game -->
+            <div class="pet-actions-grid">
+                <button id="btnFeedPet" class="pet-act-btn">🐟 Kasih Makan</button>
+                <button id="btnBathPet" class="pet-act-btn">🧼 Mandikan</button>
+                <button id="btnPlayPet" class="pet-act-btn">🧶 Puk-puk / Main</button>
+            </div>
         </div>
     </div>
 
