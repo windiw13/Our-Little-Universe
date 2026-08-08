@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 import { getFirestore, doc, setDoc, getDoc, updateDoc, onSnapshot, collection, addDoc, query, orderBy, limit, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 // FIREBASE CONFIG
@@ -19,7 +19,6 @@ const db = getFirestore(app);
 
 let currentUserData = null;
 
-// TUNGGU HALAMAN SIAP SEBELUM MEMANGGIL ELEMEN
 document.addEventListener('DOMContentLoaded', () => {
 
     const authCard = document.getElementById('authCard');
@@ -31,6 +30,23 @@ document.addEventListener('DOMContentLoaded', () => {
     const tabRegister = document.getElementById('tabRegister');
     const registerForm = document.getElementById('registerForm');
     const loginForm = document.getElementById('loginForm');
+
+    // CEK SESI USER DENGAN FIREBASE AUTH
+    onAuthStateChanged(auth, async (user) => {
+        if (user) {
+            const userDoc = await getDoc(doc(db, "users", user.uid));
+            if (userDoc.exists()) {
+                currentUserData = userDoc.data();
+                authCard?.classList.add('hidden');
+
+                if (currentUserData.coupleSpaceId) {
+                    checkConnectionStatus(currentUserData.coupleSpaceId);
+                } else {
+                    coupleCard?.classList.remove('hidden');
+                }
+            }
+        }
+    });
 
     // TAB TOGGLE
     if (tabLogin && tabRegister && loginForm && registerForm) {
@@ -102,33 +118,46 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // CREATE COUPLE SPACE
+    // CREATE COUPLE SPACE (TETAP JALAN MESKIPUN RETRIEVE USER DARI AUTH)
     document.getElementById('btnCreateSpace')?.addEventListener('click', async () => {
+        const user = auth.currentUser;
+        if (!user) return alert("Sesi kamu habis. Silakan refresh & login ulang ya!");
+
         const code = "LOVE-" + Math.random().toString(36).substring(2, 7).toUpperCase();
+        const nickname = currentUserData?.nickname || "User";
         
-        await setDoc(doc(db, "couple_spaces", code), {
-            spaceId: code,
-            partner1_uid: currentUserData.uid,
-            partner1_name: currentUserData.nickname,
-            partner2_uid: null,
-            partner2_name: null,
-            status: "waiting",
-            startDate: null,
-            mochi: { hunger: 80, hygiene: 70, love: 90 },
-            createdAt: new Date()
-        });
+        try {
+            await setDoc(doc(db, "couple_spaces", code), {
+                spaceId: code,
+                partner1_uid: user.uid,
+                partner1_name: nickname,
+                partner2_uid: null,
+                partner2_name: null,
+                status: "waiting",
+                startDate: null,
+                mochi: { hunger: 80, hygiene: 70, love: 90 },
+                createdAt: new Date()
+            });
 
-        await updateDoc(doc(db, "users", currentUserData.uid), { coupleSpaceId: code });
-        const codeDisplay = document.getElementById('generatedCodeDisplay');
-        if (codeDisplay) codeDisplay.innerText = code;
-        coupleCard?.classList.add('hidden');
-        codeDisplayCard?.classList.remove('hidden');
+            await updateDoc(doc(db, "users", user.uid), { coupleSpaceId: code });
 
-        listenForPartner(code);
+            const codeDisplay = document.getElementById('generatedCodeDisplay');
+            if (codeDisplay) codeDisplay.innerText = code;
+
+            coupleCard?.classList.add('hidden');
+            codeDisplayCard?.classList.remove('hidden');
+
+            listenForPartner(code);
+        } catch (err) {
+            alert("Gagal membuat space: " + err.message);
+        }
     });
 
     // JOIN COUPLE SPACE
     document.getElementById('btnJoinSpace')?.addEventListener('click', async () => {
+        const user = auth.currentUser;
+        if (!user) return alert("Sesi kamu habis. Silakan refresh & login ulang ya!");
+
         const inputCode = document.getElementById('joinCodeInput')?.value.trim().toUpperCase();
         if (!inputCode) return alert("Masukkan kodenya dulu ya!");
 
@@ -136,15 +165,17 @@ document.addEventListener('DOMContentLoaded', () => {
         const spaceSnap = await getDoc(spaceRef);
 
         if (spaceSnap.exists()) {
+            const nickname = currentUserData?.nickname || "User";
+
             await updateDoc(spaceRef, {
-                partner2_uid: currentUserData.uid,
-                partner2_name: currentUserData.nickname,
+                partner2_uid: user.uid,
+                partner2_name: nickname,
                 status: "connected"
             });
 
-            await updateDoc(doc(db, "users", currentUserData.uid), { coupleSpaceId: inputCode });
+            await updateDoc(doc(db, "users", user.uid), { coupleSpaceId: inputCode });
             const data = spaceSnap.data();
-            showSuccessScreen(data.partner1_name, currentUserData.nickname);
+            showSuccessScreen(data.partner1_name, nickname);
         } else {
             alert("Kode Space tidak ditemukan. Coba cek lagi ya!");
         }
@@ -180,8 +211,8 @@ document.addEventListener('DOMContentLoaded', () => {
     function showSuccessScreen(p1, p2) {
         const p1El = document.getElementById('p1Name');
         const p2El = document.getElementById('p2Name');
-        if (p1El) p1El.innerText = p1;
-        if (p2El) p2El.innerText = p2;
+        if (p1El) p1El.innerText = p1 || "Diw";
+        if (p2El) p2El.innerText = p2 || "Rama";
 
         coupleCard?.classList.add('hidden');
         codeDisplayCard?.classList.add('hidden');
@@ -238,7 +269,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function updateUserPresence(spaceId) {
-        if (!spaceId) return;
+        if (!spaceId || !currentUserData) return;
 
         const userRef = doc(db, "users", currentUserData.uid);
         await updateDoc(userRef, { lastActive: serverTimestamp() });
