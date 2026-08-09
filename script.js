@@ -409,7 +409,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // SYSTEM MOCHI: STIKER ITEM DIGESER LANGSUNG KE MOCHI
+    // SISTEM GAMING MOCHI: POINTER & TOUCH DRAG PRESISI DENGAN KOORDINAT JARI
     const stage = document.getElementById('mochiGameStage');
     const speech = document.getElementById('mochiSpeech');
     const eyeL = document.getElementById('eyeLeft');
@@ -434,7 +434,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (mode === 'dining') {
             groupDining?.classList.remove('hidden');
             btnSwitchDining?.classList.add('active');
-            if (speech) speech.innerText = '"Tarik / klik makanan ke Mochi ya! 🥣"';
+            if (speech) speech.innerText = '"Geser makanan ke mulut Mochi ya! 🥣"';
         } else if (mode === 'bath') {
             groupBath?.classList.remove('hidden');
             btnSwitchBath?.classList.add('active');
@@ -442,7 +442,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } else if (mode === 'bed') {
             groupBed?.classList.remove('hidden');
             btnSwitchBed?.classList.add('active');
-            if (speech) speech.innerText = '"Klik/geser lampu atau tangan pat-pat! 😴"';
+            if (speech) speech.innerText = '"Geser sakelar lampu atau tangan pat-pat! 😴"';
         }
     }
 
@@ -450,34 +450,47 @@ document.addEventListener('DOMContentLoaded', () => {
     btnSwitchBath?.addEventListener('click', () => switchMochiRoom('bath'));
     btnSwitchBed?.addEventListener('click', () => switchMochiRoom('bed'));
 
-    // INTERAKSI REALTIME TOUCH & DRAG ITEM UNTUK STIKER POLOS
+    // SISTEM DRAG BISA DITARIK DENGAN JARI / KURSOR
     document.querySelectorAll('.sticker-item').forEach(sticker => {
-        let isDragging = false;
+        let active = false;
 
-        sticker.addEventListener('click', () => {
-            handleItemUse(sticker);
-        });
+        const startDrag = (e) => {
+            active = true;
+            sticker.classList.add('dragging');
+            moveAt(e);
+        };
 
-        sticker.addEventListener('touchstart', (e) => {
-            isDragging = true;
-        });
+        const moveAt = (e) => {
+            if (!active) return;
+            let clientX = e.clientX || (e.touches && e.touches[0].clientX);
+            let clientY = e.clientY || (e.touches && e.touches[0].clientY);
 
-        sticker.addEventListener('touchmove', (e) => {
-            if (!isDragging) return;
-            const touch = e.touches[0];
-            sticker.style.position = 'fixed';
-            sticker.style.left = `${touch.clientX - 25}px`;
-            sticker.style.top = `${touch.clientY - 25}px`;
-            sticker.style.zIndex = '99';
-        });
-
-        sticker.addEventListener('touchend', () => {
-            if (isDragging) {
-                isDragging = false;
-                sticker.style.position = 'static';
-                handleItemUse(sticker);
+            if (clientX && clientY) {
+                sticker.style.left = `${clientX - 30}px`;
+                sticker.style.top = `${clientY - 30}px`;
             }
-        });
+        };
+
+        const stopDrag = (e) => {
+            if (!active) return;
+            active = false;
+            sticker.classList.remove('dragging');
+            sticker.style.left = '';
+            sticker.style.top = '';
+
+            // Jalankan reaksi ketika item dilepas
+            handleItemUse(sticker);
+        };
+
+        // Event listener kursor & touch sentuhan HP
+        sticker.addEventListener('mousedown', startDrag);
+        sticker.addEventListener('touchstart', startDrag, { passive: true });
+
+        window.addEventListener('mousemove', moveAt);
+        window.addEventListener('touchmove', moveAt, { passive: true });
+
+        window.addEventListener('mouseup', stopDrag);
+        window.addEventListener('touchend', stopDrag);
     });
 
     let isNight = false;
