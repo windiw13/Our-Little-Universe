@@ -409,7 +409,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // SISTEM GAMING MOCHI: REALTIME DRAG DENGAN TOUCH/POINTER ABSOLUTE
+    // SISTEM GAMING MOCHI: DRAG POINTER ABSOLUTE LENGKAP TANPA HILANG
     const stage = document.getElementById('mochiGameStage');
     const speech = document.getElementById('mochiSpeech');
     const eyeL = document.getElementById('eyeLeft');
@@ -450,40 +450,45 @@ document.addEventListener('DOMContentLoaded', () => {
     btnSwitchBath?.addEventListener('click', () => switchMochiRoom('bath'));
     btnSwitchBed?.addEventListener('click', () => switchMochiRoom('bed'));
 
-    // BISA DITARIK DENGAN KURSOR/TOUCH LGSUNG MENGIKUTI POSISI LAYAR
+    // SISTEM POINTER CAPTURE AGAR KURSOR / JARI LENGKET MENANGKAP STIKER
     document.querySelectorAll('.sticker-item').forEach(sticker => {
         let isDragging = false;
+        let startX = 0;
+        let startY = 0;
 
-        const onStart = (e) => {
+        sticker.addEventListener('pointerdown', (e) => {
             isDragging = true;
+            startX = e.clientX;
+            startY = e.clientY;
+            
+            sticker.setPointerCapture(e.pointerId);
             sticker.classList.add('dragging');
-            onMove(e);
-        };
+        });
 
-        const onMove = (e) => {
+        sticker.addEventListener('pointermove', (e) => {
             if (!isDragging) return;
-            const x = e.clientX || (e.touches && e.touches[0].clientX);
-            const y = e.clientY || (e.touches && e.touches[0].clientY);
+            const deltaX = e.clientX - startX;
+            const deltaY = e.clientY - startY;
 
-            if (x && y) {
-                sticker.style.left = `${x - 25}px`;
-                sticker.style.top = `${y - 25}px`;
-            }
-        };
+            sticker.style.transform = `translate3d(${deltaX}px, ${deltaY}px, 0px) scale(1.3)`;
+        });
 
-        const onEnd = () => {
+        const resetPosition = (e) => {
             if (!isDragging) return;
             isDragging = false;
+            
+            try {
+                sticker.releasePointerCapture(e.pointerId);
+            } catch (err) {}
+
             sticker.classList.remove('dragging');
-            sticker.style.left = '';
-            sticker.style.top = '';
+            sticker.style.transform = '';
 
             handleItemUse(sticker);
         };
 
-        sticker.addEventListener('pointerdown', onStart);
-        window.addEventListener('pointermove', onMove);
-        window.addEventListener('pointerup', onEnd);
+        sticker.addEventListener('pointerup', resetPosition);
+        sticker.addEventListener('pointercancel', resetPosition);
     });
 
     let isNight = false;

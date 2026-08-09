@@ -314,7 +314,7 @@ body {
     animation: pulseBounce 1s infinite;
 }
 
-/* DOK MAKANAN DENGAN POSISI DI BAWAH MOCHI */
+/* DOK MAKANAN DI BAWAH MOCHI */
 .items-tray-below {
     z-index: 20;
     width: 100%;
@@ -340,14 +340,13 @@ body {
     touch-action: none;
     filter: drop-shadow(0 6px 8px rgba(0,0,0,0.25));
     transition: transform 0.1s ease;
+    will-change: transform;
 }
 
-/* TAMPILAN PRESISI KETIKA STIKER DITARIK */
+/* KETIKA STIKER SEDANG DITARIK DENGAN SENTUHAN JARI */
 .sticker-item.dragging {
-    position: fixed !important;
     z-index: 99999 !important;
-    transform: scale(1.4) !important;
-    pointer-events: none;
+    cursor: grabbing !important;
 }
 
 .angela-bottom-bar {
