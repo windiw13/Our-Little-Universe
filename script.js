@@ -363,9 +363,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // EXPRESS LOVE SEND
-    document.querySelectorAll('.express-box').forEach(box => {
-        box.addEventListener('click', async () => {
-            const loveType = box.getAttribute('data-type');
+    document.querySelectorAll('.express-sticker').forEach(sticker => {
+        sticker.addEventListener('click', async () => {
+            const loveType = sticker.getAttribute('data-type');
             hugModal?.classList.add('hidden');
 
             if (currentUserData && currentUserData.coupleSpaceId) {
@@ -384,11 +384,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // DAILY CHECK IN
     let selectedMood = "😄 Happy";
-    document.querySelectorAll('.mood-box').forEach(box => {
-        box.addEventListener('click', () => {
-            document.querySelectorAll('.mood-box').forEach(b => b.classList.remove('selected'));
-            box.classList.add('selected');
-            selectedMood = box.getAttribute('data-mood');
+    document.querySelectorAll('.mood-sticker').forEach(sticker => {
+        sticker.addEventListener('click', () => {
+            document.querySelectorAll('.mood-sticker').forEach(b => b.classList.remove('selected'));
+            sticker.classList.add('selected');
+            selectedMood = sticker.getAttribute('data-mood');
         });
     });
 
@@ -409,7 +409,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // SYSTEM MOCHI: RUANG INTERAKTIF DENGAN ITEM BISA DIGESER LANGSUNG KE MOCHI
+    // SYSTEM MOCHI: STIKER ITEM DIGESER LANGSUNG KE MOCHI
     const stage = document.getElementById('mochiGameStage');
     const speech = document.getElementById('mochiSpeech');
     const eyeL = document.getElementById('eyeLeft');
@@ -434,15 +434,15 @@ document.addEventListener('DOMContentLoaded', () => {
         if (mode === 'dining') {
             groupDining?.classList.remove('hidden');
             btnSwitchDining?.classList.add('active');
-            if (speech) speech.innerText = '"Tarik piring makanan ke Mochi ya! 🥣"';
+            if (speech) speech.innerText = '"Tarik / klik makanan ke Mochi ya! 🥣"';
         } else if (mode === 'bath') {
             groupBath?.classList.remove('hidden');
             btnSwitchBath?.classList.add('active');
-            if (speech) speech.innerText = '"Geser sabun/shower ke badan Mochi! 🧼"';
+            if (speech) speech.innerText = '"Geser sabun/shower ke Mochi! 🧼"';
         } else if (mode === 'bed') {
             groupBed?.classList.remove('hidden');
             btnSwitchBed?.classList.add('active');
-            if (speech) speech.innerText = '"Geser sakelar lampu atau tangan pat-pat! 😴"';
+            if (speech) speech.innerText = '"Klik/geser lampu atau tangan pat-pat! 😴"';
         }
     }
 
@@ -450,46 +450,43 @@ document.addEventListener('DOMContentLoaded', () => {
     btnSwitchBath?.addEventListener('click', () => switchMochiRoom('bath'));
     btnSwitchBed?.addEventListener('click', () => switchMochiRoom('bed'));
 
-    // BISA DRAG DAN DROP / KLIK ITEM CARDS KE MOCHI
-    document.querySelectorAll('.drag-item-card').forEach(card => {
+    // INTERAKSI REALTIME TOUCH & DRAG ITEM UNTUK STIKER POLOS
+    document.querySelectorAll('.sticker-item').forEach(sticker => {
         let isDragging = false;
-        let origX = 0, origY = 0;
 
-        card.addEventListener('click', () => {
-            handleItemUse(card);
+        sticker.addEventListener('click', () => {
+            handleItemUse(sticker);
         });
 
-        // Touch/Mouse drag effect
-        card.addEventListener('touchstart', (e) => {
+        sticker.addEventListener('touchstart', (e) => {
             isDragging = true;
-            origX = card.offsetLeft;
-            origY = card.offsetTop;
         });
 
-        card.addEventListener('touchmove', (e) => {
+        sticker.addEventListener('touchmove', (e) => {
             if (!isDragging) return;
             const touch = e.touches[0];
-            card.style.position = 'fixed';
-            card.style.left = `${touch.clientX - 30}px`;
-            card.style.top = `${touch.clientY - 30}px`;
+            sticker.style.position = 'fixed';
+            sticker.style.left = `${touch.clientX - 25}px`;
+            sticker.style.top = `${touch.clientY - 25}px`;
+            sticker.style.zIndex = '99';
         });
 
-        card.addEventListener('touchend', () => {
+        sticker.addEventListener('touchend', () => {
             if (isDragging) {
                 isDragging = false;
-                card.style.position = 'static';
-                handleItemUse(card);
+                sticker.style.position = 'static';
+                handleItemUse(sticker);
             }
         });
     });
 
     let isNight = false;
 
-    async function handleItemUse(card) {
-        const action = card.getAttribute('data-action');
+    async function handleItemUse(sticker) {
+        const action = sticker.getAttribute('data-action');
 
         if (action === 'food') {
-            const addVal = parseInt(card.getAttribute('data-add')) || 20;
+            const addVal = parseInt(sticker.getAttribute('data-add')) || 20;
             if (eyeL) eyeL.innerText = '😸';
             if (eyeR) eyeR.innerText = '😸';
             if (mouth) mouth.innerText = ' Nom-Nom! ';

@@ -30,7 +30,7 @@ body {
 
 .hidden { display: none !important; }
 
-/* AUTHENTICATION CARDS */
+/* HALAMAN LOGIN */
 .auth-card {
     background: #ffffff;
     border-radius: 24px;
@@ -161,39 +161,42 @@ body {
 #btnPetModal::before { content: "🐱"; }
 #btnWishlistModal::before { content: "⭐"; }
 
-/* EXPRESS LOVE & DAILY CHECK IN */
+/* EXPRESS LOVE & DAILY CHECK IN (STIKER POLOS TANPA BOX) */
 .express-love-grid, .mood-box-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
+    gap: 12px;
     max-height: 52vh;
     overflow-y: auto;
-    padding: 4px;
+    padding: 6px;
 }
 
 .mood-box-grid { grid-template-columns: repeat(3, 1fr); }
 
-.express-box, .mood-box {
-    background: #fefae0;
-    border: 2.5px solid #f2cc8f;
-    border-radius: 18px;
-    padding: 12px 8px;
+.express-sticker, .mood-sticker {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 6px;
+    gap: 4px;
     cursor: pointer;
-    box-shadow: 0 4px 0px #ebdcb9;
+    padding: 8px;
+    border-radius: 16px;
+    transition: transform 0.1s ease;
 }
 
-.express-box:active, .mood-box:active { transform: translateY(3px); box-shadow: 0 1px 0px #ebdcb9; }
-.mood-box.selected { background: #e07a5f; border-color: #e07a5f; box-shadow: 0 3px 0px #b25840; }
-.mood-box.selected .mood-label { color: #ffffff; }
+.express-sticker:active, .mood-sticker:active {
+    transform: scale(1.15);
+}
 
-.anim-icon { font-size: 2.2rem; }
-.box-label, .mood-label { font-size: 0.8rem; font-weight: 800; color: #3d405b; }
+.mood-sticker.selected {
+    background: #fefae0;
+    border: 2px dashed #e07a5f;
+}
 
-/* RUANG MOCHI INTERAKTIF ITEM BISA DIGESER DARI BAWAH */
+.anim-icon { font-size: 2.8rem; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1)); }
+.sticker-label, .mood-label { font-size: 0.8rem; font-weight: 800; color: #3d405b; }
+
+/* RUANG MOCHI INTERAKTIF */
 .mochi-header {
     background: #3e2723;
     padding: 8px 12px;
@@ -201,11 +204,7 @@ body {
     color: white;
 }
 
-.mochi-top-percentages {
-    display: flex;
-    gap: 6px;
-}
-
+.mochi-top-percentages { display: flex; gap: 6px; }
 .status-chip {
     background: rgba(255,255,255,0.2);
     padding: 4px 8px;
@@ -256,10 +255,10 @@ body {
     text-align: center;
 }
 
-/* KARAKTER KUCING FULL BODY */
+/* KARAKTER KUCING FULL BODY MOCHI */
 .mochi-full-body {
     position: absolute;
-    top: 100px;
+    top: 105px;
     z-index: 9;
 }
 
@@ -293,13 +292,7 @@ body {
     filter: drop-shadow(0 -3px 0 #5a4a42);
 }
 
-.cat-face-head {
-    margin-top: 25px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
+.cat-face-head { margin-top: 25px; display: flex; flex-direction: column; align-items: center; }
 .cat-eyes-pair { display: flex; gap: 22px; font-size: 1.4rem; }
 .cat-mouth-snout { font-size: 1.3rem; font-weight: 800; color: #e07a5f; margin-top: -2px; }
 .cat-paws { display: flex; gap: 30px; margin-top: 25px; font-size: 1.2rem; }
@@ -324,53 +317,36 @@ body {
 .soap-bubbles-overlay {
     position: absolute;
     top: -10px;
-    font-size: 2rem;
+    font-size: 2.2rem;
     animation: pulseBounce 1s infinite;
 }
 
-/* FLOATING ITEM CARDS YANG BISA DIGESER LANGSUNG KE MOCHI */
-.floating-items-tray {
-    z-index: 15;
+/* RAW ITEM STIKERS DOCK (TANPA BOX & BISA DIGESER DENGAN TOUCH/DRAG) */
+.raw-items-dock {
+    z-index: 20;
     width: 100%;
     display: flex;
     justify-content: center;
     margin-bottom: 5px;
 }
 
-.tray-group {
+.dock-group {
     display: flex;
-    gap: 12px;
+    gap: 24px;
 }
 
-.drag-item-card {
-    background: #ffffff;
-    border: 3px solid #f2cc8f;
-    border-radius: 20px;
-    padding: 8px 14px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 2px;
-    box-shadow: 0 5px 0px #ebdcb9;
+.sticker-item {
+    font-size: 3.2rem;
     cursor: grab;
     user-select: none;
     touch-action: none;
-    transition: transform 0.1s ease;
+    filter: drop-shadow(0 6px 8px rgba(0,0,0,0.2));
+    transition: transform 0.08s ease;
 }
 
-.drag-item-card:active {
+.sticker-item:active {
     cursor: grabbing;
-    transform: scale(1.15);
-}
-
-.drag-item-card .item-emoji {
-    font-size: 2.2rem;
-}
-
-.drag-item-card .item-name {
-    font-size: 0.72rem;
-    font-weight: 800;
-    color: #3d405b;
+    transform: scale(1.3);
 }
 
 .angela-bottom-bar {
