@@ -20,7 +20,7 @@ body {
     width: 100%;
     max-width: 450px;
     padding: 20px;
-    padding-bottom: 80px;
+    padding-bottom: 90px;
     display: flex;
     flex-direction: column;
     gap: 15px;
@@ -29,7 +29,7 @@ body {
 .auth-card, .widget-card, .mochi-card {
     background: #ffffff;
     border-radius: 20px;
-    padding: 24px;
+    padding: 20px;
     box-shadow: 0 8px 24px rgba(149, 117, 92, 0.08);
     border: 1px solid #f0e6dd;
 }
@@ -49,6 +49,34 @@ body {
 
 .hidden {
     display: none !important;
+}
+
+/* APP HEADER */
+.app-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 5px;
+}
+
+.user-greeting h2 {
+    font-size: 1.2rem;
+    color: #4a3e3d;
+}
+
+.user-greeting p {
+    font-size: 0.9rem;
+    color: #d97757;
+    font-weight: bold;
+}
+
+.active-badge {
+    background: #ffffff;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    border: 1px solid #f0e6dd;
+    color: #666;
 }
 
 /* BUTTONS & INPUTS */
@@ -99,27 +127,28 @@ input, textarea, select {
     text-align: left;
 }
 
-.tab-switch {
-    display: flex;
+/* QUICK ACTIONS GRID */
+.quick-actions-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
     gap: 10px;
-    margin-bottom: 15px;
 }
 
-.tab-btn {
-    flex: 1;
-    padding: 10px;
-    border: none;
-    border-radius: 10px;
-    background: #f0e6dd;
-    color: #8c7a6b;
-    font-weight: 700;
-    cursor: pointer;
-}
-
-.tab-btn.active {
+.action-btn {
     background: #ffffff;
-    color: #d97757;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    border: 1px solid #f0e6dd;
+    padding: 12px;
+    border-radius: 14px;
+    font-size: 0.85rem;
+    font-weight: bold;
+    color: #4a3e3d;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+    transition: transform 0.1s ease;
+}
+
+.action-btn:active {
+    transform: scale(0.97);
 }
 
 /* TAMPILAN ALBUM MEMORIES & TIMELINE PAP */
@@ -131,15 +160,16 @@ input, textarea, select {
 
 .mem-card, .pap-card {
     background: white;
-    border-radius: 12px;
-    padding: 10px;
+    border-radius: 16px;
+    padding: 12px;
     border: 1px solid #f0e6dd;
-    margin-bottom: 10px;
+    margin-bottom: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.03);
 }
 
 .mem-card img, .pap-img {
     width: 100%;
-    border-radius: 8px;
+    border-radius: 10px;
     object-fit: cover;
     max-height: 250px;
     cursor: pointer;
@@ -253,8 +283,9 @@ input, textarea, select {
     background: #ffffff;
     display: flex;
     justify-content: space-around;
-    padding: 10px 0;
+    padding: 12px 0;
     border-top: 1px solid #f0e6dd;
+    box-shadow: 0 -4px 15px rgba(0,0,0,0.04);
     z-index: 100;
 }
 
@@ -265,6 +296,10 @@ input, textarea, select {
     color: #8c7a6b;
     font-weight: bold;
     cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
 }
 
 .nav-item.active {
