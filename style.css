@@ -193,7 +193,7 @@ body {
 .anim-icon { font-size: 2.2rem; }
 .box-label, .mood-label { font-size: 0.8rem; font-weight: 800; color: #3d405b; }
 
-/* RUANG MOCHI INTERAKTIF FULL ANIMASI */
+/* RUANG MOCHI INTERAKTIF ITEM BISA DIGESER DARI BAWAH */
 .mochi-header {
     background: #3e2723;
     padding: 8px 12px;
@@ -230,18 +230,9 @@ body {
     transition: background 0.3s ease;
 }
 
-/* TIGA MODE RUANG LATAR */
-.mochi-game-stage.mode-dining {
-    background: linear-gradient(180deg, #ffe0b2 0%, #ffcc80 60%, #e65100 100%);
-}
-
-.mochi-game-stage.mode-bath {
-    background: linear-gradient(180deg, #e0f7fa 0%, #80deea 60%, #00838f 100%);
-}
-
-.mochi-game-stage.mode-bed {
-    background: linear-gradient(180deg, #f3e5f5 0%, #ce93d8 60%, #4a148c 100%);
-}
+.mochi-game-stage.mode-dining { background: linear-gradient(180deg, #ffe0b2 0%, #ffcc80 60%, #e65100 100%); }
+.mochi-game-stage.mode-bath { background: linear-gradient(180deg, #e0f7fa 0%, #80deea 60%, #00838f 100%); }
+.mochi-game-stage.mode-bed { background: linear-gradient(180deg, #f3e5f5 0%, #ce93d8 60%, #4a148c 100%); }
 
 .stage-overlay-night {
     position: absolute;
@@ -268,11 +259,8 @@ body {
 /* KARAKTER KUCING FULL BODY */
 .mochi-full-body {
     position: absolute;
-    bottom: 120px;
-    cursor: grab;
-    user-select: none;
+    top: 100px;
     z-index: 9;
-    transition: transform 0.1s ease;
 }
 
 .cat-body-container {
@@ -312,25 +300,9 @@ body {
     align-items: center;
 }
 
-.cat-eyes-pair {
-    display: flex;
-    gap: 22px;
-    font-size: 1.4rem;
-}
-
-.cat-mouth-snout {
-    font-size: 1.3rem;
-    font-weight: 800;
-    color: #e07a5f;
-    margin-top: -2px;
-}
-
-.cat-paws {
-    display: flex;
-    gap: 30px;
-    margin-top: 25px;
-    font-size: 1.2rem;
-}
+.cat-eyes-pair { display: flex; gap: 22px; font-size: 1.4rem; }
+.cat-mouth-snout { font-size: 1.3rem; font-weight: 800; color: #e07a5f; margin-top: -2px; }
+.cat-paws { display: flex; gap: 30px; margin-top: 25px; font-size: 1.2rem; }
 
 .cat-tail {
     position: absolute;
@@ -356,33 +328,49 @@ body {
     animation: pulseBounce 1s infinite;
 }
 
-/* TOOLBAR & BOTTOM BAR MOCHI */
-.room-action-toolbar {
-    z-index: 10;
+/* FLOATING ITEM CARDS YANG BISA DIGESER LANGSUNG KE MOCHI */
+.floating-items-tray {
+    z-index: 15;
     width: 100%;
     display: flex;
     justify-content: center;
+    margin-bottom: 5px;
 }
 
-.toolbar-group {
+.tray-group {
     display: flex;
-    gap: 8px;
+    gap: 12px;
 }
 
-.food-btn, .bath-tool-btn, .bed-tool-btn {
+.drag-item-card {
     background: #ffffff;
-    border: 2px solid #f2cc8f;
+    border: 3px solid #f2cc8f;
+    border-radius: 20px;
     padding: 8px 14px;
-    border-radius: 16px;
-    font-weight: 800;
-    font-size: 0.8rem;
-    cursor: pointer;
-    box-shadow: 0 4px 0px #ebdcb9;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    box-shadow: 0 5px 0px #ebdcb9;
+    cursor: grab;
+    user-select: none;
+    touch-action: none;
+    transition: transform 0.1s ease;
 }
 
-.food-btn:active, .bath-tool-btn:active, .bed-tool-btn:active {
-    transform: translateY(2px);
-    box-shadow: 0 1px 0px #ebdcb9;
+.drag-item-card:active {
+    cursor: grabbing;
+    transform: scale(1.15);
+}
+
+.drag-item-card .item-emoji {
+    font-size: 2.2rem;
+}
+
+.drag-item-card .item-name {
+    font-size: 0.72rem;
+    font-weight: 800;
+    color: #3d405b;
 }
 
 .angela-bottom-bar {
