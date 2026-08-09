@@ -3,40 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Our Little Universe 🤍</title>
+    <title>Our Little Universe</title>
     <link rel="stylesheet" href="style.css">
-    <!-- Google Pixel & Modern Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
-<body class="pixel-theme">
+<body>
 
-    <!-- FLOATING REALTIME NOTIFICATION BANNER -->
-    <div id="realtimeNotif" class="notif-toast hidden">
-        <div class="notif-icon" id="notifIcon">💖</div>
-        <div class="notif-body">
-            <h4 id="notifTitle">Pesan Masuk!</h4>
-            <p id="notifMessage">Rama mengirimkan sesuatu...</p>
-        </div>
-        <button id="closeNotifBtn" class="notif-close">✕</button>
-    </div>
+    <!-- AUTHENTICATION & PAIRING CONTAINER -->
+    <div class="auth-container">
+        
+        <!-- CARD LOGIN / REGISTER -->
+        <div id="authCard" class="auth-card">
+            <div class="pixel-header">
+                <span class="pixel-icon">🐱🤍✨</span>
+                <h1>Our Little Universe</h1>
+                <p>A small cozy space for Diw & Rama</p>
+            </div>
 
-    <!-- AUTHENTICATION CONTAINER -->
-    <main class="auth-container">
-        <div class="app-header">
-            <div class="pixel-avatar">🐱🤍✨</div>
-            <h1 class="pixel-title">Our Little Universe</h1>
-            <p>A small cozy space for Diw & Rama</p>
-        </div>
-
-        <!-- CARD 1: LOGIN / REGISTER -->
-        <div id="authCard" class="card active">
-            <div class="tab-group">
+            <div class="tab-switch">
                 <button id="tabLogin" class="tab-btn active">Masuk</button>
                 <button id="tabRegister" class="tab-btn">Daftar Akun</button>
             </div>
 
-            <!-- Login Form -->
-            <form id="loginForm" class="form-content">
+            <!-- FORM LOGIN -->
+            <form id="loginForm" class="auth-form">
                 <div class="input-group">
                     <label>Email</label>
                     <input type="email" id="loginEmail" placeholder="email@gmail.com" required>
@@ -48,19 +38,19 @@
                 <button type="submit" class="btn-primary">Masuk ➔</button>
             </form>
 
-            <!-- Register Form -->
-            <form id="registerForm" class="form-content hidden">
+            <!-- FORM REGISTER -->
+            <form id="registerForm" class="auth-form hidden">
                 <div class="input-group">
                     <label>Nama Lengkap</label>
                     <input type="text" id="regFullName" placeholder="Windi Widiana" required>
                 </div>
                 <div class="input-group">
-                    <label>Nama Panggilan Sayang</label>
+                    <label>Nama Panggilan</label>
                     <input type="text" id="regNickname" placeholder="Diw" required>
                 </div>
                 <div class="input-group">
-                    <label>Kota Tempat Tinggal</label>
-                    <input type="text" id="regLocation" placeholder="Sukabumi" required>
+                    <label>Kota Asal</label>
+                    <input type="text" id="regLocation" placeholder="Sukabumi / Bandung" required>
                 </div>
                 <div class="input-group">
                     <label>Tanggal Lahir</label>
@@ -78,369 +68,300 @@
             </form>
         </div>
 
-        <!-- CARD 2: COUPLE SPACE SETUP -->
-        <div id="coupleCard" class="card hidden">
+        <!-- CARD HUBUNGKAN PASANGAN -->
+        <div id="coupleCard" class="auth-card hidden">
             <h2>Hubungkan Pasangan 🤍</h2>
-            <p class="card-subtitle">Buat ruang baru atau masukkan kode dari Rama.</p>
+            <p class="subtitle">Buat ruang baru atau masukkan kode dari Rama.</p>
 
-            <div class="couple-options">
-                <div class="option-box">
+            <div class="couple-actions">
+                <div class="action-box">
                     <h3>Buat Space Baru</h3>
                     <p>Dapatkan kode unik untuk dikirim ke Rama.</p>
                     <button id="btnCreateSpace" class="btn-secondary">Buat Space & Dapatkan Kode</button>
                 </div>
 
-                <div class="divider"><span>atau</span></div>
+                <div class="divider">atau</div>
 
-                <div class="option-box">
+                <div class="action-box">
                     <h3>Punya Kode Pasangan?</h3>
-                    <input type="text" id="joinCodeInput" placeholder="Contoh: LOVE-8F29Q">
+                    <input type="text" id="joinCodeInput" placeholder="Contoh: LOVE-8F29Q" class="code-input">
                     <button id="btnJoinSpace" class="btn-primary">Gabung ke Space Rama</button>
                 </div>
             </div>
         </div>
 
-        <!-- CARD 3: SHOW CODE WAITING SCREEN -->
-        <div id="codeDisplayCard" class="card hidden">
+        <!-- CARD TAMPILAN KODE -->
+        <div id="codeDisplayCard" class="auth-card hidden">
             <h2>Kode Space Kamu 🔒</h2>
-            <p class="card-subtitle">Kirimkan kode ini ke Rama untuk terhubung berdua:</p>
-            
-            <div class="code-box">
-                <span id="generatedCodeDisplay">LOVE-XXXXX</span>
-                <button id="btnCopyCode" class="btn-icon">📋 Salin</button>
-            </div>
+            <p>Kirimkan kode ini ke Rama ya!</p>
 
-            <div class="waiting-animation">
-                <div class="pixel-avatar pulse">🐱❤️🐱</div>
+            <div class="code-badge" id="generatedCodeDisplay">LOVE-XXXXX</div>
+            <button id="btnCopyCode" class="btn-secondary">📋 Salin Kode</button>
+
+            <div class="waiting-spinner">
+                <div class="spinner"></div>
                 <p>Menunggu Rama bergabung...</p>
             </div>
         </div>
 
-        <!-- CARD 4: CONNECTION SUCCESSFUL -->
-        <div id="successCard" class="card hidden">
-            <div class="success-icon">🎉</div>
-            <h2>Connection Successful!</h2>
-            <div class="couple-badge">
-                <span id="p1Name">Diw</span>
-                <span class="heart-anim">❤️</span>
-                <span id="p2Name">Rama</span>
-            </div>
-            <p class="card-subtitle">Your Little Universe is Ready 🤍</p>
-            <button id="btnEnterApp" class="btn-primary">Masuk ke Rumah Digital ➔</button>
+        <!-- CARD KONEKSI BERHASIL -->
+        <div id="successCard" class="auth-card hidden">
+            <div class="success-icon">🎉💖</div>
+            <h2>Terhubung!</h2>
+            <p class="couple-names"><span id="p1Name">Diw</span> ❤️ <span id="p2Name">Rama</span></p>
+            <p>Ruang rahasia kalian berdua sudah siap!</p>
+            <button id="btnEnterApp" class="btn-primary">Masuk ke Our Universe ➔</button>
         </div>
-    </main>
 
-    <!-- HOME DASHBOARD CONTAINER -->
-    <div id="homeScreen" class="home-container hidden">
-        <header class="home-header">
+    </div>
+
+    <!-- MAIN HOME DASHBOARD -->
+    <div id="homeScreen" class="main-screen hidden">
+        <header class="app-header">
             <div class="user-greeting">
-                <span class="greeting-text" id="timeGreeting">Good Day! ✨</span>
-                <h2 id="homeUserGreeting">Diw ❤️</h2>
-                <span class="partner-active-status" id="partnerActiveStatus">🟢 Rama Aktif</span>
+                <h2 id="timeGreeting">Good Day! ✨</h2>
+                <p id="homeUserGreeting">Diw ❤️</p>
             </div>
-            <div class="couple-status-pill">
-                <span>Sukabumi</span>
-                <span class="heart-pulse">💖</span>
-                <span>Bandung</span>
-            </div>
+            <div id="partnerActiveStatus" class="active-badge">⚪ Checking...</div>
         </header>
 
-        <!-- WIDGET DASHBOARD: MEMORIES ON THIS DAY -->
-        <section id="onThisDayWidget" class="card on-this-day-card hidden">
-            <div class="otd-badge">📸 Kenangan Spesial Hari Ini</div>
-            <h4 id="otdTitle">Kenangan di Tanggal Ini!</h4>
-            <img id="otdImage" src="" alt="Memory Image" class="otd-img hidden">
-            <p id="otdCaption" class="otd-caption"></p>
-        </section>
-
-        <!-- Card 1: Day Counter -->
-        <section class="card counter-card">
-            <div class="pixel-decor left">🌸</div>
-            <div class="pixel-decor right">🌿</div>
-            <div class="counter-badge">Together Since</div>
-            <div class="counter-days">
-                <span id="daysTogetherCount">0</span>
-                <small>Hari</small>
-            </div>
-            
-            <div class="start-date-picker">
+        <!-- WIDGET HARI JADIAN -->
+        <div class="widget-card love-days-card">
+            <h3>Hari Bersama 💖</h3>
+            <div class="days-count"><span id="daysTogetherCount">0</span> <small>Hari</small></div>
+            <div class="date-picker-inline">
+                <label>Tanggal Jadian:</label>
                 <input type="date" id="startDateInput">
             </div>
+        </div>
 
-            <p class="counter-sub">Diw & Rama's Pixel World 🎮</p>
-        </section>
+        <!-- ON THIS DAY WIDGET -->
+        <div id="onThisDayWidget" class="widget-card otd-card hidden">
+            <h3 id="otdTitle">Tahun Lalu Hari Ini ✨</h3>
+            <img id="otdImage" src="" alt="Kenangan Masa Lalu" class="hidden">
+            <p id="otdCaption"></p>
+        </div>
 
-        <!-- Card 2: Distance Tracker -->
-        <section class="card distance-card">
-            <div class="distance-info">
-                <div class="city-box">
-                    <span class="city-name">Sukabumi</span>
-                    <span class="partner-name">Diw 🏡</span>
-                </div>
-                <div class="distance-line">
-                    <span class="line"></span>
-                    <span class="km-badge">~143 KM</span>
-                    <span class="line"></span>
-                </div>
-                <div class="city-box">
-                    <span class="city-name">Bandung</span>
-                    <span class="partner-name">Rama 🏢</span>
-                </div>
+        <!-- ACTION BUTTONS GRID -->
+        <div class="quick-actions-grid">
+            <button id="btnHugModal" class="action-btn">💖 Express Love</button>
+            <button id="btnMoodModal" class="action-btn">😊 Mood Hari Ini</button>
+            <button id="btnPetModal" class="action-btn">🐱 Ruang Mochi</button>
+            <button id="btnWishlistModal" class="action-btn">📜 Wishlist List</button>
+        </div>
+
+        <!-- LOG AKTIVITAS -->
+        <div class="widget-card activity-card">
+            <h3>Aktivitas Terbaru 🔔</h3>
+            <div id="activityLogList" class="act-log-list">
+                <p class="empty-act">Belum ada aktivitas hari ini.</p>
             </div>
-            <p class="distance-quote">"Distance means so little when someone means so much."</p>
-        </section>
+        </div>
 
-        <!-- Card 3: Quick Action Buttons -->
-        <section class="quick-grid">
-            <button id="btnHugModal" class="action-btn hug-btn">
-                <span class="btn-icon">💖</span>
-                <span class="btn-label">Express Love</span>
-            </button>
-            <button id="btnMoodModal" class="action-btn mood-btn">
-                <span class="btn-icon">😊</span>
-                <span class="btn-label">Daily Check</span>
-            </button>
-            <button id="btnPetModal" class="action-btn pet-btn">
-                <span class="btn-icon">🐱</span>
-                <span class="btn-label">Mochi</span>
-            </button>
-            <button id="btnWishlistModal" class="action-btn wish-btn">
-                <span class="btn-icon">⭐</span>
-                <span class="btn-label">Wishlist</span>
-            </button>
-        </section>
-
-        <!-- Card 4: Riwayat Seluruh Aktivitas -->
-        <section class="card activity-card">
-            <div class="act-header">
-                <span class="pixel-icon">💌</span>
-                <h4>Riwayat Aktivitas Kita</h4>
-            </div>
-            <div id="activityLogList" class="activity-log-container">
-                <p class="empty-act">Belum ada aktivitas hari ini. Kirim Express Love yuk!</p>
-            </div>
-        </section>
-
-        <!-- Bottom Navigation Bar -->
+        <!-- NAVBAR BOTTOM -->
         <nav class="bottom-nav">
-            <button class="nav-item active" id="navHome">🏠 <span>Home</span></button>
-            <button class="nav-item" id="navJourney">📸 <span>Our Journey</span></button>
-            <button class="nav-item" id="navMemories">🖼️ <span>Memories</span></button>
-            <button class="nav-item" id="navHeartnotes">💌 <span>Heartnotes</span></button>
+            <button id="navHome" class="nav-item active">🏠 Home</button>
+            <button id="navJourney" class="nav-item">📸 PAP Keseharian</button>
+            <button id="navMemories" class="nav-item">🖼️ Album</button>
+            <button id="navHeartnotes" class="nav-item">💌 Heartnotes</button>
         </nav>
     </div>
 
-    <!-- SCREEN 1: OUR JOURNEY (PAP KESEHARIAN) -->
-    <div id="journeyScreen" class="sub-screen hidden">
-        <header class="sub-screen-header">
-            <h3>Our Journey 📸</h3>
-            <p>PAP Keseharian & Activity Updates</p>
+    <!-- SCREEN 2: OUR JOURNEY PAP -->
+    <div id="journeyScreen" class="main-screen hidden">
+        <header class="app-header">
+            <h2>PAP Keseharian 📸</h2>
+            <button id="btnOpenAddJourney" class="btn-small">+ Kirim PAP</button>
         </header>
-        <div class="sub-screen-content">
-            <button id="btnOpenAddJourney" class="btn-secondary" style="margin-bottom: 12px;">📷 Kirim PAP Keseharian</button>
 
-            <form id="addJourneyForm" class="add-wish-form hidden">
-                <label class="camera-btn-label">
-                    📷 Ambil Foto dari Kamera / Galeri
-                    <!-- INPUT FILE TERHUBUNG KE KAMERA HP -->
-                    <input type="file" id="journeyCameraInput" accept="image/*" capture="environment" class="hidden">
-                </label>
-                <div id="journeyPreviewContainer" class="img-preview-box hidden">
-                    <img id="journeyPreviewImg" src="" alt="Preview PAP">
-                </div>
-                <textarea id="journeyDescInput" placeholder="Keterangan aktivitas (ex: 'Lagi ngajar siswa SMK hari ini ✨')" required style="width: 100%; height: 50px; padding: 6px; border-radius: 8px; border: 1px solid #f2cc8f; font-size: 11px; outline: none;"></textarea>
-                <button type="submit" class="btn-primary" style="padding: 8px;">Kirim PAP ➔</button>
-            </form>
-
-            <div id="journeyTimelineContainer" class="timeline-container">
-                <p class="empty-act">Belum ada PAP keseharian. Kirim foto kegiatanmu yuk!</p>
+        <form id="addJourneyForm" class="add-form hidden">
+            <label class="camera-btn-label">
+                📷 Ambil / Pilih Foto PAP
+                <input type="file" id="journeyCameraInput" accept="image/*" class="hidden">
+            </label>
+            <div id="journeyPreviewContainer" class="img-preview-box hidden">
+                <img id="journeyPreviewImg" src="" alt="Preview">
             </div>
-        </div>
+            <input type="text" id="journeyDescInput" placeholder="Tulis catatan kecil / kegiatanmu...">
+            <button type="submit" class="btn-primary">Kirimkan ke Pasangan 🚀</button>
+        </form>
+
+        <div id="journeyTimelineContainer" class="timeline-container"></div>
+
         <nav class="bottom-nav">
-            <button class="nav-item" id="navHomeJ">🏠 <span>Home</span></button>
-            <button class="nav-item active" id="navJourneyJ">📸 <span>Our Journey</span></button>
-            <button class="nav-item" id="navMemoriesJ">🖼️ <span>Memories</span></button>
-            <button class="nav-item" id="navHeartnotesJ">💌 <span>Heartnotes</span></button>
+            <button id="navHome2" onclick="document.getElementById('navHome').click()" class="nav-item">🏠 Home</button>
+            <button class="nav-item active">📸 PAP Keseharian</button>
+            <button id="navMemories2" onclick="document.getElementById('navMemories').click()" class="nav-item">🖼️ Album</button>
+            <button id="navHeartnotes2" onclick="document.getElementById('navHeartnotes').click()" class="nav-item">💌 Heartnotes</button>
         </nav>
     </div>
 
-    <!-- SCREEN 2: MEMORIES (ALBUM KENANGAN) -->
-    <div id="memoriesScreen" class="sub-screen hidden">
-        <header class="sub-screen-header">
-            <h3>Memories 🖼️</h3>
-            <p>Album Kenangan Spesial Kita</p>
+    <!-- SCREEN 3: MEMORIES ALBUM -->
+    <div id="memoriesScreen" class="main-screen hidden">
+        <header class="app-header">
+            <h2>Album Kenangan 🖼️</h2>
+            <button id="btnOpenAddMemory" class="btn-small">+ Tambah Momen</button>
         </header>
-        <div class="sub-screen-content">
-            <button id="btnOpenAddMemory" class="btn-secondary" style="margin-bottom: 12px;">+ Tambah Foto ke Album</button>
 
-            <form id="addMemoryForm" class="add-wish-form hidden">
-                <label class="camera-btn-label">
-                    📸 Pilih / Ambil Foto Spesial
-                    <input type="file" id="memCameraInput" accept="image/*" class="hidden">
-                </label>
-                <div id="memPreviewContainer" class="img-preview-box hidden">
-                    <img id="memPreviewImg" src="" alt="Preview Memory">
-                </div>
-                <input type="date" id="memDateInput" required>
-                <input type="text" id="memTitleInput" placeholder="Judul momen (ex: 'Jalan-jalan ke Bandung', 'Date Cafe')" required>
-                <input type="text" id="memDescInput" placeholder="Keterangan kenangan..." style="width: 100%; padding: 6px; border-radius: 8px; border: 1px solid #f2cc8f; font-size: 11px; outline: none;">
-                <button type="submit" class="btn-primary" style="padding: 8px;">Simpan ke Album ➔</button>
-            </form>
-
-            <div id="memoriesGridContainer" class="memories-grid">
-                <p class="empty-act">Belum ada album kenangan. Tambahkan momen spesial kalian!</p>
+        <form id="addMemoryForm" class="add-form hidden">
+            <label class="camera-btn-label">
+                🖼️ Pilih Foto Momen
+                <input type="file" id="memCameraInput" accept="image/*" class="hidden">
+            </label>
+            <div id="memPreviewContainer" class="img-preview-box hidden">
+                <img id="memPreviewImg" src="" alt="Preview">
             </div>
-        </div>
+            <input type="date" id="memDateInput" required>
+            <input type="text" id="memTitleInput" placeholder="Judul Kenangan (misal: Jalan ke Pantai)" required>
+            <textarea id="memDescInput" placeholder="Cerita singkat kenangan ini..."></textarea>
+            <button type="submit" class="btn-primary">Simpan ke Album 💖</button>
+        </form>
+
+        <div id="memoriesGridContainer" class="memories-grid"></div>
+
         <nav class="bottom-nav">
-            <button class="nav-item" id="navHomeM">🏠 <span>Home</span></button>
-            <button class="nav-item" id="navJourneyM">📸 <span>Our Journey</span></button>
-            <button class="nav-item active" id="navMemoriesM">🖼️ <span>Memories</span></button>
-            <button class="nav-item" id="navHeartnotesM">💌 <span>Heartnotes</span></button>
+            <button onclick="document.getElementById('navHome').click()" class="nav-item">🏠 Home</button>
+            <button onclick="document.getElementById('navJourney').click()" class="nav-item">📸 PAP Keseharian</button>
+            <button class="nav-item active">🖼️ Album</button>
+            <button onclick="document.getElementById('navHeartnotes').click()" class="nav-item">💌 Heartnotes</button>
         </nav>
     </div>
 
-    <!-- SCREEN 3: HEARTNOTES -->
-    <div id="heartnotesScreen" class="sub-screen hidden">
-        <header class="sub-screen-header">
-            <h3>Heartnotes 💌</h3>
-            <p>Ungkapan Perasaan & Curahan Hati</p>
+    <!-- SCREEN 4: HEARTNOTES (CHAT BUBBLE STYLE) -->
+    <div id="heartnotesScreen" class="main-screen hidden">
+        <header class="app-header">
+            <h2>Heartnotes 💌</h2>
+            <button id="btnOpenAddNote" class="btn-small">+ Tulis Surat</button>
         </header>
-        <div class="sub-screen-content">
-            <button id="btnOpenAddNote" class="btn-secondary" style="margin-bottom: 12px;">+ Tulis Ungkapan Rasa</button>
-            <form id="addNoteForm" class="add-wish-form hidden">
-                <input type="text" id="noteTitleInput" placeholder="Subjek / Judul (contoh: 'Makasih udah selalu sabar')" required>
-                <textarea id="noteContentInput" placeholder="Tuliskan kata-kata yang mau kamu sampaikan ke pasangan..." style="width: 100%; height: 90px; padding: 8px; border-radius: 8px; border: 1px solid #f2cc8f; font-size: 11px; outline: none;" required></textarea>
-                <button type="submit" class="btn-primary" style="padding: 8px;">Kirim Heartnote ➔</button>
-            </form>
 
-            <div id="notesContainer" class="notes-list">
-                <p class="empty-act">Belum ada Heartnotes. Tulis ucapan manis untuk pasanganmu!</p>
+        <form id="addNoteForm" class="add-form hidden">
+            <input type="text" id="noteTitleInput" placeholder="Judul Pesan...">
+            <textarea id="noteContentInput" placeholder="Tuliskan isi hatimu di sini..." required></textarea>
+            <button type="submit" class="btn-primary">Kirim Heartnote 💌</button>
+        </form>
+
+        <div id="notesContainer" class="notes-container"></div>
+
+        <nav class="bottom-nav">
+            <button onclick="document.getElementById('navHome').click()" class="nav-item">🏠 Home</button>
+            <button onclick="document.getElementById('navJourney').click()" class="nav-item">📸 PAP Keseharian</button>
+            <button onclick="document.getElementById('navMemories').click()" class="nav-item">🖼️ Album</button>
+            <button class="nav-item active">💌 Heartnotes</button>
+        </nav>
+    </div>
+
+    <!-- SCREEN 5: RUANG MOCHI (PET GAME) -->
+    <div id="petScreen" class="main-screen hidden">
+        <header class="app-header">
+            <button id="btnBackFromPet" class="btn-small">⬅️ Kembali</button>
+            <h2>Mochi Room 🐱</h2>
+        </header>
+
+        <div class="mochi-card">
+            <div id="mochiPlayArea" class="mochi-play-area">
+                <div id="mochiBubble" class="speech-bubble">"Meow! Rawat Mochi berdua ya! 🤍"</div>
+                <div id="mochiCharacter" class="mochi-cat">
+                    <div class="cat-ears"></div>
+                    <div class="cat-face">
+                        <span class="cat-eye">●</span>
+                        <span id="mochiMouth" class="cat-mouth">ω</span>
+                        <span class="cat-eye">●</span>
+                    </div>
+                </div>
+                <div id="draggableItem" class="draggable-item hidden">🐟</div>
+            </div>
+
+            <div class="mochi-stats">
+                <div class="stat-bar-group">
+                    <label>Lapar 🐟</label>
+                    <div class="progress"><div id="barHunger" class="fill" style="width: 80%;"></div></div>
+                    <span id="txtHunger">80%</span>
+                </div>
+                <div class="stat-bar-group">
+                    <label>Kebersihan 🧼</label>
+                    <div class="progress"><div id="barHygiene" class="fill" style="width: 70%;"></div></div>
+                    <span id="txtHygiene">70%</span>
+                </div>
+                <div class="stat-bar-group">
+                    <label>Kasih Sayang 💖</label>
+                    <div class="progress"><div id="barLove" class="fill" style="width: 90%;"></div></div>
+                    <span id="txtLove">90%</span>
+                </div>
+            </div>
+
+            <div class="mochi-actions">
+                <button id="btnFeedTool" class="btn-action-tool">🐟 Beri Makan</button>
+                <button id="btnBathTool" class="btn-action-tool">🧽 Mandikan</button>
+                <button id="btnPlayPet" class="btn-action-tool">💖 Puk-puk</button>
             </div>
         </div>
-        <nav class="bottom-nav">
-            <button class="nav-item" id="navHomeH">🏠 <span>Home</span></button>
-            <button class="nav-item" id="navJourneyH">📸 <span>Our Journey</span></button>
-            <button class="nav-item" id="navMemoriesH">🖼️ <span>Memories</span></button>
-            <button class="nav-item active" id="navHeartnotesH">💌 <span>Heartnotes</span></button>
-        </nav>
+    </div>
+
+    <!-- MODAL WISHLIST -->
+    <div id="wishlistModal" class="modal hidden">
+        <div class="modal-content">
+            <button id="closeWishlistModal" class="close-btn">&times;</button>
+            <h3>Wishlist Bersama 📜</h3>
+            <button id="btnOpenAddWish" class="btn-small">+ Tambah Wishlist</button>
+
+            <form id="addWishForm" class="add-form hidden">
+                <input type="text" id="wishTitleInput" placeholder="Impian (misal: Nonton Konser Berdua)" required>
+                <select id="wishCategorySelect">
+                    <option value="✈️ Liburan">✈️ Liburan</option>
+                    <option value="🍽️ Kuliner">🍽️ Kuliner</option>
+                    <option value="🛍️ Barang">🛍️ Barang</option>
+                    <option value="🎯 Target">🎯 Target</option>
+                </select>
+                <button type="submit" class="btn-primary">Tambah Wishlist 🎯</button>
+            </form>
+
+            <div id="wishlistContainer" class="wishlist-container"></div>
+        </div>
     </div>
 
     <!-- MODAL EXPRESS LOVE -->
     <div id="hugModal" class="modal hidden">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>Express Love to Rama 💖</h3>
-                <button class="close-modal" id="closeHugModal">✕</button>
-            </div>
-            <p class="modal-sub">Pilih jenis perasaan yang mau kamu kirim sekarang:</p>
+        <div class="modal-content text-center">
+            <button id="closeHugModal" class="close-btn">&times;</button>
+            <h3>Kirim Express Love 💖</h3>
+            <p>Pilih rasa sayang yang ingin dikirimkan sekarang:</p>
             <div class="hug-options">
-                <button class="hug-opt-btn" data-type="Peluk Hangat 🤗">🤗 Peluk Hangat</button>
-                <button class="hug-opt-btn" data-type="Cium Manis 💋">💋 Cium Manis (Kiss)</button>
-                <button class="hug-opt-btn" data-type="Usap Kepala 🫳">🫳 Usap-usap Kepala (Pat)</button>
-                <button class="hug-opt-btn" data-type="Kangen Banget 🥺">🥺 Kangen Banget</button>
-                <button class="hug-opt-btn" data-type="Peluk + Cium ❤️">❤️ Peluk & Cium</button>
+                <button class="hug-opt-btn" data-type="Pelukan Hangat 🫂">🫂 Pelukan Hangat</button>
+                <button class="hug-opt-btn" data-type="Ciuman Manis 💋">💋 Ciuman Manis</button>
+                <button class="hug-opt-btn" data-type="Usapan Kepala 💆‍♂️">💆‍♂️ Usap Kepala</button>
+                <button class="hug-opt-btn" data-type="Genggaman Tangan 🤝">🤝 Genggam Tangan</button>
             </div>
         </div>
     </div>
 
-    <!-- MODAL DAILY CHECK (MOOD) -->
+    <!-- MODAL MOOD -->
     <div id="moodModal" class="modal hidden">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>Perasaan Hari Ini 😊</h3>
-                <button class="close-modal" id="closeMoodModal">✕</button>
+        <div class="modal-content text-center">
+            <button id="closeMoodModal" class="close-btn">&times;</button>
+            <h3>Ganti Mood Hari Ini 😊</h3>
+            <div class="mood-options">
+                <button class="mood-opt selected" data-mood="😊 Bahagia">😊 Bahagia</button>
+                <button class="mood-opt" data-mood="🥰 Manja">🥰 Manja</button>
+                <button class="mood-opt" data-mood="😴 Capec">😴 Capec</button>
+                <button class="mood-opt" data-mood="🥺 Kangen">🥺 Kangen</button>
+                <button class="mood-opt" data-mood="😤 Meringis/Sebel">😤 Sebel</button>
             </div>
-            <div class="mood-selector">
-                <button class="mood-opt" data-mood="😊 Bahagia">😊</button>
-                <button class="mood-opt" data-mood="🥰 Semangat">🥰</button>
-                <button class="mood-opt" data-mood="😴 Lelah">😴</button>
-                <button class="mood-opt" data-mood="😔 Sedih">😔</button>
-                <button class="mood-opt" data-mood="🥺 Kangen">🥺</button>
-            </div>
-            <textarea id="moodNoteInput" placeholder="Ceritain sedikit hari ini... (misal: 'Capek kerjaan, tapi seneng inget kamu')"></textarea>
-            <button id="btnSaveMood" class="btn-primary">Simpan Mood Hari Ini ➔</button>
+            <input type="text" id="moodNoteInput" placeholder="Catatan alasan mood (opsional)...">
+            <button id="btnSaveMood" class="btn-primary">Simpan Mood ✨</button>
         </div>
     </div>
 
-    <!-- MODAL WISHLIST KITA -->
-    <div id="wishlistModal" class="modal hidden">
-        <div class="modal-content wishlist-modal-content">
-            <div class="modal-header">
-                <h3>Wishlist Kita ⭐</h3>
-                <button class="close-modal" id="closeWishlistModal">✕</button>
-            </div>
-            <p class="modal-sub">Impian & rencana seru yang ingin kita wujudkan berdua!</p>
-            
-            <button id="btnOpenAddWish" class="btn-secondary" style="margin-bottom: 12px;">+ Tambah Impian Baru</button>
-
-            <form id="addWishForm" class="add-wish-form hidden">
-                <input type="text" id="wishTitleInput" placeholder="Judul impian (contoh: 'Piknik ke Lembang')" required>
-                <select id="wishCategorySelect">
-                    <option value="✈️ Travel">✈️ Travel / Jalan-jalan</option>
-                    <option value="🎁 Barang">🎁 Barang / Koleksi</option>
-                    <option value="💍 Masa Depan">💍 Masa Depan</option>
-                    <option value="🍕 Kuliner">🍕 Kuliner / Date</option>
-                </select>
-                <button type="submit" class="btn-primary" style="padding: 8px; margin-top: 4px;">Simpan Wishlist ➔</button>
-            </form>
-
-            <div id="wishlistContainer" class="wishlist-list">
-                <p class="empty-act">Belum ada wishlist. Yuk buat impian pertama kalian!</p>
+    <!-- MODAL VIEWER UNTUK BUKA FOTO FULLSCREEN (PAP & MEMORIES) -->
+    <div id="imageViewerModal" class="modal hidden">
+        <div class="modal-content image-viewer-content">
+            <button id="closeImageViewer" class="close-btn">&times;</button>
+            <div class="viewer-body">
+                <img id="viewerImage" src="" alt="Detail Foto">
+                <div id="viewerHeader" class="viewer-header"></div>
+                <div id="viewerTitle" class="viewer-title"></div>
+                <div id="viewerDesc" class="viewer-desc"></div>
             </div>
         </div>
-    </div>
-
-    <!-- SCREEN RUANGAN MOCHI FULL-SCREEN -->
-    <div id="petScreen" class="pet-room-container hidden">
-        <header class="pet-room-header">
-            <button id="btnBackFromPet" class="btn-back">⬅️ Home</button>
-            <div class="pet-status-bars">
-                <div class="status-pill">🍲 <div class="bar-bg"><div id="barHunger" class="bar-fill hunger" style="width: 80%;"></div></div> <span id="txtHunger">80%</span></div>
-                <div class="status-pill">🧼 <div class="bar-bg"><div id="barHygiene" class="bar-fill hygiene" style="width: 70%;"></div></div> <span id="txtHygiene">70%</span></div>
-                <div class="status-pill">💖 <div class="bar-bg"><div id="barLove" class="bar-fill love" style="width: 90%;"></div></div> <span id="txtLove">90%</span></div>
-            </div>
-        </header>
-
-        <main class="pet-room-view" id="mochiPlayArea">
-            <div class="pet-speech-bubble" id="mochiBubble">"Meow! Rawat Mochi berdua ya! 🤍"</div>
-            <div id="draggableItem" class="draggable-item hidden">🐟</div>
-
-            <div class="mochi-character-box" id="mochiCharacter">
-                <div class="mochi-ears">
-                    <span class="ear left"></span>
-                    <span class="ear right"></span>
-                </div>
-                <div class="mochi-body">
-                    <div class="mochi-face">
-                        <div class="mochi-eyes">
-                            <span class="eye"></span>
-                            <span class="eye"></span>
-                        </div>
-                        <div class="mochi-cheeks">
-                            <span class="cheek"></span>
-                            <span class="cheek"></span>
-                        </div>
-                        <div class="mochi-mouth" id="mochiMouth">ω</div>
-                    </div>
-                </div>
-                <div class="mochi-shadow"></div>
-            </div>
-        </main>
-
-        <footer class="pet-room-nav">
-            <button id="btnFeedTool" class="room-nav-btn">
-                <span class="nav-icon">🍽️</span>
-                <span>Makan</span>
-            </button>
-            <button id="btnBathTool" class="room-nav-btn">
-                <span class="nav-icon">🚿</span>
-                <span>Mandi</span>
-            </button>
-            <button id="btnPlayPet" class="room-nav-btn active">
-                <span class="nav-icon">🫳</span>
-                <span>Puk-puk</span>
-            </button>
-        </footer>
     </div>
 
     <script type="module" src="script.js"></script>
