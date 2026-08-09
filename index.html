@@ -230,43 +230,76 @@
         <div id="notesContainer" class="notes-container"></div>
     </div>
 
-    <!-- SCREEN 5: RUANG MOCHI (INTERAKTIF GAYA TALKING ANGELA) -->
+    <!-- SCREEN 5: RUANG MOCHI INTERAKTIF FULL ANIMASI -->
     <div id="petScreen" class="main-screen hidden">
         <header class="app-header mochi-header">
             <button id="btnBackFromPet" class="btn-small">⬅️ Kembali</button>
-            <div class="mochi-top-stats">
-                <span class="lvl-badge">LV 50</span>
-                <span class="coin-badge">🪙 3,900</span>
+            <div class="mochi-top-percentages">
+                <span class="status-chip">🥣 <b id="pctHunger">40%</b> Kembang</span>
+                <span class="status-chip">🧼 <b id="pctHygiene">50%</b> Bersih</span>
+                <span class="status-chip">😴 <b id="pctEnergy">30%</b> Energi</span>
             </div>
         </header>
 
-        <div class="angela-room-card">
-            <div id="mochiBubble" class="angela-speech">"Meow! Elus atau geser aku ya! 🤍"</div>
+        <div class="mochi-game-stage mode-dining" id="mochiGameStage">
+            <div id="mochiSpeech" class="angela-speech">"Meow! Mochi laper banget nih..."</div>
             
-            <!-- BEDROOM BACKGROUND & DRAGGABLE MOCHI -->
-            <div id="angelaStage" class="angela-stage">
-                <div class="stage-lamp">💡</div>
-                <div class="stage-bed">🛌</div>
-                
-                <!-- KARAKTER MOCHI YANG BISA DIGESER -->
-                <div id="draggableMochi" class="mochi-character-angela">
-                    <div id="mochiAvatarFace" class="angela-cat-face">🐱</div>
+            <div class="stage-overlay-night hidden" id="nightOverlay"></div>
+
+            <!-- KARAKTER FULL BODY MOCHI -->
+            <div id="draggableMochi" class="mochi-full-body">
+                <div class="cat-body-container" id="catBodyContainer">
+                    <div class="cat-ears-pair"><span></span><span></span></div>
+                    <div class="cat-face-head">
+                        <div class="cat-eyes-pair">
+                            <span class="cat-eye" id="eyeLeft">●</span>
+                            <span class="cat-eye" id="eyeRight">●</span>
+                        </div>
+                        <div class="cat-mouth-snout" id="catMouth">ω</div>
+                    </div>
+                    <div class="cat-torso">
+                        <div class="cat-paws"><span>🐾</span><span>🐾</span></div>
+                    </div>
+                    <div class="cat-tail" id="catTail"></div>
+                    <div class="soap-bubbles-overlay hidden" id="soapOverlay">🧼🫧✨</div>
                 </div>
             </div>
 
-            <!-- STATUS BAR Bawah Persis Talking Angela -->
+            <!-- PINTU / TOOLS SESUAI RUANGAN -->
+            <div class="room-action-toolbar" id="roomToolbar">
+                <!-- TOOL RUANG MAKAN -->
+                <div class="toolbar-group" id="toolsDining">
+                    <button class="food-btn" data-food="salmon" data-add="25">🐟 Salmon</button>
+                    <button class="food-btn" data-food="milk" data-add="15">🥛 Susu</button>
+                    <button class="food-btn" data-food="cake" data-add="20">🍰 Cake</button>
+                </div>
+
+                <!-- TOOL KAMAR MANDI -->
+                <div class="toolbar-group hidden" id="toolsBath">
+                    <button class="bath-tool-btn" id="btnApplySoap">🧽 Sabun Busa</button>
+                    <button class="bath-tool-btn" id="btnRinseWater">🚿 Bilas Air</button>
+                </div>
+
+                <!-- TOOL KAMAR TIDUR -->
+                <div class="toolbar-group hidden" id="toolsBed">
+                    <button class="bed-tool-btn" id="btnToggleLamp">💡 On/Off Lampu</button>
+                    <button class="bed-tool-btn" id="btnPatHead">🖐️ Pat-Pat Mochi</button>
+                </div>
+            </div>
+
+            <!-- NAVIGASI BAWAH RUANGAN MOCHI -->
             <div class="angela-bottom-bar">
-                <button id="btnFeedTool" class="angela-btn-stat">
-                    <span class="stat-icon">🍴</span>
-                    <span class="stat-val" id="txtHunger">82%</span>
+                <button id="btnSwitchDining" class="angela-btn-stat active">
+                    <span class="stat-icon">🥣</span>
+                    <span class="stat-label">Ruang Makan</span>
                 </button>
-                <button id="btnBathTool" class="angela-btn-stat">
+                <button id="btnSwitchBath" class="angela-btn-stat">
                     <span class="stat-icon">🚽</span>
-                    <span class="stat-val" id="txtHygiene">70%</span>
+                    <span class="stat-label">Kamar Mandi</span>
                 </button>
-                <button id="btnPlayPet" class="angela-btn-stat">
-                    <span class="stat-icon">✨</span>
-                    <span class="stat-val" id="txtLove">90%</span>
+                <button id="btnSwitchBed" class="angela-btn-stat">
+                    <span class="stat-icon">🛏️</span>
+                    <span class="stat-label">Kamar Tidur</span>
                 </button>
             </div>
         </div>
@@ -302,7 +335,7 @@
         </div>
     </div>
 
-    <!-- MODAL EXPRESS LOVE (GRID BOX BISA DIKLIK) -->
+    <!-- MODAL EXPRESS LOVE -->
     <div id="hugModal" class="modal hidden">
         <div class="modal-content text-center">
             <button id="closeHugModal" class="close-btn">&times;</button>
@@ -342,7 +375,7 @@
         </div>
     </div>
 
-    <!-- MODAL DAILY CHECK IN (GRID BOX BISA DIKLIK) -->
+    <!-- MODAL DAILY CHECK IN -->
     <div id="moodModal" class="modal hidden">
         <div class="modal-content text-center">
             <button id="closeMoodModal" class="close-btn">&times;</button>

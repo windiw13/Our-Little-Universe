@@ -70,6 +70,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 currentUserData = { uid: user.uid, nickname: "Diw" };
                 updateGreetingName();
             }
+        } else {
+            // Mochi sedih saat belum login
+            const speech = document.getElementById('mochiSpeech');
+            const eyeL = document.getElementById('eyeLeft');
+            const eyeR = document.getElementById('eyeRight');
+            const mouth = document.getElementById('catMouth');
+
+            if (speech) speech.innerText = '"Mochi sedih kesepian... Kalian belum menyayangi Mochi hari ini 😿"';
+            if (eyeL) eyeL.innerText = '🥺';
+            if (eyeR) eyeR.innerText = '🥺';
+            if (mouth) mouth.innerText = '︵';
         }
     });
 
@@ -178,7 +189,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 partner2_name: null,
                 status: "waiting",
                 startDate: null,
-                mochi: { hunger: 82, hygiene: 70, love: 90 },
+                mochi: { hunger: 40, hygiene: 50, energy: 30 },
                 createdAt: new Date()
             });
 
@@ -352,7 +363,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('homeScreen')?.classList.remove('hidden');
     });
 
-    // EXPRESS LOVE SEND (BOX DAPAT DIKLIK)
+    // EXPRESS LOVE SEND
     document.querySelectorAll('.express-box').forEach(box => {
         box.addEventListener('click', async () => {
             const loveType = box.getAttribute('data-type');
@@ -372,7 +383,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // DAILY CHECK IN (BOX DAPAT DIKLIK)
+    // DAILY CHECK IN
     let selectedMood = "😄 Happy";
     document.querySelectorAll('.mood-box').forEach(box => {
         box.addEventListener('click', () => {
@@ -399,110 +410,181 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // MOCHI INTERAKTIF (BISA DRAG/GESER SEPERTI TALKING ANGELA)
-    const draggableMochi = document.getElementById('draggableMochi');
-    const mochiBubble = document.getElementById('mochiBubble');
-    const mochiAvatarFace = document.getElementById('mochiAvatarFace');
+    // SYSTEM MINI GAME MOCHI INTERAKTIF FULL ANIMATION
+    const stage = document.getElementById('mochiGameStage');
+    const speech = document.getElementById('mochiSpeech');
+    const eyeL = document.getElementById('eyeLeft');
+    const eyeR = document.getElementById('eyeRight');
+    const mouth = document.getElementById('catMouth');
+    const soapOverlay = document.getElementById('soapOverlay');
+    const nightOverlay = document.getElementById('nightOverlay');
 
-    let isDragging = false;
-    let startX, currentX = 0;
+    const toolsDining = document.getElementById('toolsDining');
+    const toolsBath = document.getElementById('toolsBath');
+    const toolsBed = document.getElementById('toolsBed');
 
-    if (draggableMochi) {
-        draggableMochi.addEventListener('mousedown', (e) => {
-            isDragging = true;
-            startX = e.clientX - currentX;
-        });
+    const btnSwitchDining = document.getElementById('btnSwitchDining');
+    const btnSwitchBath = document.getElementById('btnSwitchBath');
+    const btnSwitchBed = document.getElementById('btnSwitchBed');
 
-        window.addEventListener('mousemove', (e) => {
-            if (!isDragging) return;
-            currentX = e.clientX - startX;
-            draggableMochi.style.transform = `translateX(${currentX}px)`;
-        });
+    function switchMochiRoom(mode) {
+        stage.className = `mochi-game-stage mode-${mode}`;
+        [toolsDining, toolsBath, toolsBed].forEach(t => t?.classList.add('hidden'));
+        [btnSwitchDining, btnSwitchBath, btnSwitchBed].forEach(b => b?.classList.remove('active'));
 
-        window.addEventListener('mouseup', () => {
-            if (isDragging) {
-                isDragging = false;
-                if (mochiBubble) mochiBubble.innerText = '"Purrr... Wiii digeser-geser!"';
-                if (mochiAvatarFace) mochiAvatarFace.innerText = "😸";
-                setTimeout(() => {
-                    draggableMochi.style.transform = `translateX(0px)`;
-                    currentX = 0;
-                    if (mochiAvatarFace) mochiAvatarFace.innerText = "🐱";
-                    if (mochiBubble) mochiBubble.innerText = '"Meow! Elus atau geser aku ya! 🤍"';
-                }, 1200);
+        if (mode === 'dining') {
+            toolsDining?.classList.remove('hidden');
+            btnSwitchDining?.classList.add('active');
+            if (speech) speech.innerText = '"Wah Ruang Makan! Mochi mau makan lezat! 😋"';
+        } else if (mode === 'bath') {
+            toolsBath?.classList.remove('hidden');
+            btnSwitchBath?.classList.add('active');
+            if (speech) speech.innerText = '"Kamar Mandi! Ayo mandikan Mochi biar bersih! 🧼"';
+        } else if (mode === 'bed') {
+            toolsBed?.classList.remove('hidden');
+            btnSwitchBed?.classList.add('active');
+            if (speech) speech.innerText = '"Kamar Tidur... Mochi siap bobo nyenyak 😴"';
+        }
+    }
+
+    btnSwitchDining?.addEventListener('click', () => switchMochiRoom('dining'));
+    btnSwitchBath?.addEventListener('click', () => switchMochiRoom('bath'));
+    btnSwitchBed?.addEventListener('click', () => switchMochiRoom('bed'));
+
+    // FEEDING ACTION
+    document.querySelectorAll('.food-btn').forEach(btn => {
+        btn.addEventListener('click', async () => {
+            const addVal = parseInt(btn.getAttribute('data-add')) || 20;
+            
+            // Animasi Makan
+            if (eyeL) eyeL.innerText = '😸';
+            if (eyeR) eyeR.innerText = '😸';
+            if (mouth) mouth.innerText = ' Nom-Nom! ';
+            if (speech) speech.innerText = '"Nyam nyam! Mochi senang banget makannya lezat! ❤️"';
+
+            setTimeout(() => {
+                if (eyeL) eyeL.innerText = '●';
+                if (eyeR) eyeR.innerText = '●';
+                if (mouth) mouth.innerText = 'ω';
+            }, 2500);
+
+            updateMochiPercentage('hunger', addVal);
+
+            if (currentUserData?.coupleSpaceId) {
+                await addDoc(collection(db, "couple_spaces", currentUserData.coupleSpaceId, "notifications"), {
+                    type: "mochi",
+                    senderUid: currentUserData.uid || "anon",
+                    senderName: currentUserData.nickname || "User",
+                    message: "memberi makan lezat ke Mochi 🥣",
+                    timestamp: serverTimestamp()
+                });
             }
         });
+    });
 
-        // Touch event support for mobile screens
-        draggableMochi.addEventListener('touchstart', (e) => {
-            isDragging = true;
-            startX = e.touches[0].clientX - currentX;
-        });
+    // BATH ACTION
+    document.getElementById('btnApplySoap')?.addEventListener('click', () => {
+        soapOverlay?.classList.remove('hidden');
+        if (speech) speech.innerText = '"Waaah badanku penuh busa sabun wangi! 🧼"';
+        if (eyeL) eyeL.innerText = '😸';
+        if (eyeR) eyeR.innerText = '😸';
+    });
 
-        window.addEventListener('touchmove', (e) => {
-            if (!isDragging) return;
-            currentX = e.touches[0].clientX - startX;
-            draggableMochi.style.transform = `translateX(${currentX}px)`;
-        });
+    document.getElementById('btnRinseWater')?.addEventListener('click', async () => {
+        soapOverlay?.classList.add('hidden');
+        if (speech) speech.innerText = '"Byuur! Sabunnya hilang, Mochi wangi & bersih! ✨"';
+        if (eyeL) eyeL.innerText = '✨';
+        if (eyeR) eyeR.innerText = '✨';
 
-        window.addEventListener('touchend', () => {
-            if (isDragging) {
-                isDragging = false;
-                if (mochiBubble) mochiBubble.innerText = '"Purrr... Wiii digeser-geser!"';
-                if (mochiAvatarFace) mochiAvatarFace.innerText = "😸";
-                setTimeout(() => {
-                    draggableMochi.style.transform = `translateX(0px)`;
-                    currentX = 0;
-                    if (mochiAvatarFace) mochiAvatarFace.innerText = "🐱";
-                    if (mochiBubble) mochiBubble.innerText = '"Meow! Elus atau geser aku ya! 🤍"';
-                }, 1200);
+        setTimeout(() => {
+            if (eyeL) eyeL.innerText = '●';
+            if (eyeR) eyeR.innerText = '●';
+        }, 2000);
+
+        updateMochiPercentage('hygiene', 30);
+
+        if (currentUserData?.coupleSpaceId) {
+            await addDoc(collection(db, "couple_spaces", currentUserData.coupleSpaceId, "notifications"), {
+                type: "mochi",
+                senderUid: currentUserData.uid || "anon",
+                senderName: currentUserData.nickname || "User",
+                message: "memandikan Mochi sampai wangi & bersih 🧼",
+                timestamp: serverTimestamp()
+            });
+        }
+    });
+
+    // BED ACTION
+    let isNight = false;
+    document.getElementById('btnToggleLamp')?.addEventListener('click', () => {
+        isNight = !isNight;
+        nightOverlay?.classList.toggle('hidden', !isNight);
+        if (isNight) {
+            if (speech) speech.innerText = '"Lampu mati... Mochi bobo nyenyak yaa 💤"';
+            if (eyeL) eyeL.innerText = '￣';
+            if (eyeR) eyeR.innerText = '￣';
+            if (mouth) mouth.innerText = 'uuu';
+        } else {
+            if (speech) speech.innerText = '"Lampu menyala! Mochi bangun lagi! ☀️"';
+            if (eyeL) eyeL.innerText = '●';
+            if (eyeR) eyeR.innerText = '●';
+            if (mouth) mouth.innerText = 'ω';
+        }
+    });
+
+    document.getElementById('btnPatHead')?.addEventListener('click', async () => {
+        if (speech) speech.innerText = '"Purrr... Mochi pusing tapi seneng banget dipuk-puk! 💖"';
+        if (eyeL) eyeL.innerText = '🥰';
+        if (eyeR) eyeR.innerText = '🥰';
+
+        setTimeout(() => {
+            if (eyeL) eyeL.innerText = '●';
+            if (eyeR) eyeR.innerText = '●';
+        }, 2000);
+
+        updateMochiPercentage('energy', 20);
+
+        if (currentUserData?.coupleSpaceId) {
+            await addDoc(collection(db, "couple_spaces", currentUserData.coupleSpaceId, "notifications"), {
+                type: "mochi",
+                senderUid: currentUserData.uid || "anon",
+                senderName: currentUserData.nickname || "User",
+                message: "mempuk-puk & mengelus Mochi 🖐️",
+                timestamp: serverTimestamp()
+            });
+        }
+    });
+
+    async function updateMochiPercentage(type, amount) {
+        if (!currentUserData || !currentUserData.coupleSpaceId) return;
+        const spaceRef = doc(db, "couple_spaces", currentUserData.coupleSpaceId);
+
+        getDoc(spaceRef).then(async (snap) => {
+            if (snap.exists()) {
+                let m = snap.data().mochi || { hunger: 40, hygiene: 50, energy: 30 };
+                m[type] = Math.min(100, (m[type] || 30) + amount);
+                await updateDoc(spaceRef, { mochi: m });
             }
         });
     }
 
-    document.getElementById('btnFeedTool')?.addEventListener('click', async () => {
-        if (mochiBubble) mochiBubble.innerText = '"Nyam nyam! Makanan lezat!"';
-        if (mochiAvatarFace) mochiAvatarFace.innerText = "😸";
-        if (currentUserData?.coupleSpaceId) {
-            await addDoc(collection(db, "couple_spaces", currentUserData.coupleSpaceId, "notifications"), {
-                type: "mochi",
-                senderUid: currentUserData.uid || "anon",
-                senderName: currentUserData.nickname || "User",
-                message: "memberi makan Mochi 🍽️",
-                timestamp: serverTimestamp()
-            });
-        }
-    });
+    function listenMochiStats(spaceId) {
+        if (!spaceId) return;
+        onSnapshot(doc(db, "couple_spaces", spaceId), (docSnap) => {
+            if (docSnap.exists()) {
+                const mochi = docSnap.data().mochi || { hunger: 40, hygiene: 50, energy: 30 };
+                const pH = document.getElementById('pctHunger');
+                const pHy = document.getElementById('pctHygiene');
+                const pE = document.getElementById('pctEnergy');
 
-    document.getElementById('btnBathTool')?.addEventListener('click', async () => {
-        if (mochiBubble) mochiBubble.innerText = '"Byur! Mochi wangi banget!"';
-        if (mochiAvatarFace) mochiAvatarFace.innerText = "🧼";
-        if (currentUserData?.coupleSpaceId) {
-            await addDoc(collection(db, "couple_spaces", currentUserData.coupleSpaceId, "notifications"), {
-                type: "mochi",
-                senderUid: currentUserData.uid || "anon",
-                senderName: currentUserData.nickname || "User",
-                message: "memandikan Mochi 🚽",
-                timestamp: serverTimestamp()
-            });
-        }
-    });
+                if (pH) pH.innerText = (mochi.hunger || 40) + '%';
+                if (pHy) pHy.innerText = (mochi.hygiene || 50) + '%';
+                if (pE) pE.innerText = (mochi.energy || 30) + '%';
+            }
+        });
+    }
 
-    document.getElementById('btnPlayPet')?.addEventListener('click', async () => {
-        if (mochiBubble) mochiBubble.innerText = '"Purrr... Puk-puknya hangat!"';
-        if (mochiAvatarFace) mochiAvatarFace.innerText = "😻";
-        if (currentUserData?.coupleSpaceId) {
-            await addDoc(collection(db, "couple_spaces", currentUserData.coupleSpaceId, "notifications"), {
-                type: "mochi",
-                senderUid: currentUserData.uid || "anon",
-                senderName: currentUserData.nickname || "User",
-                message: "mengelus Mochi ✨",
-                timestamp: serverTimestamp()
-            });
-        }
-    });
-
-    // SCREEN SWITCHING (MENJAGA NAVBAR TETAP KONSISTEN)
+    // SCREEN SWITCHING
     const homeScreen = document.getElementById('homeScreen');
     const journeyScreen = document.getElementById('journeyScreen');
     const memoriesScreen = document.getElementById('memoriesScreen');
@@ -923,28 +1005,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
             });
         });
-    }
-
-    // MOCHI STATS
-    function listenMochiStats(spaceId) {
-        if (!spaceId) return;
-        onSnapshot(doc(db, "couple_spaces", spaceId), (docSnap) => {
-            if (docSnap.exists()) {
-                const mochi = docSnap.data().mochi || { hunger: 82, hygiene: 70, love: 90 };
-                updateMochiUI(mochi);
-            }
-        });
-    }
-
-    function updateMochiUI(mochi) {
-        const txtH = document.getElementById('txtHunger');
-        if (txtH) txtH.innerText = (mochi.hunger || 82) + '%';
-
-        const txtHy = document.getElementById('txtHygiene');
-        if (txtHy) txtHy.innerText = (mochi.hygiene || 70) + '%';
-
-        const txtL = document.getElementById('txtLove');
-        if (txtL) txtL.innerText = (mochi.love || 90) + '%';
     }
 
     // RIWAYAT AKTIVITAS
