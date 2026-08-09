@@ -409,7 +409,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // SISTEM GAMING MOCHI: POINTER & TOUCH DRAG PRESISI DENGAN KOORDINAT JARI
+    // SISTEM GAMING MOCHI: REALTIME DRAG DENGAN TOUCH/POINTER ABSOLUTE
     const stage = document.getElementById('mochiGameStage');
     const speech = document.getElementById('mochiSpeech');
     const eyeL = document.getElementById('eyeLeft');
@@ -434,7 +434,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (mode === 'dining') {
             groupDining?.classList.remove('hidden');
             btnSwitchDining?.classList.add('active');
-            if (speech) speech.innerText = '"Geser makanan ke mulut Mochi ya! 🥣"';
+            if (speech) speech.innerText = '"Tarik makanan ke Mochi ya! 🥣"';
         } else if (mode === 'bath') {
             groupBath?.classList.remove('hidden');
             btnSwitchBath?.classList.add('active');
@@ -450,47 +450,40 @@ document.addEventListener('DOMContentLoaded', () => {
     btnSwitchBath?.addEventListener('click', () => switchMochiRoom('bath'));
     btnSwitchBed?.addEventListener('click', () => switchMochiRoom('bed'));
 
-    // SISTEM DRAG BISA DITARIK DENGAN JARI / KURSOR
+    // BISA DITARIK DENGAN KURSOR/TOUCH LGSUNG MENGIKUTI POSISI LAYAR
     document.querySelectorAll('.sticker-item').forEach(sticker => {
-        let active = false;
+        let isDragging = false;
 
-        const startDrag = (e) => {
-            active = true;
+        const onStart = (e) => {
+            isDragging = true;
             sticker.classList.add('dragging');
-            moveAt(e);
+            onMove(e);
         };
 
-        const moveAt = (e) => {
-            if (!active) return;
-            let clientX = e.clientX || (e.touches && e.touches[0].clientX);
-            let clientY = e.clientY || (e.touches && e.touches[0].clientY);
+        const onMove = (e) => {
+            if (!isDragging) return;
+            const x = e.clientX || (e.touches && e.touches[0].clientX);
+            const y = e.clientY || (e.touches && e.touches[0].clientY);
 
-            if (clientX && clientY) {
-                sticker.style.left = `${clientX - 30}px`;
-                sticker.style.top = `${clientY - 30}px`;
+            if (x && y) {
+                sticker.style.left = `${x - 25}px`;
+                sticker.style.top = `${y - 25}px`;
             }
         };
 
-        const stopDrag = (e) => {
-            if (!active) return;
-            active = false;
+        const onEnd = () => {
+            if (!isDragging) return;
+            isDragging = false;
             sticker.classList.remove('dragging');
             sticker.style.left = '';
             sticker.style.top = '';
 
-            // Jalankan reaksi ketika item dilepas
             handleItemUse(sticker);
         };
 
-        // Event listener kursor & touch sentuhan HP
-        sticker.addEventListener('mousedown', startDrag);
-        sticker.addEventListener('touchstart', startDrag, { passive: true });
-
-        window.addEventListener('mousemove', moveAt);
-        window.addEventListener('touchmove', moveAt, { passive: true });
-
-        window.addEventListener('mouseup', stopDrag);
-        window.addEventListener('touchend', stopDrag);
+        sticker.addEventListener('pointerdown', onStart);
+        window.addEventListener('pointermove', onMove);
+        window.addEventListener('pointerup', onEnd);
     });
 
     let isNight = false;

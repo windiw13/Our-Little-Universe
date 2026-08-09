@@ -250,17 +250,17 @@ body {
 
 /* KARAKTER FULL BODY MOCHI */
 .mochi-full-body {
-    position: absolute;
-    top: 95px;
+    position: relative;
+    margin-top: 15px;
     z-index: 5;
 }
 
 .cat-body-container {
-    width: 120px;
-    height: 150px;
+    width: 130px;
+    height: 160px;
     background: #ffffff;
     border: 4px solid #5a4a42;
-    border-radius: 60px 60px 40px 40px;
+    border-radius: 65px 65px 45px 45px;
     position: relative;
     display: flex;
     flex-direction: column;
@@ -279,16 +279,16 @@ body {
 
 .cat-ears-pair span {
     width: 0; height: 0;
-    border-left: 18px solid transparent;
-    border-right: 18px solid transparent;
-    border-bottom: 26px solid #ffffff;
+    border-left: 20px solid transparent;
+    border-right: 20px solid transparent;
+    border-bottom: 28px solid #ffffff;
     filter: drop-shadow(0 -3px 0 #5a4a42);
 }
 
-.cat-face-head { margin-top: 25px; display: flex; flex-direction: column; align-items: center; }
-.cat-eyes-pair { display: flex; gap: 22px; font-size: 1.4rem; }
-.cat-mouth-snout { font-size: 1.3rem; font-weight: 800; color: #e07a5f; margin-top: -2px; }
-.cat-paws { display: flex; gap: 30px; margin-top: 25px; font-size: 1.2rem; }
+.cat-face-head { margin-top: 30px; display: flex; flex-direction: column; align-items: center; }
+.cat-eyes-pair { display: flex; gap: 24px; font-size: 1.5rem; }
+.cat-mouth-snout { font-size: 1.4rem; font-weight: 800; color: #e07a5f; margin-top: -2px; }
+.cat-paws { display: flex; gap: 32px; margin-top: 25px; font-size: 1.3rem; }
 
 .cat-tail {
     position: absolute;
@@ -314,22 +314,23 @@ body {
     animation: pulseBounce 1s infinite;
 }
 
-/* DOK STIKER DI BAWAH (TIDAK MENUTUPI MOCHI SAMA SEKALI) */
-.raw-items-dock {
+/* DOK MAKANAN DENGAN POSISI DI BAWAH MOCHI */
+.items-tray-below {
     z-index: 20;
     width: 100%;
     display: flex;
     justify-content: center;
+    margin-top: auto;
     margin-bottom: 8px;
-    background: rgba(255,255,255,0.3);
-    padding: 8px;
-    border-radius: 20px;
-    backdrop-filter: blur(4px);
+    background: rgba(255,255,255,0.4);
+    padding: 10px;
+    border-radius: 22px;
+    backdrop-filter: blur(6px);
 }
 
 .dock-group {
     display: flex;
-    gap: 30px;
+    gap: 32px;
 }
 
 .sticker-item {
@@ -337,14 +338,14 @@ body {
     cursor: grab;
     user-select: none;
     touch-action: none;
-    filter: drop-shadow(0 6px 8px rgba(0,0,0,0.2));
+    filter: drop-shadow(0 6px 8px rgba(0,0,0,0.25));
     transition: transform 0.1s ease;
 }
 
-/* KETIKA STIKER SEDANG DIGESER DI LAYAR */
+/* TAMPILAN PRESISI KETIKA STIKER DITARIK */
 .sticker-item.dragging {
     position: fixed !important;
-    z-index: 9999 !important;
+    z-index: 99999 !important;
     transform: scale(1.4) !important;
     pointer-events: none;
 }
