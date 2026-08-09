@@ -159,21 +159,13 @@
             <button id="btnWishlistModal" class="action-btn">Wishlist</button>
         </div>
 
-        <!-- LOG AKTIVITAS (PER BUBBLE SEPERTI CHAT) -->
+        <!-- LOG AKTIVITAS -->
         <div class="widget-card activity-card">
             <h3>💌 Riwayat Aktivitas Kita</h3>
             <div id="activityLogList" class="act-log-list">
                 <p class="empty-act">Belum ada aktivitas hari ini.</p>
             </div>
         </div>
-
-        <!-- NAVBAR BOTTOM -->
-        <nav class="bottom-nav">
-            <button id="navHome" class="nav-item active">Home</button>
-            <button id="navJourney" class="nav-item">Our Journey</button>
-            <button id="navMemories" class="nav-item">Memories</button>
-            <button id="navHeartnotes" class="nav-item">Heartnotes</button>
-        </nav>
     </div>
 
     <!-- SCREEN 2: OUR JOURNEY -->
@@ -196,13 +188,6 @@
         </form>
 
         <div id="journeyTimelineContainer" class="journey-chat-container"></div>
-
-        <nav class="bottom-nav">
-            <button onclick="document.getElementById('navHome').click()" class="nav-item">Home</button>
-            <button class="nav-item active">Our Journey</button>
-            <button onclick="document.getElementById('navMemories').click()" class="nav-item">Memories</button>
-            <button onclick="document.getElementById('navHeartnotes').click()" class="nav-item">Heartnotes</button>
-        </nav>
     </div>
 
     <!-- SCREEN 3: MEMORIES ALBUM -->
@@ -227,13 +212,6 @@
         </form>
 
         <div id="memoriesGridContainer" class="memories-feed-grid"></div>
-
-        <nav class="bottom-nav">
-            <button onclick="document.getElementById('navHome').click()" class="nav-item">Home</button>
-            <button onclick="document.getElementById('navJourney').click()" class="nav-item">Our Journey</button>
-            <button class="nav-item active">Memories</button>
-            <button onclick="document.getElementById('navHeartnotes').click()" class="nav-item">Heartnotes</button>
-        </nav>
     </div>
 
     <!-- SCREEN 4: HEARTNOTES -->
@@ -250,58 +228,57 @@
         </form>
 
         <div id="notesContainer" class="notes-container"></div>
-
-        <nav class="bottom-nav">
-            <button onclick="document.getElementById('navHome').click()" class="nav-item">Home</button>
-            <button onclick="document.getElementById('navJourney').click()" class="nav-item">Our Journey</button>
-            <button onclick="document.getElementById('navMemories').click()" class="nav-item">Memories</button>
-            <button class="nav-item active">Heartnotes</button>
-        </nav>
     </div>
 
-    <!-- SCREEN 5: RUANG MOCHI (PET GAME INTERAKTIF GAYA TALKING TOM) -->
+    <!-- SCREEN 5: RUANG MOCHI (INTERAKTIF GAYA TALKING ANGELA) -->
     <div id="petScreen" class="main-screen hidden">
-        <header class="app-header">
+        <header class="app-header mochi-header">
             <button id="btnBackFromPet" class="btn-small">⬅️ Kembali</button>
-            <h2>Mochi Room 🐱</h2>
+            <div class="mochi-top-stats">
+                <span class="lvl-badge">LV 50</span>
+                <span class="coin-badge">🪙 3,900</span>
+            </div>
         </header>
 
-        <div class="mochi-card">
-            <div id="mochiPlayArea" class="mochi-play-area">
-                <div id="mochiBubble" class="speech-bubble">"Meow! Sentuh atau rawat aku ya! 🤍"</div>
+        <div class="angela-room-card">
+            <div id="mochiBubble" class="angela-speech">"Meow! Elus atau geser aku ya! 🤍"</div>
+            
+            <!-- BEDROOM BACKGROUND & DRAGGABLE MOCHI -->
+            <div id="angelaStage" class="angela-stage">
+                <div class="stage-lamp">💡</div>
+                <div class="stage-bed">🛌</div>
                 
-                <!-- KARAKTER ANIMASI MOCHI -->
-                <div id="mochiCharacter" class="mochi-cat-avatar">
-                    <div id="mochiEmotionIcon" class="mochi-avatar-display">🐱</div>
-                    <div id="mochiEffectOverlay" class="mochi-effect-overlay"></div>
+                <!-- KARAKTER MOCHI YANG BISA DIGESER -->
+                <div id="draggableMochi" class="mochi-character-angela">
+                    <div id="mochiAvatarFace" class="angela-cat-face">🐱</div>
                 </div>
             </div>
 
-            <div class="mochi-stats">
-                <div class="stat-bar-group">
-                    <label>Lapar 🐟</label>
-                    <div class="progress"><div id="barHunger" class="fill" style="width: 80%;"></div></div>
-                    <span id="txtHunger">80%</span>
-                </div>
-                <div class="stat-bar-group">
-                    <label>Kebersihan 🧼</label>
-                    <div class="progress"><div id="barHygiene" class="fill" style="width: 70%;"></div></div>
-                    <span id="txtHygiene">70%</span>
-                </div>
-                <div class="stat-bar-group">
-                    <label>Kasih Sayang 💖</label>
-                    <div class="progress"><div id="barLove" class="fill" style="width: 90%;"></div></div>
-                    <span id="txtLove">90%</span>
-                </div>
-            </div>
-
-            <div class="mochi-actions">
-                <button id="btnFeedTool" class="btn-action-tool">🐟 Beri Makan</button>
-                <button id="btnBathTool" class="btn-action-tool">🧽 Mandikan</button>
-                <button id="btnPlayPet" class="btn-action-tool">💖 Puk-puk</button>
+            <!-- STATUS BAR Bawah Persis Talking Angela -->
+            <div class="angela-bottom-bar">
+                <button id="btnFeedTool" class="angela-btn-stat">
+                    <span class="stat-icon">🍴</span>
+                    <span class="stat-val" id="txtHunger">82%</span>
+                </button>
+                <button id="btnBathTool" class="angela-btn-stat">
+                    <span class="stat-icon">🚽</span>
+                    <span class="stat-val" id="txtHygiene">70%</span>
+                </button>
+                <button id="btnPlayPet" class="angela-btn-stat">
+                    <span class="stat-icon">✨</span>
+                    <span class="stat-val" id="txtLove">90%</span>
+                </button>
             </div>
         </div>
     </div>
+
+    <!-- BOTTOM NAVBAR STIKER TETAP -->
+    <nav id="globalBottomNav" class="bottom-nav hidden">
+        <button id="navHome" class="nav-item active">Home</button>
+        <button id="navJourney" class="nav-item">Our Journey</button>
+        <button id="navMemories" class="nav-item">Memories</button>
+        <button id="navHeartnotes" class="nav-item">Heartnotes</button>
+    </nav>
 
     <!-- MODALS -->
     <div id="wishlistModal" class="modal hidden">
@@ -325,39 +302,39 @@
         </div>
     </div>
 
-    <!-- MODAL EXPRESS LOVE (INTERAKTIF DENGAN BOX & ANIMASI LENGKAP) -->
+    <!-- MODAL EXPRESS LOVE (GRID BOX BISA DIKLIK) -->
     <div id="hugModal" class="modal hidden">
         <div class="modal-content text-center">
             <button id="closeHugModal" class="close-btn">&times;</button>
             <h3>Kirim Express Love 💖</h3>
-            <p style="margin-bottom:12px; font-size:0.85rem; color:#8c7a6b;">Pilih rasa sayang yang ingin dikirimkan sekarang:</p>
+            <p style="margin-bottom:12px; font-size:0.85rem; color:#8c7a6b;">Pilih rasa sayang yang ingin dikirimkan:</p>
             
             <div class="express-love-grid">
-                <div class="express-box" data-type="Pelukan Hangat 🫂" data-icon="🫂">
+                <div class="express-box" data-type="Pelukan Hangat 🫂">
                     <span class="anim-icon">🫂</span>
                     <span class="box-label">Pelukan Hangat</span>
                 </div>
-                <div class="express-box" data-type="Ciuman Manis 💋" data-icon="💋">
+                <div class="express-box" data-type="Ciuman Manis 💋">
                     <span class="anim-icon">💋</span>
                     <span class="box-label">Ciuman Manis</span>
                 </div>
-                <div class="express-box" data-type="Pat-Pat 🖐️" data-icon="🖐️">
+                <div class="express-box" data-type="Pat-Pat 🖐️">
                     <span class="anim-icon">🖐️</span>
                     <span class="box-label">Pat-Pat</span>
                 </div>
-                <div class="express-box" data-type="Genggam Tangan 🤝" data-icon="🤝">
+                <div class="express-box" data-type="Pegang Tangan 🤝">
                     <span class="anim-icon">🤝</span>
                     <span class="box-label">Pegang Tangan</span>
                 </div>
-                <div class="express-box" data-type="Usap Kepala 💆‍♂️" data-icon="💆‍♂️">
+                <div class="express-box" data-type="Usap Kepala 💆‍♂️">
                     <span class="anim-icon">💆‍♂️</span>
                     <span class="box-label">Usap Kepala</span>
                 </div>
-                <div class="express-box" data-type="Peluk Kangen 🥺" data-icon="🥺">
+                <div class="express-box" data-type="Peluk Kangen 🥺">
                     <span class="anim-icon">🥺</span>
                     <span class="box-label">Peluk Kangen</span>
                 </div>
-                <div class="express-box" data-type="Cubit Pipi Gemas 🤏" data-icon="🤏">
+                <div class="express-box" data-type="Cubit Pipi Gemas 🤏">
                     <span class="anim-icon">🤏</span>
                     <span class="box-label">Cubit Pipi Gemas</span>
                 </div>
@@ -365,7 +342,7 @@
         </div>
     </div>
 
-    <!-- MODAL DAILY CHECK IN (EXPRESSI LENGKAP DALAM BOX) -->
+    <!-- MODAL DAILY CHECK IN (GRID BOX BISA DIKLIK) -->
     <div id="moodModal" class="modal hidden">
         <div class="modal-content text-center">
             <button id="closeMoodModal" class="close-btn">&times;</button>
@@ -373,47 +350,47 @@
             <p style="margin-bottom:12px; font-size:0.85rem; color:#8c7a6b;">Bagaimana perasaanmu hari ini?</p>
 
             <div class="mood-box-grid">
-                <div class="mood-box selected" data-mood="😄 Happy" data-icon="😄">
+                <div class="mood-box selected" data-mood="😄 Happy">
                     <span class="anim-icon">😄</span>
                     <span class="mood-label">Happy</span>
                 </div>
-                <div class="mood-box" data-mood="🥰 Loved" data-icon="🥰">
+                <div class="mood-box" data-mood="🥰 Loved">
                     <span class="anim-icon">🥰</span>
                     <span class="mood-label">Loved</span>
                 </div>
-                <div class="mood-box" data-mood="😌 Calm" data-icon="😌">
+                <div class="mood-box" data-mood="😌 Calm">
                     <span class="anim-icon">😌</span>
                     <span class="mood-label">Calm</span>
                 </div>
-                <div class="mood-box" data-mood="🤩 Excited" data-icon="🤩">
+                <div class="mood-box" data-mood="🤩 Excited">
                     <span class="anim-icon">🤩</span>
                     <span class="mood-label">Excited</span>
                 </div>
-                <div class="mood-box" data-mood="😴 Tired" data-icon="😴">
+                <div class="mood-box" data-mood="😴 Tired">
                     <span class="anim-icon">😴</span>
                     <span class="mood-label">Tired</span>
                 </div>
-                <div class="mood-box" data-mood="😔 Sad" data-icon="😔">
+                <div class="mood-box" data-mood="😔 Sad">
                     <span class="anim-icon">😔</span>
                     <span class="mood-label">Sad</span>
                 </div>
-                <div class="mood-box" data-mood="🥺 Need You" data-icon="🥺">
+                <div class="mood-box" data-mood="🥺 Need You">
                     <span class="anim-icon">🥺</span>
                     <span class="mood-label">Need You</span>
                 </div>
-                <div class="mood-box" data-mood="😤 Annoyed" data-icon="😤">
+                <div class="mood-box" data-mood="😤 Annoyed">
                     <span class="anim-icon">😤</span>
                     <span class="mood-label">Annoyed</span>
                 </div>
-                <div class="mood-box" data-mood="😵‍💫 Overwhelmed" data-icon="😵‍💫">
+                <div class="mood-box" data-mood="😵‍💫 Overwhelmed">
                     <span class="anim-icon">😵‍💫</span>
                     <span class="mood-label">Overwhelmed</span>
                 </div>
-                <div class="mood-box" data-mood="🥹 Miss You" data-icon="🥹">
+                <div class="mood-box" data-mood="🥹 Miss You">
                     <span class="anim-icon">🥹</span>
                     <span class="mood-label">Miss You</span>
                 </div>
-                <div class="mood-box" data-mood="🤗 Need a Hug" data-icon="🤗">
+                <div class="mood-box" data-mood="🤗 Need a Hug">
                     <span class="anim-icon">🤗</span>
                     <span class="mood-label">Need a Hug</span>
                 </div>
@@ -424,7 +401,7 @@
         </div>
     </div>
 
-    <!-- MODAL VIEWER UNTUK BUKA FOTO FULLSCREEN (MEMORIES & PAP) -->
+    <!-- MODAL VIEWER FULLSCREEN -->
     <div id="imageViewerModal" class="modal hidden">
         <div class="modal-content image-viewer-content">
             <button id="closeImageViewer" class="close-btn">&times;</button>

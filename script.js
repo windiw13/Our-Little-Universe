@@ -30,8 +30,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const tabRegister = document.getElementById('tabRegister');
     const registerForm = document.getElementById('registerForm');
     const loginForm = document.getElementById('loginForm');
+    const globalBottomNav = document.getElementById('globalBottomNav');
 
-    // MODAL IMAGE VIEWER (FULLSCREEN FOTO)
+    // MODAL IMAGE VIEWER
     const imageViewerModal = document.getElementById('imageViewerModal');
     const closeImageViewer = document.getElementById('closeImageViewer');
     const viewerImage = document.getElementById('viewerImage');
@@ -79,7 +80,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // TAB TOGGLE LOGIN/REGISTER
+    // TAB TOGGLE
     if (tabLogin && tabRegister && loginForm && registerForm) {
         tabLogin.addEventListener('click', () => {
             tabLogin.classList.add('active');
@@ -151,7 +152,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // CREATE COUPLE SPACE
+    // CREATE SPACE
     document.getElementById('btnCreateSpace')?.addEventListener('click', async () => {
         const userId = auth.currentUser?.uid || currentUserData?.uid || "user-" + Date.now();
         const nickname = currentUserData?.nickname || "Diw";
@@ -177,23 +178,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 partner2_name: null,
                 status: "waiting",
                 startDate: null,
-                mochi: { hunger: 80, hygiene: 70, love: 90 },
+                mochi: { hunger: 82, hygiene: 70, love: 90 },
                 createdAt: new Date()
             });
 
-            await setDoc(doc(db, "users", userId), { 
-                uid: userId, 
-                nickname: nickname, 
-                coupleSpaceId: code 
-            }, { merge: true });
-
+            await setDoc(doc(db, "users", userId), { uid: userId, nickname: nickname, coupleSpaceId: code }, { merge: true });
             listenForPartner(code);
         } catch (err) {
-            console.log("Firestore background sync note:", err.message);
+            console.log("Firestore sync:", err.message);
         }
     });
 
-    // JOIN COUPLE SPACE
+    // JOIN SPACE
     document.getElementById('btnJoinSpace')?.addEventListener('click', async () => {
         const userId = auth.currentUser?.uid || currentUserData?.uid || "user-" + Date.now();
         const nickname = currentUserData?.nickname || "Rama";
@@ -213,12 +209,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     status: "connected"
                 });
 
-                await setDoc(doc(db, "users", userId), { 
-                    uid: userId, 
-                    nickname: nickname, 
-                    coupleSpaceId: inputCode 
-                }, { merge: true });
-
+                await setDoc(doc(db, "users", userId), { uid: userId, nickname: nickname, coupleSpaceId: inputCode }, { merge: true });
                 const data = spaceSnap.data();
                 showSuccessScreen(data.partner1_name, nickname);
             } else {
@@ -276,6 +267,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         const homeScreen = document.getElementById('homeScreen');
         if (homeScreen) homeScreen.classList.remove('hidden');
+        if (globalBottomNav) globalBottomNav.classList.remove('hidden');
 
         if (!currentUserData) currentUserData = { nickname: "Diw", coupleSpaceId: "DEMO" };
 
@@ -296,15 +288,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const greetingEl = document.getElementById('timeGreeting');
         if (!greetingEl) return;
 
-        if (hour >= 5 && hour < 12) {
-            greetingEl.innerText = "Good Morning! ☀️";
-        } else if (hour >= 12 && hour < 17) {
-            greetingEl.innerText = "Good Afternoon! 🌤️";
-        } else if (hour >= 17 && hour < 21) {
-            greetingEl.innerText = "Good Evening! 🌙";
-        } else {
-            greetingEl.innerText = "Good Night! ✨";
-        }
+        if (hour >= 5 && hour < 12) greetingEl.innerText = "Good Morning! ☀️";
+        else if (hour >= 12 && hour < 17) greetingEl.innerText = "Good Afternoon! 🌤️";
+        else if (hour >= 17 && hour < 21) greetingEl.innerText = "Good Evening! 🌙";
+        else greetingEl.innerText = "Good Night! ✨";
     }
 
     async function updateUserPresence(spaceId) {
@@ -333,20 +320,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 const diffMinutes = Math.floor((now - lastActive) / 60000);
 
                 if (statusEl) {
-                    if (diffMinutes < 3) {
-                        statusEl.innerText = `🟢 ${partnerName} Aktif sekarang`;
-                    } else if (diffMinutes < 60) {
-                        statusEl.innerText = `🟡 ${partnerName} Aktif ${diffMinutes} mnt lalu`;
-                    } else {
-                        const diffHours = Math.floor(diffMinutes / 60);
-                        statusEl.innerText = `⚪ ${partnerName} Aktif ${diffHours} jam lalu`;
-                    }
+                    if (diffMinutes < 3) statusEl.innerText = `🟢 ${partnerName} Aktif sekarang`;
+                    else if (diffMinutes < 60) statusEl.innerText = `🟡 ${partnerName} Aktif ${diffMinutes} mnt lalu`;
+                    else statusEl.innerText = `⚪ ${partnerName} Aktif ${Math.floor(diffMinutes / 60)} jam lalu`;
                 }
             }
         });
     }
 
-    // MODAL DIALOG CONTROLLERS (EXPRESS LOVE, MOOD, WISHLIST, MOCHI)
+    // MODAL DIALOG CONTROLLERS
     const hugModal = document.getElementById('hugModal');
     const moodModal = document.getElementById('moodModal');
     const wishlistModal = document.getElementById('wishlistModal');
@@ -370,10 +352,10 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('homeScreen')?.classList.remove('hidden');
     });
 
-    // EXPRESS LOVE SEND
-    document.querySelectorAll('.hug-opt-btn').forEach(btn => {
-        btn.addEventListener('click', async () => {
-            const loveType = btn.getAttribute('data-type');
+    // EXPRESS LOVE SEND (BOX DAPAT DIKLIK)
+    document.querySelectorAll('.express-box').forEach(box => {
+        box.addEventListener('click', async () => {
+            const loveType = box.getAttribute('data-type');
             hugModal?.classList.add('hidden');
 
             if (currentUserData && currentUserData.coupleSpaceId) {
@@ -390,13 +372,13 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // MOOD SEND
-    let selectedMood = "😊 Bahagia";
-    document.querySelectorAll('.mood-opt').forEach(btn => {
-        btn.addEventListener('click', () => {
-            document.querySelectorAll('.mood-opt').forEach(b => b.classList.remove('selected'));
-            btn.classList.add('selected');
-            selectedMood = btn.getAttribute('data-mood');
+    // DAILY CHECK IN (BOX DAPAT DIKLIK)
+    let selectedMood = "😄 Happy";
+    document.querySelectorAll('.mood-box').forEach(box => {
+        box.addEventListener('click', () => {
+            document.querySelectorAll('.mood-box').forEach(b => b.classList.remove('selected'));
+            box.classList.add('selected');
+            selectedMood = box.getAttribute('data-mood');
         });
     });
 
@@ -405,7 +387,7 @@ document.addEventListener('DOMContentLoaded', () => {
         moodModal?.classList.add('hidden');
 
         if (currentUserData && currentUserData.coupleSpaceId) {
-            const msgText = note ? `Mood: ${selectedMood} ("${note}")` : `Mood: ${selectedMood}`;
+            const msgText = note ? `Mood Check-In: ${selectedMood} ("${note}")` : `Mood Check-In: ${selectedMood}`;
             await addDoc(collection(db, "couple_spaces", currentUserData.coupleSpaceId, "notifications"), {
                 type: "mood",
                 senderUid: currentUserData.uid || auth.currentUser?.uid || "anon",
@@ -417,23 +399,130 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // SCREEN SWITCHING
+    // MOCHI INTERAKTIF (BISA DRAG/GESER SEPERTI TALKING ANGELA)
+    const draggableMochi = document.getElementById('draggableMochi');
+    const mochiBubble = document.getElementById('mochiBubble');
+    const mochiAvatarFace = document.getElementById('mochiAvatarFace');
+
+    let isDragging = false;
+    let startX, currentX = 0;
+
+    if (draggableMochi) {
+        draggableMochi.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            startX = e.clientX - currentX;
+        });
+
+        window.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            currentX = e.clientX - startX;
+            draggableMochi.style.transform = `translateX(${currentX}px)`;
+        });
+
+        window.addEventListener('mouseup', () => {
+            if (isDragging) {
+                isDragging = false;
+                if (mochiBubble) mochiBubble.innerText = '"Purrr... Wiii digeser-geser!"';
+                if (mochiAvatarFace) mochiAvatarFace.innerText = "😸";
+                setTimeout(() => {
+                    draggableMochi.style.transform = `translateX(0px)`;
+                    currentX = 0;
+                    if (mochiAvatarFace) mochiAvatarFace.innerText = "🐱";
+                    if (mochiBubble) mochiBubble.innerText = '"Meow! Elus atau geser aku ya! 🤍"';
+                }, 1200);
+            }
+        });
+
+        // Touch event support for mobile screens
+        draggableMochi.addEventListener('touchstart', (e) => {
+            isDragging = true;
+            startX = e.touches[0].clientX - currentX;
+        });
+
+        window.addEventListener('touchmove', (e) => {
+            if (!isDragging) return;
+            currentX = e.touches[0].clientX - startX;
+            draggableMochi.style.transform = `translateX(${currentX}px)`;
+        });
+
+        window.addEventListener('touchend', () => {
+            if (isDragging) {
+                isDragging = false;
+                if (mochiBubble) mochiBubble.innerText = '"Purrr... Wiii digeser-geser!"';
+                if (mochiAvatarFace) mochiAvatarFace.innerText = "😸";
+                setTimeout(() => {
+                    draggableMochi.style.transform = `translateX(0px)`;
+                    currentX = 0;
+                    if (mochiAvatarFace) mochiAvatarFace.innerText = "🐱";
+                    if (mochiBubble) mochiBubble.innerText = '"Meow! Elus atau geser aku ya! 🤍"';
+                }, 1200);
+            }
+        });
+    }
+
+    document.getElementById('btnFeedTool')?.addEventListener('click', async () => {
+        if (mochiBubble) mochiBubble.innerText = '"Nyam nyam! Makanan lezat!"';
+        if (mochiAvatarFace) mochiAvatarFace.innerText = "😸";
+        if (currentUserData?.coupleSpaceId) {
+            await addDoc(collection(db, "couple_spaces", currentUserData.coupleSpaceId, "notifications"), {
+                type: "mochi",
+                senderUid: currentUserData.uid || "anon",
+                senderName: currentUserData.nickname || "User",
+                message: "memberi makan Mochi 🍽️",
+                timestamp: serverTimestamp()
+            });
+        }
+    });
+
+    document.getElementById('btnBathTool')?.addEventListener('click', async () => {
+        if (mochiBubble) mochiBubble.innerText = '"Byur! Mochi wangi banget!"';
+        if (mochiAvatarFace) mochiAvatarFace.innerText = "🧼";
+        if (currentUserData?.coupleSpaceId) {
+            await addDoc(collection(db, "couple_spaces", currentUserData.coupleSpaceId, "notifications"), {
+                type: "mochi",
+                senderUid: currentUserData.uid || "anon",
+                senderName: currentUserData.nickname || "User",
+                message: "memandikan Mochi 🚽",
+                timestamp: serverTimestamp()
+            });
+        }
+    });
+
+    document.getElementById('btnPlayPet')?.addEventListener('click', async () => {
+        if (mochiBubble) mochiBubble.innerText = '"Purrr... Puk-puknya hangat!"';
+        if (mochiAvatarFace) mochiAvatarFace.innerText = "😻";
+        if (currentUserData?.coupleSpaceId) {
+            await addDoc(collection(db, "couple_spaces", currentUserData.coupleSpaceId, "notifications"), {
+                type: "mochi",
+                senderUid: currentUserData.uid || "anon",
+                senderName: currentUserData.nickname || "User",
+                message: "mengelus Mochi ✨",
+                timestamp: serverTimestamp()
+            });
+        }
+    });
+
+    // SCREEN SWITCHING (MENJAGA NAVBAR TETAP KONSISTEN)
     const homeScreen = document.getElementById('homeScreen');
     const journeyScreen = document.getElementById('journeyScreen');
     const memoriesScreen = document.getElementById('memoriesScreen');
     const heartnotesScreen = document.getElementById('heartnotesScreen');
+    const petScreen = document.getElementById('petScreen');
 
-    function showSubScreen(screenToShow) {
-        [homeScreen, journeyScreen, memoriesScreen, heartnotesScreen].forEach(s => s?.classList.add('hidden'));
+    function showSubScreen(screenToShow, activeNavId) {
+        [homeScreen, journeyScreen, memoriesScreen, heartnotesScreen, petScreen].forEach(s => s?.classList.add('hidden'));
         screenToShow?.classList.remove('hidden');
+
+        document.querySelectorAll('.nav-item').forEach(btn => btn.classList.remove('active'));
+        if (activeNavId) document.getElementById(activeNavId)?.classList.add('active');
     }
 
-    document.querySelectorAll('[id^="navHome"]').forEach(btn => btn.addEventListener('click', () => showSubScreen(homeScreen)));
-    document.querySelectorAll('[id^="navJourney"]').forEach(btn => btn.addEventListener('click', () => showSubScreen(journeyScreen)));
-    document.querySelectorAll('[id^="navMemories"]').forEach(btn => btn.addEventListener('click', () => showSubScreen(memoriesScreen)));
-    document.querySelectorAll('[id^="navHeartnotes"]').forEach(btn => btn.addEventListener('click', () => showSubScreen(heartnotesScreen)));
+    document.getElementById('navHome')?.addEventListener('click', () => showSubScreen(homeScreen, 'navHome'));
+    document.getElementById('navJourney')?.addEventListener('click', () => showSubScreen(journeyScreen, 'navJourney'));
+    document.getElementById('navMemories')?.addEventListener('click', () => showSubScreen(memoriesScreen, 'navMemories'));
+    document.getElementById('navHeartnotes')?.addEventListener('click', () => showSubScreen(heartnotesScreen, 'navHeartnotes'));
 
-    // OUR JOURNEY (BUBBLE CHAT + TANGGAL/HARI PEMISAH)
+    // OUR JOURNEY
     let journeyBase64Img = "";
 
     document.getElementById('btnOpenAddJourney')?.addEventListener('click', () => {
@@ -505,7 +594,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function listenJourneyPAP(spaceId) {
         if (!spaceId) return;
         const ref = collection(db, "couple_spaces", spaceId, "journey_pap");
-        const q = query(ref, orderBy("createdAt", "asc")); // Urut dari terlama ke terbaru seperti chat
+        const q = query(ref, orderBy("createdAt", "asc"));
 
         onSnapshot(q, (snapshot) => {
             const container = document.getElementById('journeyTimelineContainer');
@@ -523,12 +612,9 @@ document.addEventListener('DOMContentLoaded', () => {
             snapshot.docs.forEach(docSnap => {
                 const data = docSnap.data();
                 const dateObj = data.createdAt ? data.createdAt.toDate() : new Date();
-                
-                // Format Hari/Tanggal untuk Pemisah Chat
                 const dateHeaderStr = dateObj.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
                 const timeStr = dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
-                // Jika tanggal berubah, tampilkan Pemisah Hari/Tanggal di tengah
                 if (dateHeaderStr !== lastDateStr) {
                     const divider = document.createElement('div');
                     divider.className = 'date-divider';
@@ -563,7 +649,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // MEMORIES ALBUM (FEED 1:1 DENGAN FRAME & KETERANGAN)
+    // MEMORIES ALBUM
     let memBase64Img = "";
 
     document.getElementById('btnOpenAddMemory')?.addEventListener('click', () => {
@@ -844,30 +930,24 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!spaceId) return;
         onSnapshot(doc(db, "couple_spaces", spaceId), (docSnap) => {
             if (docSnap.exists()) {
-                const mochi = docSnap.data().mochi || { hunger: 80, hygiene: 70, love: 90 };
+                const mochi = docSnap.data().mochi || { hunger: 82, hygiene: 70, love: 90 };
                 updateMochiUI(mochi);
             }
         });
     }
 
     function updateMochiUI(mochi) {
-        const barH = document.getElementById('barHunger');
         const txtH = document.getElementById('txtHunger');
-        if (barH) barH.style.width = mochi.hunger + '%';
-        if (txtH) txtH.innerText = mochi.hunger + '%';
+        if (txtH) txtH.innerText = (mochi.hunger || 82) + '%';
 
-        const barHy = document.getElementById('barHygiene');
         const txtHy = document.getElementById('txtHygiene');
-        if (barHy) barHy.style.width = mochi.hygiene + '%';
-        if (txtHy) txtHy.innerText = mochi.hygiene + '%';
+        if (txtHy) txtHy.innerText = (mochi.hygiene || 70) + '%';
 
-        const barL = document.getElementById('barLove');
         const txtL = document.getElementById('txtLove');
-        if (barL) barL.style.width = mochi.love + '%';
-        if (txtL) txtL.innerText = mochi.love + '%';
+        if (txtL) txtL.innerText = (mochi.love || 90) + '%';
     }
 
-    // RIWAYAT AKTIVITAS (PER-BUBBLE BEDA SENDER)
+    // RIWAYAT AKTIVITAS
     function listenRealtimeNotifications(spaceId) {
         if (!spaceId) return;
         const notifRef = collection(db, "couple_spaces", spaceId, "notifications");
