@@ -60,17 +60,26 @@ document.addEventListener('DOMContentLoaded', () => {
             const userDoc = await getDoc(doc(db, "users", user.uid)).catch(() => null);
             if (userDoc && userDoc.exists()) {
                 currentUserData = userDoc.data();
+                updateGreetingName();
                 if (currentUserData.coupleSpaceId) {
                     authCard?.classList.add('hidden');
                     checkConnectionStatus(currentUserData.coupleSpaceId);
                 }
             } else {
                 currentUserData = { uid: user.uid, nickname: "Diw" };
+                updateGreetingName();
             }
         }
     });
 
-    // TAB TOGGLE
+    function updateGreetingName() {
+        const userGreeting = document.getElementById('homeUserGreeting');
+        if (userGreeting && currentUserData) {
+            userGreeting.innerText = (currentUserData.nickname || "Diw") + " ❤️";
+        }
+    }
+
+    // TAB TOGGLE LOGIN/REGISTER
     if (tabLogin && tabRegister && loginForm && registerForm) {
         tabLogin.addEventListener('click', () => {
             tabLogin.classList.add('active');
@@ -92,7 +101,7 @@ document.addEventListener('DOMContentLoaded', () => {
         registerForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const fullName = document.getElementById('regFullName')?.value;
-            const nickname = document.getElementById('regNickname')?.value;
+            const nickname = document.getElementById('regNickname')?.value || "Diw";
             const location = document.getElementById('regLocation')?.value;
             const birthDate = document.getElementById('regBirthDate')?.value;
             const email = document.getElementById('regEmail')?.value;
@@ -105,6 +114,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 currentUserData = { uid, fullName, nickname, location, birthDate, email, coupleSpaceId: null };
                 await setDoc(doc(db, "users", uid), currentUserData, { merge: true }).catch(() => {});
 
+                updateGreetingName();
                 authCard?.classList.add('hidden');
                 coupleCard?.classList.remove('hidden');
             } catch (error) {
@@ -127,6 +137,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const userDoc = await getDoc(doc(db, "users", uid)).catch(() => null);
                 currentUserData = (userDoc && userDoc.exists()) ? userDoc.data() : { uid, nickname: "Diw" };
 
+                updateGreetingName();
                 authCard?.classList.add('hidden');
 
                 if (currentUserData && currentUserData.coupleSpaceId) {
@@ -154,6 +165,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (!currentUserData) currentUserData = { uid: userId, nickname: nickname, coupleSpaceId: code };
         else currentUserData.coupleSpaceId = code;
+
+        updateGreetingName();
 
         try {
             await setDoc(doc(db, "couple_spaces", code), {
@@ -266,16 +279,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (!currentUserData) currentUserData = { nickname: "Diw", coupleSpaceId: "DEMO" };
 
-        const userGreeting = document.getElementById('homeUserGreeting');
-        if (userGreeting) userGreeting.innerText = currentUserData.nickname + " ❤️";
-
+        updateGreetingName();
         updateTimeGreeting();
         updateUserPresence(currentUserData.coupleSpaceId);
         listenRealtimeNotifications(currentUserData.coupleSpaceId);
         listenStartDate(currentUserData.coupleSpaceId);
         listenMochiStats(currentUserData.coupleSpaceId);
         listenWishlist(currentUserData.coupleSpaceId);
-        checkOnThisDayMemoriesOnly(currentUserData.coupleSpaceId);
         listenJourneyPAP(currentUserData.coupleSpaceId);
         listenMemoriesAlbum(currentUserData.coupleSpaceId);
         listenHeartnotes(currentUserData.coupleSpaceId);
@@ -336,6 +346,77 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // MODAL DIALOG CONTROLLERS (EXPRESS LOVE, MOOD, WISHLIST, MOCHI)
+    const hugModal = document.getElementById('hugModal');
+    const moodModal = document.getElementById('moodModal');
+    const wishlistModal = document.getElementById('wishlistModal');
+
+    document.getElementById('btnHugModal')?.addEventListener('click', () => hugModal?.classList.remove('hidden'));
+    document.getElementById('closeHugModal')?.addEventListener('click', () => hugModal?.classList.add('hidden'));
+
+    document.getElementById('btnMoodModal')?.addEventListener('click', () => moodModal?.classList.remove('hidden'));
+    document.getElementById('closeMoodModal')?.addEventListener('click', () => moodModal?.classList.add('hidden'));
+
+    document.getElementById('btnWishlistModal')?.addEventListener('click', () => wishlistModal?.classList.remove('hidden'));
+    document.getElementById('closeWishlistModal')?.addEventListener('click', () => wishlistModal?.classList.add('hidden'));
+
+    document.getElementById('btnPetModal')?.addEventListener('click', () => {
+        document.getElementById('homeScreen')?.classList.add('hidden');
+        document.getElementById('petScreen')?.classList.remove('hidden');
+    });
+
+    document.getElementById('btnBackFromPet')?.addEventListener('click', () => {
+        document.getElementById('petScreen')?.classList.add('hidden');
+        document.getElementById('homeScreen')?.classList.remove('hidden');
+    });
+
+    // EXPRESS LOVE SEND
+    document.querySelectorAll('.hug-opt-btn').forEach(btn => {
+        btn.addEventListener('click', async () => {
+            const loveType = btn.getAttribute('data-type');
+            hugModal?.classList.add('hidden');
+
+            if (currentUserData && currentUserData.coupleSpaceId) {
+                await addDoc(collection(db, "couple_spaces", currentUserData.coupleSpaceId, "notifications"), {
+                    type: "express",
+                    senderUid: currentUserData.uid || auth.currentUser?.uid || "anon",
+                    senderName: currentUserData.nickname || "User",
+                    message: `mengirimkan ${loveType}`,
+                    timestamp: serverTimestamp()
+                });
+
+                alert(`Berhasil mengirimkan ${loveType}! 💖`);
+            }
+        });
+    });
+
+    // MOOD SEND
+    let selectedMood = "😊 Bahagia";
+    document.querySelectorAll('.mood-opt').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.mood-opt').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            selectedMood = btn.getAttribute('data-mood');
+        });
+    });
+
+    document.getElementById('btnSaveMood')?.addEventListener('click', async () => {
+        const note = document.getElementById('moodNoteInput')?.value;
+        moodModal?.classList.add('hidden');
+
+        if (currentUserData && currentUserData.coupleSpaceId) {
+            const msgText = note ? `Mood: ${selectedMood} ("${note}")` : `Mood: ${selectedMood}`;
+            await addDoc(collection(db, "couple_spaces", currentUserData.coupleSpaceId, "notifications"), {
+                type: "mood",
+                senderUid: currentUserData.uid || auth.currentUser?.uid || "anon",
+                senderName: currentUserData.nickname || "User",
+                message: msgText,
+                timestamp: serverTimestamp()
+            });
+            alert(`Mood hari ini (${selectedMood}) tersimpan! 🤍`);
+        }
+    });
+
     // SCREEN SWITCHING
     const homeScreen = document.getElementById('homeScreen');
     const journeyScreen = document.getElementById('journeyScreen');
@@ -352,7 +433,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('[id^="navMemories"]').forEach(btn => btn.addEventListener('click', () => showSubScreen(memoriesScreen)));
     document.querySelectorAll('[id^="navHeartnotes"]').forEach(btn => btn.addEventListener('click', () => showSubScreen(heartnotesScreen)));
 
-    // OUR JOURNEY PAP
+    // OUR JOURNEY (BUBBLE CHAT + TANGGAL/HARI PEMISAH)
     let journeyBase64Img = "";
 
     document.getElementById('btnOpenAddJourney')?.addEventListener('click', () => {
@@ -398,6 +479,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 imgData: journeyBase64Img,
                 desc: desc,
                 author: currentUserData.nickname || "User",
+                authorUid: currentUserData.uid || auth.currentUser?.uid || "anon",
                 createdAt: serverTimestamp()
             });
 
@@ -405,7 +487,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 type: "pap",
                 senderUid: currentUserData.uid || auth.currentUser?.uid || "anon",
                 senderName: currentUserData.nickname || "User",
-                message: `mengirimkan PAP keseharian baru 📸`,
+                message: `mengirimkan PAP di Our Journey 📸`,
                 timestamp: serverTimestamp()
             });
 
@@ -423,7 +505,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function listenJourneyPAP(spaceId) {
         if (!spaceId) return;
         const ref = collection(db, "couple_spaces", spaceId, "journey_pap");
-        const q = query(ref, orderBy("createdAt", "desc"));
+        const q = query(ref, orderBy("createdAt", "asc")); // Urut dari terlama ke terbaru seperti chat
 
         onSnapshot(q, (snapshot) => {
             const container = document.getElementById('journeyTimelineContainer');
@@ -431,37 +513,57 @@ document.addEventListener('DOMContentLoaded', () => {
             container.innerHTML = '';
 
             if (snapshot.empty) {
-                container.innerHTML = '<p class="empty-act">Belum ada PAP keseharian. Kirim foto kegiatanmu yuk!</p>';
+                container.innerHTML = '<p class="empty-act">Belum ada PAP di Our Journey. Kirim foto kegiatanmu yuk!</p>';
                 return;
             }
+
+            const myUid = currentUserData?.uid || auth.currentUser?.uid;
+            let lastDateStr = "";
 
             snapshot.docs.forEach(docSnap => {
                 const data = docSnap.data();
                 const dateObj = data.createdAt ? data.createdAt.toDate() : new Date();
-                const timeStr = dateObj.toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' });
+                
+                // Format Hari/Tanggal untuk Pemisah Chat
+                const dateHeaderStr = dateObj.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+                const timeStr = dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
-                const item = document.createElement('div');
-                item.className = 'pap-card';
-                item.innerHTML = `
-                    <div class="pap-header">
-                        <span class="pap-user">📸 ${data.author}</span>
-                        <span class="pap-time">${timeStr}</span>
+                // Jika tanggal berubah, tampilkan Pemisah Hari/Tanggal di tengah
+                if (dateHeaderStr !== lastDateStr) {
+                    const divider = document.createElement('div');
+                    divider.className = 'date-divider';
+                    divider.innerHTML = `<span>${dateHeaderStr}</span>`;
+                    container.appendChild(divider);
+                    lastDateStr = dateHeaderStr;
+                }
+
+                const isMyMessage = data.authorUid === myUid || data.author === currentUserData?.nickname;
+                const bubbleClass = isMyMessage ? 'sent' : 'received';
+
+                const card = document.createElement('div');
+                card.className = `journey-bubble ${bubbleClass}`;
+                card.innerHTML = `
+                    <div class="journey-header">
+                        <span class="journey-user">${isMyMessage ? 'Kamu' : data.author}</span>
+                        <span class="journey-time">${timeStr}</span>
                     </div>
-                    <img src="${data.imgData}" alt="PAP Keseharian" class="pap-img">
-                    ${data.desc ? `<div class="pap-desc">${data.desc}</div>` : ''}
+                    <img src="${data.imgData}" alt="PAP" class="journey-img">
+                    ${data.desc ? `<div class="journey-desc">${data.desc}</div>` : ''}
                 `;
 
-                const imgEl = item.querySelector('.pap-img');
+                const imgEl = card.querySelector('.journey-img');
                 imgEl.addEventListener('click', () => {
-                    openPhotoViewer(data.imgData, `PAP dari ${data.author} • ${timeStr}`, '', data.desc);
+                    openPhotoViewer(data.imgData, `PAP dari ${isMyMessage ? 'Kamu' : data.author} • ${timeStr}`, '', data.desc);
                 });
 
-                container.appendChild(item);
+                container.appendChild(card);
             });
+
+            container.scrollTop = container.scrollHeight;
         });
     }
 
-    // MEMORIES ALBUM
+    // MEMORIES ALBUM (FEED 1:1 DENGAN FRAME & KETERANGAN)
     let memBase64Img = "";
 
     document.getElementById('btnOpenAddMemory')?.addEventListener('click', () => {
@@ -507,7 +609,7 @@ document.addEventListener('DOMContentLoaded', () => {
         await addDoc(collection(db, "couple_spaces", currentUserData.coupleSpaceId, "memories"), {
             imgData: memBase64Img,
             date, title, desc,
-            author: currentUserData.nickname,
+            author: currentUserData.nickname || "Diw",
             createdAt: serverTimestamp()
         });
 
@@ -538,16 +640,18 @@ document.addEventListener('DOMContentLoaded', () => {
             snapshot.docs.forEach(docSnap => {
                 const data = docSnap.data();
                 const card = document.createElement('div');
-                card.className = 'mem-card';
+                card.className = 'mem-card-feed';
                 card.innerHTML = `
-                    <img src="${data.imgData}" alt="${data.title}">
-                    <span class="mem-date">📅 ${data.date}</span>
-                    <div class="mem-title">${data.title}</div>
-                    ${data.desc ? `<div class="mem-desc">"${data.desc}"</div>` : ''}
+                    <div class="mem-frame-box">
+                        <img src="${data.imgData}" alt="${data.title}">
+                    </div>
+                    <div class="mem-info-box">
+                        <span class="mem-date-badge">📅 ${data.date}</span>
+                        <div class="mem-feed-title">${data.title}</div>
+                    </div>
                 `;
 
-                const imgEl = card.querySelector('img');
-                imgEl.addEventListener('click', () => {
+                card.addEventListener('click', () => {
                     openPhotoViewer(data.imgData, `📅 ${data.date} • Oleh ${data.author || 'Diw/Rama'}`, data.title, data.desc);
                 });
 
@@ -556,7 +660,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // HEARTNOTES (CHAT BUBBLE STYLE)
+    // HEARTNOTES
     document.getElementById('btnOpenAddNote')?.addEventListener('click', () => {
         document.getElementById('addNoteForm')?.classList.toggle('hidden');
     });
@@ -637,47 +741,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    function checkOnThisDayMemoriesOnly(spaceId) {
-        if (!spaceId) return;
-        const today = new Date();
-        const currentMonthDay = `${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
-
-        const memRef = collection(db, "couple_spaces", spaceId, "memories");
-        onSnapshot(memRef, (snapshot) => {
-            const widget = document.getElementById('onThisDayWidget');
-            let matchFound = false;
-
-            snapshot.docs.forEach((docSnap) => {
-                const data = docSnap.data();
-                if (data.date) {
-                    const memDate = new Date(data.date);
-                    const memMonthDay = `${String(memDate.getMonth() + 1).padStart(2, '0')}-${String(memDate.getDate()).padStart(2, '0')}`;
-
-                    if (memMonthDay === currentMonthDay && memDate.getFullYear() < today.getFullYear()) {
-                        matchFound = true;
-                        const yearsAgo = today.getFullYear() - memDate.getFullYear();
-
-                        const titleEl = document.getElementById('otdTitle');
-                        const capEl = document.getElementById('otdCaption');
-                        if (titleEl) titleEl.innerText = `${yearsAgo} Tahun Lalu Hari Ini ✨`;
-                        if (capEl) capEl.innerText = `"${data.title}" ${data.desc ? '- ' + data.desc : ''}`;
-
-                        const imgEl = document.getElementById('otdImage');
-                        if (data.imgData && imgEl) {
-                            imgEl.src = data.imgData;
-                            imgEl.classList.remove('hidden');
-                            imgEl.onclick = () => openPhotoViewer(data.imgData, `${yearsAgo} Tahun Lalu Hari Ini ✨`, data.title, data.desc);
-                        }
-
-                        widget?.classList.remove('hidden');
-                    }
-                }
-            });
-
-            if (!matchFound) widget?.classList.add('hidden');
-        });
-    }
-
+    // TANGGAL BERSAMA
     const startDateInput = document.getElementById('startDateInput');
 
     function listenStartDate(spaceId) {
@@ -707,6 +771,28 @@ document.addEventListener('DOMContentLoaded', () => {
         const countEl = document.getElementById('daysTogetherCount');
         if (countEl) countEl.innerText = isNaN(diffDays) ? 0 : diffDays;
     }
+
+    // WISHLIST
+    const btnOpenAddWish = document.getElementById('btnOpenAddWish');
+    const addWishForm = document.getElementById('addWishForm');
+
+    btnOpenAddWish?.addEventListener('click', () => addWishForm?.classList.toggle('hidden'));
+
+    addWishForm?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const title = document.getElementById('wishTitleInput')?.value.trim();
+        const category = document.getElementById('wishCategorySelect')?.value;
+
+        if (!title || !currentUserData || !currentUserData.coupleSpaceId) return;
+
+        await addDoc(collection(db, "couple_spaces", currentUserData.coupleSpaceId, "wishlists"), {
+            title, category, author: currentUserData.nickname || "Diw", authorUid: currentUserData.uid || "anon", isDone: false, createdAt: serverTimestamp()
+        });
+
+        const titleIn = document.getElementById('wishTitleInput');
+        if (titleIn) titleIn.value = '';
+        addWishForm?.classList.add('hidden');
+    });
 
     function listenWishlist(spaceId) {
         if (!spaceId) return;
@@ -753,6 +839,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // MOCHI STATS
     function listenMochiStats(spaceId) {
         if (!spaceId) return;
         onSnapshot(doc(db, "couple_spaces", spaceId), (docSnap) => {
@@ -780,6 +867,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (txtL) txtL.innerText = mochi.love + '%';
     }
 
+    // RIWAYAT AKTIVITAS (PER-BUBBLE BEDA SENDER)
     function listenRealtimeNotifications(spaceId) {
         if (!spaceId) return;
         const notifRef = collection(db, "couple_spaces", spaceId, "notifications");
@@ -794,15 +882,26 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
+            const myUid = currentUserData?.uid || auth.currentUser?.uid;
+
             snapshot.docs.forEach((docSnap) => {
                 const data = docSnap.data();
                 const dateObj = data.timestamp ? data.timestamp.toDate() : new Date();
                 const timeStr = dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
-                const item = document.createElement('div');
-                item.className = 'act-item';
-                item.innerHTML = `<span class="act-user">${data.senderName}</span> ${data.message} <span class="act-time">${timeStr}</span>`;
-                if (logContainer) logContainer.appendChild(item);
+                const isMine = data.senderUid === myUid || data.senderName === currentUserData?.nickname;
+                const senderClass = isMine ? 'diw' : 'rama';
+
+                const bubble = document.createElement('div');
+                bubble.className = `act-bubble ${senderClass}`;
+                bubble.innerHTML = `
+                    <div class="act-header">
+                        <span class="act-sender ${senderClass}">${isMine ? 'Kamu (' + data.senderName + ')' : data.senderName}</span>
+                        <span class="act-time">${timeStr}</span>
+                    </div>
+                    <div class="act-body">${data.message}</div>
+                `;
+                if (logContainer) logContainer.appendChild(bubble);
             });
         });
     }

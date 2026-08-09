@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Our Little Universe</title>
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Quicksand:wght@500;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body>
 
@@ -125,34 +125,43 @@
             <div id="partnerActiveStatus" class="active-badge">⚪ Checking...</div>
         </header>
 
-        <!-- WIDGET HARI JADIAN -->
+        <!-- WIDGET HARI BERSAMA -->
         <div class="widget-card love-days-card">
-            <h3>Hari Bersama 💖</h3>
-            <div class="days-count"><span id="daysTogetherCount">0</span> <small>Hari</small></div>
+            <h3>TOGETHER SINCE</h3>
+            <div class="days-count"><span id="daysTogetherCount">707</span> <small>Hari</small></div>
             <div class="date-picker-inline">
-                <label>Tanggal Jadian:</label>
                 <input type="date" id="startDateInput">
             </div>
+            <p class="pixel-subtitle">Diw & Rama's Pixel World 🎮</p>
         </div>
 
-        <!-- ON THIS DAY WIDGET -->
-        <div id="onThisDayWidget" class="widget-card otd-card hidden">
-            <h3 id="otdTitle">Tahun Lalu Hari Ini ✨</h3>
-            <img id="otdImage" src="" alt="Kenangan Masa Lalu" class="hidden">
-            <p id="otdCaption"></p>
+        <!-- WIDGET LDR DISTANCE -->
+        <div class="widget-card ldr-card">
+            <div class="ldr-cities">
+                <div class="city-box">
+                    <h4>Sukabumi</h4>
+                    <p>Diw 🏡</p>
+                </div>
+                <div class="distance-badge">~143 KM</div>
+                <div class="city-box" style="text-align: right;">
+                    <h4>Bandung</h4>
+                    <p>Rama 🏢</p>
+                </div>
+            </div>
+            <p class="ldr-quote">"Distance means so little when someone means so much."</p>
         </div>
 
         <!-- ACTION BUTTONS GRID -->
         <div class="quick-actions-grid">
-            <button id="btnHugModal" class="action-btn">💖 Express Love</button>
-            <button id="btnMoodModal" class="action-btn">😊 Mood Hari Ini</button>
-            <button id="btnPetModal" class="action-btn">🐱 Ruang Mochi</button>
-            <button id="btnWishlistModal" class="action-btn">📜 Wishlist List</button>
+            <button id="btnHugModal" class="action-btn">Express Love</button>
+            <button id="btnMoodModal" class="action-btn">Daily Check</button>
+            <button id="btnPetModal" class="action-btn">Mochi</button>
+            <button id="btnWishlistModal" class="action-btn">Wishlist</button>
         </div>
 
-        <!-- LOG AKTIVITAS -->
+        <!-- LOG AKTIVITAS (PER BUBBLE SEPERTI CHAT) -->
         <div class="widget-card activity-card">
-            <h3>Aktivitas Terbaru 🔔</h3>
+            <h3>💌 Riwayat Aktivitas Kita</h3>
             <div id="activityLogList" class="act-log-list">
                 <p class="empty-act">Belum ada aktivitas hari ini.</p>
             </div>
@@ -160,17 +169,17 @@
 
         <!-- NAVBAR BOTTOM -->
         <nav class="bottom-nav">
-            <button id="navHome" class="nav-item active">🏠 Home</button>
-            <button id="navJourney" class="nav-item">📸 PAP Keseharian</button>
-            <button id="navMemories" class="nav-item">🖼️ Album</button>
-            <button id="navHeartnotes" class="nav-item">💌 Heartnotes</button>
+            <button id="navHome" class="nav-item active">Home</button>
+            <button id="navJourney" class="nav-item">Our Journey</button>
+            <button id="navMemories" class="nav-item">Memories</button>
+            <button id="navHeartnotes" class="nav-item">Heartnotes</button>
         </nav>
     </div>
 
-    <!-- SCREEN 2: OUR JOURNEY PAP -->
+    <!-- SCREEN 2: OUR JOURNEY (BUBBLE CHAT + TANGGAL/HARI) -->
     <div id="journeyScreen" class="main-screen hidden">
         <header class="app-header">
-            <h2>PAP Keseharian 📸</h2>
+            <h2>Our Journey 📸</h2>
             <button id="btnOpenAddJourney" class="btn-small">+ Kirim PAP</button>
         </header>
 
@@ -186,20 +195,20 @@
             <button type="submit" class="btn-primary">Kirimkan ke Pasangan 🚀</button>
         </form>
 
-        <div id="journeyTimelineContainer" class="timeline-container"></div>
+        <div id="journeyTimelineContainer" class="journey-chat-container"></div>
 
         <nav class="bottom-nav">
-            <button id="navHome2" onclick="document.getElementById('navHome').click()" class="nav-item">🏠 Home</button>
-            <button class="nav-item active">📸 PAP Keseharian</button>
-            <button id="navMemories2" onclick="document.getElementById('navMemories').click()" class="nav-item">🖼️ Album</button>
-            <button id="navHeartnotes2" onclick="document.getElementById('navHeartnotes').click()" class="nav-item">💌 Heartnotes</button>
+            <button onclick="document.getElementById('navHome').click()" class="nav-item">Home</button>
+            <button class="nav-item active">Our Journey</button>
+            <button onclick="document.getElementById('navMemories').click()" class="nav-item">Memories</button>
+            <button onclick="document.getElementById('navHeartnotes').click()" class="nav-item">Heartnotes</button>
         </nav>
     </div>
 
-    <!-- SCREEN 3: MEMORIES ALBUM -->
+    <!-- SCREEN 3: MEMORIES ALBUM (FEED 1:1 BARU GEDE KALO DIKLIK) -->
     <div id="memoriesScreen" class="main-screen hidden">
         <header class="app-header">
-            <h2>Album Kenangan 🖼️</h2>
+            <h2>Memories 🖼️</h2>
             <button id="btnOpenAddMemory" class="btn-small">+ Tambah Momen</button>
         </header>
 
@@ -217,17 +226,17 @@
             <button type="submit" class="btn-primary">Simpan ke Album 💖</button>
         </form>
 
-        <div id="memoriesGridContainer" class="memories-grid"></div>
+        <div id="memoriesGridContainer" class="memories-feed-grid"></div>
 
         <nav class="bottom-nav">
-            <button onclick="document.getElementById('navHome').click()" class="nav-item">🏠 Home</button>
-            <button onclick="document.getElementById('navJourney').click()" class="nav-item">📸 PAP Keseharian</button>
-            <button class="nav-item active">🖼️ Album</button>
-            <button onclick="document.getElementById('navHeartnotes').click()" class="nav-item">💌 Heartnotes</button>
+            <button onclick="document.getElementById('navHome').click()" class="nav-item">Home</button>
+            <button onclick="document.getElementById('navJourney').click()" class="nav-item">Our Journey</button>
+            <button class="nav-item active">Memories</button>
+            <button onclick="document.getElementById('navHeartnotes').click()" class="nav-item">Heartnotes</button>
         </nav>
     </div>
 
-    <!-- SCREEN 4: HEARTNOTES (CHAT BUBBLE STYLE) -->
+    <!-- SCREEN 4: HEARTNOTES -->
     <div id="heartnotesScreen" class="main-screen hidden">
         <header class="app-header">
             <h2>Heartnotes 💌</h2>
@@ -243,10 +252,10 @@
         <div id="notesContainer" class="notes-container"></div>
 
         <nav class="bottom-nav">
-            <button onclick="document.getElementById('navHome').click()" class="nav-item">🏠 Home</button>
-            <button onclick="document.getElementById('navJourney').click()" class="nav-item">📸 PAP Keseharian</button>
-            <button onclick="document.getElementById('navMemories').click()" class="nav-item">🖼️ Album</button>
-            <button class="nav-item active">💌 Heartnotes</button>
+            <button onclick="document.getElementById('navHome').click()" class="nav-item">Home</button>
+            <button onclick="document.getElementById('navJourney').click()" class="nav-item">Our Journey</button>
+            <button onclick="document.getElementById('navMemories').click()" class="nav-item">Memories</button>
+            <button class="nav-item active">Heartnotes</button>
         </nav>
     </div>
 
@@ -268,7 +277,6 @@
                         <span class="cat-eye">●</span>
                     </div>
                 </div>
-                <div id="draggableItem" class="draggable-item hidden">🐟</div>
             </div>
 
             <div class="mochi-stats">
@@ -297,7 +305,7 @@
         </div>
     </div>
 
-    <!-- MODAL WISHLIST -->
+    <!-- MODALS -->
     <div id="wishlistModal" class="modal hidden">
         <div class="modal-content">
             <button id="closeWishlistModal" class="close-btn">&times;</button>
@@ -319,12 +327,11 @@
         </div>
     </div>
 
-    <!-- MODAL EXPRESS LOVE -->
     <div id="hugModal" class="modal hidden">
         <div class="modal-content text-center">
             <button id="closeHugModal" class="close-btn">&times;</button>
             <h3>Kirim Express Love 💖</h3>
-            <p>Pilih rasa sayang yang ingin dikirimkan sekarang:</p>
+            <p style="margin-bottom:12px; font-size:0.85rem; color:#8c7a6b;">Pilih rasa sayang yang ingin dikirimkan sekarang:</p>
             <div class="hug-options">
                 <button class="hug-opt-btn" data-type="Pelukan Hangat 🫂">🫂 Pelukan Hangat</button>
                 <button class="hug-opt-btn" data-type="Ciuman Manis 💋">💋 Ciuman Manis</button>
@@ -334,7 +341,6 @@
         </div>
     </div>
 
-    <!-- MODAL MOOD -->
     <div id="moodModal" class="modal hidden">
         <div class="modal-content text-center">
             <button id="closeMoodModal" class="close-btn">&times;</button>
@@ -344,14 +350,14 @@
                 <button class="mood-opt" data-mood="🥰 Manja">🥰 Manja</button>
                 <button class="mood-opt" data-mood="😴 Capec">😴 Capec</button>
                 <button class="mood-opt" data-mood="🥺 Kangen">🥺 Kangen</button>
-                <button class="mood-opt" data-mood="😤 Meringis/Sebel">😤 Sebel</button>
+                <button class="mood-opt" data-mood="😤 Sebel">😤 Sebel</button>
             </div>
             <input type="text" id="moodNoteInput" placeholder="Catatan alasan mood (opsional)...">
-            <button id="btnSaveMood" class="btn-primary">Simpan Mood ✨</button>
+            <button id="btnSaveMood" class="btn-primary" style="margin-top:10px;">Simpan Mood ✨</button>
         </div>
     </div>
 
-    <!-- MODAL VIEWER UNTUK BUKA FOTO FULLSCREEN (PAP & MEMORIES) -->
+    <!-- MODAL VIEWER UNTUK BUKA FOTO FULLSCREEN (MEMORIES & PAP) -->
     <div id="imageViewerModal" class="modal hidden">
         <div class="modal-content image-viewer-content">
             <button id="closeImageViewer" class="close-btn">&times;</button>
